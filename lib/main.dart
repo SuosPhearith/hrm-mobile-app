@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mobile_app/screens/select_language_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:mobile_app/app_routes.dart';
 import 'package:mobile_app/middlewares/auth_middleware.dart';
@@ -48,7 +49,7 @@ class MyApp extends StatelessWidget {
         primaryColor: Color(0xFF002458),
         colorScheme: ColorScheme.light(
           primary: Color(0xFF002458),
-          secondary: Color(0xFFFFE082),
+          secondary: Color(0xFFD4AD38),
         ),
         textTheme: const TextTheme(
           bodyLarge: TextStyle(fontSize: 18),
@@ -82,11 +83,16 @@ final GoRouter _router = GoRouter(
       ],
     ),
 
-    // NO Bottom Navigation
+    // Private Routes
     GoRoute(
       path: AppRoutes.login,
       builder: (context, state) =>
           AuthMiddleware(child: const AuthLayout(child: LoginScreen())),
+    ),
+    GoRoute(
+      path: AppRoutes.selectLanguage,
+      builder: (context, state) => AuthMiddleware(
+          child: const AuthLayout(child: SelectLanguageScreen())),
     ),
   ],
   errorBuilder: (context, state) => Scaffold(
@@ -123,10 +129,10 @@ class _MainLayoutState extends State<MainLayout> {
           setState(() => _currentIndex = index);
         },
         type: BottomNavigationBarType.fixed,
-        selectedItemColor: Colors.blue,
+        selectedItemColor: Theme.of(context).colorScheme.secondary,
         unselectedItemColor: Colors.grey,
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home_filled), label: "Home"),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: "ទំព័រដើម"),
           BottomNavigationBarItem(icon: Icon(Icons.receipt), label: "Sale"),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
         ],

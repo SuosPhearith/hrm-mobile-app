@@ -8,6 +8,7 @@ class AuthProvider extends ChangeNotifier {
   String? _error;
   bool _isLoggedIn = false;
   bool _isChecking = false;
+  bool _isSelectingLanguage = false;
 
   // Services
   final FlutterSecureStorage _storage = FlutterSecureStorage();
@@ -18,12 +19,14 @@ class AuthProvider extends ChangeNotifier {
   String? get error => _error;
   bool get isLoggedIn => _isLoggedIn;
   bool get isChecking => _isChecking;
+  bool get isSelectingLanguage => _isSelectingLanguage;
 
   // Setters
 
   // Initialize
   AuthProvider() {
     handleCheckAuth();
+    handleSelectLanguage();
   }
   // Login
   Future<void> handleLogin(
@@ -46,7 +49,9 @@ class AuthProvider extends ChangeNotifier {
   // Logout
   Future<void> handleLogout() async {
     _isLoggedIn = false;
+    _isSelectingLanguage = false;
     _storage.delete(key: 'token');
+    _storage.delete(key: 'lang');
     notifyListeners();
   }
 
@@ -83,5 +88,26 @@ class AuthProvider extends ChangeNotifier {
     } catch (e) {
       rethrow;
     }
+  }
+
+  // Select Language
+  Future<void> handleSelectLanguage() async {
+    _isChecking = true;
+    notifyListeners();
+    String lang = await _storage.read(key: 'lang') ?? '';
+    if (lang.isNotEmpty) {
+      _isSelectingLanguage = true;
+      notifyListeners();
+      return;
+    }
+    _isSelectingLanguage = false;
+    _isChecking = false;
+    notifyListeners();
+  }
+
+  Future<void> handleSetLanguage(String lang) async {
+    await _storage.write(key: 'lang', value: lang);
+    _isSelectingLanguage = true;
+    notifyListeners();
   }
 }
