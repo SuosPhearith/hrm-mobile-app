@@ -48,7 +48,7 @@ class SelectLanguageScreen extends StatelessWidget {
                       await provider.handleSetLanguage('kh');
                       provider.setIsChecking(true);
                       if (context.mounted) {
-                        context.push(AppRoutes.welcome);
+                        context.go(AppRoutes.welcome);
                       }
                     },
                     child: _buildLanguageOption('ភាសាខ្មែរ', '🇰🇭'),
@@ -58,7 +58,7 @@ class SelectLanguageScreen extends StatelessWidget {
                       await provider.handleSetLanguage('en');
                       provider.setIsChecking(true);
                       if (context.mounted) {
-                        context.push(AppRoutes.welcome);
+                        context.go(AppRoutes.welcome);
                       }
                     },
                     child: _buildLanguageOption('English', '🇺🇸'),

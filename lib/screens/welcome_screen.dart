@@ -75,72 +75,74 @@ class WelcomeScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              Container(
-                height: 300,
-                padding: EdgeInsets.only(
-                    bottom: 20), // Note: 'custom' isn't valid, see note below
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.bottomCenter, // Start at the bottom
-                    end: Alignment.topCenter, // End at the top
-                    colors: [
-                      Colors.white, // 100% white at the bottom
-                      Colors.white, // 100% white at the bottom
-                      Colors.white10, // 0% white (transparent) at the top
-                    ],
+              SafeArea(
+                child: Container(
+                  height: 300,
+                  padding: EdgeInsets.only(
+                      bottom: 20), // Note: 'custom' isn't valid, see note below
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.bottomCenter, // Start at the bottom
+                      end: Alignment.topCenter, // End at the top
+                      colors: [
+                        Colors.white, // 100% white at the bottom
+                        Colors.white, // 100% white at the bottom
+                        Colors.white10, // 0% white (transparent) at the top
+                      ],
+                    ),
                   ),
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Center(
-                      child: Column(
-                        children: [
-                          Text(
-                            'សូមស្វាគមន៍មកកាន់',
-                            style: TextStyle(fontSize: 20),
-                          ),
-                          Text(
-                            'កម្មវិធីព័ត៌មានមន្ត្រីរាជការ ក.អ.ក',
-                            style: TextStyle(fontSize: 20),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(
-                              top: 24.0,
-                              right: 12.0,
-                              left: 12.0,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Center(
+                        child: Column(
+                          children: [
+                            Text(
+                              'សូមស្វាគមន៍មកកាន់',
+                              style: TextStyle(fontSize: 20),
                             ),
-                            child: SizedBox(
-                              width: double.infinity,
-                              height: 50,
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  Provider.of<AuthProvider>(context,
-                                          listen: false)
-                                      .setIsChecking(false);
-                                  context.go(AppRoutes.home);
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor:
-                                      Theme.of(context).primaryColor,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
+                            Text(
+                              'កម្មវិធីព័ត៌មានមន្ត្រីរាជការ ក.អ.ក',
+                              style: TextStyle(fontSize: 20),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                top: 24.0,
+                                right: 12.0,
+                                left: 12.0,
+                              ),
+                              child: SizedBox(
+                                width: double.infinity,
+                                height: 50,
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    Provider.of<AuthProvider>(context,
+                                            listen: false)
+                                        .setIsChecking(false);
+                                    context.go(AppRoutes.home);
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor:
+                                        Theme.of(context).primaryColor,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
                                   ),
-                                ),
-                                child: Text(
-                                  'ចូលប្រព័ន្ធ',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.white,
+                                  child: Text(
+                                    'ចូលប្រព័ន្ធ',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.white,
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ],
