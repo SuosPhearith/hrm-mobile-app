@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:mobile_app/app_routes.dart';
 import 'package:mobile_app/providers/global/auth_provider.dart';
-import 'package:mobile_app/widgets/helper.dart';
 import 'package:provider/provider.dart';
 
 class SelectLanguageScreen extends StatelessWidget {
@@ -44,101 +45,23 @@ class SelectLanguageScreen extends StatelessWidget {
                 children: [
                   GestureDetector(
                     onTap: () async {
-                      try {
-                        await provider.handleSetLanguage('kh');
-                      } catch (e) {
-                        if (context.mounted) {
-                          showErrorDialog(
-                              context, "មានបញ្ហាកើតឡើងក្នុងការជ្រើសរើសភាសា");
-                        }
+                      await provider.handleSetLanguage('kh');
+                      provider.setIsChecking(true);
+                      if (context.mounted) {
+                        context.push(AppRoutes.welcome);
                       }
                     },
-                    child: Container(
-                      width: 350,
-                      margin: EdgeInsets.all(8),
-                      padding: EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(8),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black12, // Shadow color
-                            spreadRadius: 2, // How much the shadow spreads
-                            blurRadius: 5, // How blurry the shadow is
-                            offset: Offset(0, 2), // Shadow position (x, y)
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              color: Colors.grey[200],
-                              shape: BoxShape.circle,
-                            ),
-                            child: Center(
-                                child: Text('🇰🇭',
-                                    style: TextStyle(fontSize: 20))),
-                          ),
-                          SizedBox(width: 12),
-                          Text(
-                            'ភាសាខ្មែរ',
-                            style: TextStyle(fontSize: 16),
-                          ),
-                        ],
-                      ),
-                    ),
+                    child: _buildLanguageOption('ភាសាខ្មែរ', '🇰🇭'),
                   ),
                   GestureDetector(
                     onTap: () async {
-                      try {
-                        await provider.handleSetLanguage('en');
-                      } catch (e) {
-                        if (context.mounted) {
-                          showErrorDialog(
-                              context, "មានបញ្ហាកើតឡើងក្នុងការជ្រើសរើសភាសា");
-                        }
+                      await provider.handleSetLanguage('en');
+                      provider.setIsChecking(true);
+                      if (context.mounted) {
+                        context.push(AppRoutes.welcome);
                       }
                     },
-                    child: Container(
-                      width: 350,
-                      margin: EdgeInsets.all(8),
-                      padding: EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(8),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black12,
-                            spreadRadius: 2,
-                            blurRadius: 5,
-                            offset: Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              color: Colors.grey[200],
-                              shape: BoxShape.circle,
-                            ),
-                            child: Center(
-                                child: Text('🇺🇸',
-                                    style: TextStyle(fontSize: 20))),
-                          ),
-                          SizedBox(width: 12),
-                          Text(
-                            'English',
-                            style: TextStyle(fontSize: 16),
-                          ),
-                        ],
-                      ),
-                    ),
+                    child: _buildLanguageOption('English', '🇺🇸'),
                   ),
                 ],
               ),
@@ -147,5 +70,44 @@ class SelectLanguageScreen extends StatelessWidget {
         ),
       );
     });
+  }
+
+  // Helper method to build language option UI
+  Widget _buildLanguageOption(String language, String flag) {
+    return Container(
+      width: 350,
+      margin: EdgeInsets.all(8),
+      padding: EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black12,
+            spreadRadius: 2,
+            blurRadius: 5,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: Colors.grey[200],
+              shape: BoxShape.circle,
+            ),
+            child: Center(child: Text(flag, style: TextStyle(fontSize: 20))),
+          ),
+          SizedBox(width: 12),
+          Text(
+            language,
+            style: TextStyle(fontSize: 16),
+          ),
+        ],
+      ),
+    );
   }
 }

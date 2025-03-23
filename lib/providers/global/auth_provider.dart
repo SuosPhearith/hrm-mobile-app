@@ -22,6 +22,10 @@ class AuthProvider extends ChangeNotifier {
   bool get isSelectingLanguage => _isSelectingLanguage;
 
   // Setters
+  void setIsChecking(bool value) {
+    _isChecking = value;
+    notifyListeners();
+  }
 
   // Initialize
   AuthProvider() {

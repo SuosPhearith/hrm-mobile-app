@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile_app/screens/select_language_screen.dart';
+import 'package:mobile_app/screens/welcome_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:mobile_app/app_routes.dart';
 import 'package:mobile_app/middlewares/auth_middleware.dart';
@@ -93,6 +94,10 @@ final GoRouter _router = GoRouter(
       path: AppRoutes.selectLanguage,
       builder: (context, state) => AuthMiddleware(
           child: const AuthLayout(child: SelectLanguageScreen())),
+    ),
+    GoRoute(
+      path: AppRoutes.welcome,
+      builder: (context, state) => WelcomeScreen(),
     ),
   ],
   errorBuilder: (context, state) => Scaffold(

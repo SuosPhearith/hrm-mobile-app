@@ -170,7 +170,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ? Text(
                                 'ចូលប្រព័ន្ធ',
                                 style: TextStyle(
-                                  fontSize: 18,
+                                  fontSize: 14,
                                   color: Colors.white,
                                 ),
                               )
