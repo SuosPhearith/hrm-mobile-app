@@ -5,4 +5,6 @@ class AppRoutes {
   static const String login = '/login';
   static const String selectLanguage = '/select-language';
   static const String welcome = '/welcome';
+  static const String about = '/about';
+  static const String holliday = '/holliday';
 }

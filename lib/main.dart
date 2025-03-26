@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mobile_app/screens/about_screen.dart';
+import 'package:mobile_app/screens/holliday_screen.dart';
 import 'package:mobile_app/screens/select_language_screen.dart';
 import 'package:mobile_app/screens/welcome_screen.dart';
 import 'package:provider/provider.dart';
@@ -10,7 +12,6 @@ import 'package:mobile_app/providers/global/auth_provider.dart';
 import 'package:mobile_app/screens/home_screen.dart';
 import 'package:mobile_app/screens/login_screen.dart';
 import 'package:mobile_app/screens/profile_screen.dart';
-import 'package:mobile_app/screens/sale_screen.dart';
 import 'package:mobile_app/utils/dio.client.dart';
 
 void main() async {
@@ -76,8 +77,11 @@ final GoRouter _router = GoRouter(
             path: AppRoutes.home,
             builder: (context, state) => const HomeScreen()),
         GoRoute(
-            path: AppRoutes.sale,
-            builder: (context, state) => const SaleScreen()),
+            path: AppRoutes.about,
+            builder: (context, state) => const AboutScreen()),
+        GoRoute(
+            path: AppRoutes.holliday,
+            builder: (context, state) => const HollidayScreen()),
         GoRoute(
             path: AppRoutes.profile,
             builder: (context, state) => const ProfileScreen()),
@@ -119,7 +123,8 @@ class _MainLayoutState extends State<MainLayout> {
 
   final List<Widget> _pages = [
     const HomeScreen(),
-    const SaleScreen(),
+    const AboutScreen(),
+    const HollidayScreen(),
     const ProfileScreen(),
   ];
 
@@ -138,8 +143,12 @@ class _MainLayoutState extends State<MainLayout> {
         unselectedItemColor: Colors.grey,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: "ទំព័រដើម"),
-          BottomNavigationBarItem(icon: Icon(Icons.receipt), label: "Sale"),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.info), label: "អំពីប្រព័ន្ធ"),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.calendar_month), label: "ឈប់សម្រាក់"),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.grid_view_rounded), label: "ផ្សេងៗ"),
         ],
       ),
     );
