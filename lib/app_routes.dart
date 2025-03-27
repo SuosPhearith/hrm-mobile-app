@@ -7,4 +7,7 @@ class AppRoutes {
   static const String welcome = '/welcome';
   static const String about = '/about';
   static const String holliday = '/holliday';
+  static const String request = '/request';
+  static const String scan = '/scan';
+  static const String daily = '/daily';
 }

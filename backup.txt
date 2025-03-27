@@ -1,0 +1,194 @@
+// void _showMonthPicker(BuildContext context) {
+  //   showModalBottomSheet(
+  //     context: context,
+  //     isScrollControlled: true, // Allows dynamic height
+  //     shape: const RoundedRectangleBorder(
+  //       borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
+  //     ), // Rounded top corners
+  //     backgroundColor: Colors.white, // Clean background
+  //     builder: (BuildContext context) {
+  //       return Container(
+  //         constraints: BoxConstraints(
+  //           maxHeight: MediaQuery.of(context).size.height *
+  //               0.7, // Max 60% of screen height
+  //         ),
+  //         child: StatefulBuilder(
+  //           builder: (BuildContext context, StateSetter setModalState) {
+  //             return Column(
+  //               mainAxisSize: MainAxisSize.min, // Only take needed space
+  //               children: [
+  //                 // Header
+  //                 Padding(
+  //                   padding: const EdgeInsets.symmetric(vertical: 16.0),
+  //                   child: Text(
+  //                     'ជ្រើសរើសខែ',
+  //                     style: TextStyle(
+  //                       fontSize: 20.0,
+  //                       fontWeight: FontWeight.bold,
+  //                       color: Colors.grey[800],
+  //                     ),
+  //                   ),
+  //                 ),
+  //                 // Calendar
+  //                 Expanded(
+  //                   child: Padding(
+  //                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
+  //                     child: TableCalendar(
+  //                       firstDay: DateTime.utc(2020, 1, 1),
+  //                       lastDay: DateTime.utc(2030, 12, 31),
+  //                       focusedDay: _focusedDay,
+  //                       calendarFormat: CalendarFormat.month,
+  //                       availableCalendarFormats: const {
+  //                         CalendarFormat.month: 'Month',
+  //                       },
+  //                       headerStyle: HeaderStyle(
+  //                         formatButtonVisible: false,
+  //                         titleCentered: true,
+  //                         titleTextFormatter: (date, locale) {
+  //                           // Khmer month names
+  //                           const khmerMonths = [
+  //                             'មករា',
+  //                             'កុម្ភៈ',
+  //                             'មីនា',
+  //                             'មេសា',
+  //                             'ឧសភា',
+  //                             'មិថុនា',
+  //                             'កក្កដា',
+  //                             'សីហា',
+  //                             'កញ្ញា',
+  //                             'តុលា',
+  //                             'វិច្ឆិកា',
+  //                             'ធ្នូ',
+  //                           ];
+  //                           return '${khmerMonths[date.month - 1]} ${date.year}';
+  //                         },
+  //                         titleTextStyle: TextStyle(
+  //                           fontSize: 18.0,
+  //                           fontWeight: FontWeight.w600,
+  //                           color: Colors.blue[900],
+  //                         ),
+  //                         leftChevronIcon:
+  //                             Icon(Icons.chevron_left, color: Colors.blue[700]),
+  //                         rightChevronIcon: Icon(Icons.chevron_right,
+  //                             color: Colors.blue[700]),
+  //                       ),
+  //                       calendarStyle: CalendarStyle(
+  //                         outsideDaysVisible: false, // Cleaner look
+  //                         defaultTextStyle: TextStyle(color: Colors.grey[700]),
+  //                         weekendTextStyle: TextStyle(color: Colors.grey[700]),
+  //                         disabledTextStyle: TextStyle(color: Colors.grey[300]),
+  //                       ),
+  //                       daysOfWeekStyle: DaysOfWeekStyle(
+  //                         weekdayStyle: TextStyle(
+  //                           fontSize: 14.0, // Slightly smaller to fit
+  //                           color: Colors.grey[800],
+  //                           fontWeight: FontWeight.w500,
+  //                         ),
+  //                         weekendStyle: TextStyle(
+  //                           fontSize: 14.0,
+  //                           color: Colors.grey[800],
+  //                           fontWeight: FontWeight.w500,
+  //                         ),
+  //                         dowTextFormatter: (date, locale) {
+  //                           // Khmer day names
+  //                           const khmerDays = [
+  //                             'ចន្ទ',
+  //                             'អង្គារ',
+  //                             'ពុធ',
+  //                             'ព្រហ',
+  //                             'សុក្រ',
+  //                             'សៅរ៍',
+  //                             'អាទិត្យ'
+  //                           ];
+  //                           return khmerDays[date.weekday - 1];
+  //                         },
+  //                       ),
+  //                       daysOfWeekHeight: 40.0, // Ensure visibility
+  //                       onDaySelected: (selectedDay, focusedDay) {
+  //                         setModalState(() {
+  //                           _focusedDay = focusedDay;
+  //                         });
+  //                       },
+  //                       onPageChanged: (focusedDay) {
+  //                         setModalState(() {
+  //                           _focusedDay = focusedDay;
+  //                         });
+  //                       },
+  //                       enabledDayPredicate: (day) =>
+  //                           false, // Disable day selection
+  //                     ),
+  //                   ),
+  //                 ),
+  //                 // Buttons
+  //                 Padding(
+  //                   padding: const EdgeInsets.all(16.0),
+  //                   child: Row(
+  //                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+  //                     children: [
+  //                       Expanded(
+  //                         flex: 1,
+  //                         child: OutlinedButton(
+  //                           onPressed: () => Navigator.pop(context),
+  //                           style: OutlinedButton.styleFrom(
+  //                             side: BorderSide(
+  //                                 color: Colors.grey.shade600,
+  //                                 width: 1.5), // Border color
+  //                             shape: RoundedRectangleBorder(
+  //                               borderRadius: BorderRadius.circular(
+  //                                   12.0), // Rounded border
+  //                             ),
+  //                             padding: const EdgeInsets.symmetric(
+  //                               horizontal: 24.0,
+  //                               vertical: 12.0,
+  //                             ),
+  //                           ),
+  //                           child: Text(
+  //                             'បោះបង់',
+  //                             style: TextStyle(
+  //                               fontSize: 16.0,
+  //                               color: Colors.grey[600],
+  //                             ),
+  //                           ),
+  //                         ),
+  //                       ),
+  //                       SizedBox(width: 10), // Space between buttons
+  //                       Expanded(
+  //                         flex: 1,
+  //                         child: ElevatedButton(
+  //                           onPressed: () {
+  //                             setState(() {
+  //                               _selectedMonth = _focusedDay;
+  //                             });
+  //                             Navigator.pop(context);
+  //                           },
+  //                           style: ElevatedButton.styleFrom(
+  //                             backgroundColor: Theme.of(context)
+  //                                 .primaryColor, // Professional blue
+  //                             shape: RoundedRectangleBorder(
+  //                               borderRadius: BorderRadius.circular(12.0),
+  //                             ),
+  //                             padding: const EdgeInsets.symmetric(
+  //                               horizontal: 24.0,
+  //                               vertical: 12.0,
+  //                             ),
+  //                           ),
+  //                           child: const Text(
+  //                             'ជ្រើសរើស',
+  //                             style: TextStyle(
+  //                               fontSize: 16.0,
+  //                               color: Colors.white,
+  //                             ),
+  //                           ),
+  //                         ),
+  //                       ),
+  //                     ],
+  //                   ),
+  //                 ),
+  //               ],
+  //             );
+  //           },
+  //         ),
+  //       );
+  //     },
+  //   );
+  // }

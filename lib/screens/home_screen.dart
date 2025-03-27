@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:mobile_app/app_routes.dart';
+import 'package:percent_indicator/circular_percent_indicator.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -6,81 +9,93 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[200],
+      backgroundColor: Colors.grey[100], // Softer background
       body: SingleChildScrollView(
-          child: Column(
-        children: [
-          Header(),
-          FirstDashboard(),
-          Notify(),
-          Functions(),
-          Request()
-        ],
-      )),
+        child: Column(
+          children: [
+            const Header(),
+            const FirstDashboard(),
+            const Notify(),
+            const Functions(),
+            const Request(),
+          ],
+        ),
+      ),
     );
   }
 }
 
 class Request extends StatelessWidget {
-  const Request({
-    super.key,
-  });
+  const Request({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(
-        top: 8.0,
-        bottom: 8.0,
-      ),
+      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
       child: Container(
-        color: Colors.white,
-        padding: const EdgeInsets.all(8.0),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16.0),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.2),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Expanded(
-                  child: Container(
-                    margin: const EdgeInsets.only(right: 4.0),
-                    padding: const EdgeInsets.symmetric(vertical: 8.0),
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade300,
-                      borderRadius: BorderRadius.circular(16.0),
-                    ),
-                    child: const Center(
-                      child: Text(
-                        'ស្នើសុំ',
-                        style: TextStyle(
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.bold,
+                  child: GestureDetector(
+                    onTap: () {},
+                    child: Container(
+                      margin: const EdgeInsets.only(right: 4.0),
+                      padding: const EdgeInsets.symmetric(vertical: 10.0),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [Colors.blue[600]!, Colors.blue[800]!],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(12.0),
+                      ),
+                      child: const Center(
+                        child: Text(
+                          'ស្នើសុំ',
+                          style: TextStyle(
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ),
                   ),
                 ),
                 Expanded(
-                  child: Container(
-                    margin: const EdgeInsets.only(left: 4.0),
-                    padding: const EdgeInsets.symmetric(vertical: 8.0),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16.0),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black12,
-                          blurRadius: 4,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: const Center(
-                      child: Text(
-                        'ត្រួតពិនិត្យ',
-                        style: TextStyle(
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.bold,
+                  child: GestureDetector(
+                    onTap: () {},
+                    child: Container(
+                      margin: const EdgeInsets.only(left: 4.0),
+                      padding: const EdgeInsets.symmetric(vertical: 10.0),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12.0),
+                        border: Border.all(color: Colors.grey.shade300),
+                      ),
+                      child: Center(
+                        child: Text(
+                          'ត្រួតពិនិត្យ',
+                          style: TextStyle(
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey.shade700,
+                          ),
                         ),
                       ),
                     ),
@@ -88,201 +103,146 @@ class Request extends StatelessWidget {
                 ),
               ],
             ),
-            Container(
-              width: double.infinity,
-              margin: const EdgeInsets.only(top: 8.0),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey.shade300),
-                borderRadius: BorderRadius.circular(12.0),
-              ),
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'P-12345',
-                        style: TextStyle(fontSize: 16.0),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8.0, vertical: 4.0),
-                        decoration: BoxDecoration(
-                          color: Colors.yellow.shade200,
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                        child: const Text(
-                          'កំពុងរង់ចាំ',
-                          style: TextStyle(fontSize: 14.0),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8.0),
-                  Row(
-                    children: [
-                      const Text(
-                        '20-01-2025 ដល់ 23-01-2025',
-                        style: TextStyle(fontSize: 14.0),
-                      ),
-                      const SizedBox(width: 8.0),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                        decoration: BoxDecoration(
-                          color: Colors.blue.shade100,
-                          borderRadius: BorderRadius.circular(16.0),
-                        ),
-                        child: const Text(
-                          '4 ថ្ងៃ',
-                          style: TextStyle(fontSize: 14.0),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8.0), // Spacing between sections
-                  // Third Row: Description
-                  const Text(
-                    'បេសកម្ម (ក្នុងប្រទេស) គ្រោះថ្នាក់ចរាចណ៍',
-                    style: TextStyle(fontSize: 14.0),
-                  ),
-                ],
-              ),
-            ),
-            Container(
-              width: double.infinity,
-              margin: const EdgeInsets.only(top: 8.0),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey.shade300),
-                borderRadius: BorderRadius.circular(12.0),
-              ),
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'P-12345',
-                        style: TextStyle(fontSize: 16.0),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8.0, vertical: 4.0),
-                        decoration: BoxDecoration(
-                          color: Colors.yellow.shade200,
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                        child: const Text(
-                          'កំពុងរង់ចាំ',
-                          style: TextStyle(fontSize: 14.0),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8.0),
-                  Row(
-                    children: [
-                      const Text(
-                        '20-01-2025 ដល់ 23-01-2025',
-                        style: TextStyle(fontSize: 14.0),
-                      ),
-                      const SizedBox(width: 8.0),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                        decoration: BoxDecoration(
-                          color: Colors.blue.shade100,
-                          borderRadius: BorderRadius.circular(16.0),
-                        ),
-                        child: const Text(
-                          '4 ថ្ងៃ',
-                          style: TextStyle(fontSize: 14.0),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8.0), // Spacing between sections
-                  // Third Row: Description
-                  const Text(
-                    'បេសកម្ម (ក្នុងប្រទេស) គ្រោះថ្នាក់ចរាចណ៍',
-                    style: TextStyle(fontSize: 14.0),
-                  ),
-                ],
-              ),
-            )
+            _buildRequestItem(),
+            _buildRequestItem(),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildRequestItem() {
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(top: 12.0),
+      padding: const EdgeInsets.all(16.0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12.0),
+        border: Border.all(color: Colors.grey.shade200),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey[100]!,
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'P-12345',
+                style: TextStyle(
+                  fontSize: 16.0,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey.shade800,
+                ),
+              ),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10.0, vertical: 4.0),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Colors.yellow[300]!, Colors.yellow[500]!],
+                  ),
+                  borderRadius: BorderRadius.circular(20.0),
+                ),
+                child: const Text(
+                  'កំពុងរង់ចាំ',
+                  style: TextStyle(
+                    fontSize: 14.0,
+                    color: Colors.black87,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8.0),
+          Row(
+            children: [
+              Text(
+                '20-01-2025 ដល់ 23-01-2025',
+                style: TextStyle(fontSize: 14.0, color: Colors.grey.shade700),
+              ),
+              const SizedBox(width: 8.0),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10.0, vertical: 4.0),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Colors.blue[100]!, Colors.blue[200]!],
+                  ),
+                  borderRadius: BorderRadius.circular(20.0),
+                ),
+                child: Text(
+                  '4 ថ្ងៃ',
+                  style: TextStyle(fontSize: 14.0, color: Colors.blue.shade800),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8.0),
+          Text(
+            'បេសកម្ម (ក្នុងប្រទេស) គ្រោះថ្នាក់ចរាចណ៍',
+            style: TextStyle(fontSize: 14.0, color: Colors.grey.shade600),
+          ),
+        ],
       ),
     );
   }
 }
 
 class Notify extends StatelessWidget {
-  const Notify({
-    super.key,
-  });
+  const Notify({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(12.0),
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
+        padding: const EdgeInsets.all(16.0),
         decoration: BoxDecoration(
-          color: const Color.fromARGB(255, 255, 245, 210),
+          gradient: LinearGradient(
+            colors: [Colors.amber[200]!, Colors.amber[100]!],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
           borderRadius: BorderRadius.circular(12.0),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black12,
-              spreadRadius: 2,
-              blurRadius: 5,
-              offset: const Offset(0, 2),
-            ),
-          ],
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            Icon(
+              Icons.info_outline,
+              color: Colors.amber[800],
+              size: 28.0,
+            ),
+            const SizedBox(width: 12.0),
             Expanded(
-              child: Row(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(
-                    Icons.info_outline,
-                    color: Colors
-                        .amber.shade700, // Slightly darker amber for contrast
-                    size: 24.0, // Consistent size
-                  ),
-                  const SizedBox(width: 12.0),
-                  Flexible(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          'សារសំខាន់',
-                          style: TextStyle(
-                            fontSize: 18.0,
-                            fontWeight: FontWeight.bold, // Bold for emphasis
-                            color: Colors.amber.shade900, // Professional tone
-                          ),
-                        ),
-                        const SizedBox(
-                            height: 4.0), // Spacing between title and subtitle
-                        Text(
-                          'សូមភ្ជាប់តេលេក្រាមដើម្បីទទួលបានដំណឹងផ្សេងៗ',
-                          style: TextStyle(
-                            fontSize: 12.0, // Slightly larger for readability
-                            color: Colors
-                                .grey.shade800, // Neutral, professional color
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 2,
-                        ),
-                      ],
+                  Text(
+                    'សារសំខាន់',
+                    style: TextStyle(
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.amber[900],
                     ),
+                  ),
+                  const SizedBox(height: 4.0),
+                  Text(
+                    'សូមភ្ជាប់តេលេក្រាមដើម្បីទទួលបានដំណឹងផ្សេងៗ',
+                    style: TextStyle(
+                      fontSize: 14.0,
+                      color: Colors.grey.shade800,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),
@@ -290,16 +250,11 @@ class Notify extends StatelessWidget {
             IconButton(
               icon: Icon(
                 Icons.close,
-                color: Colors.grey.shade600, // Subtle color for close button
-                size: 20.0, // Smaller size for balance
+                color: Colors.grey.shade600,
+                size: 20.0,
               ),
-              onPressed: () {
-                // Add your close action here
-              },
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(),
-              splashRadius:
-                  20.0, // Smaller splash radius for cleaner interaction
+              onPressed: () {},
+              splashRadius: 20.0,
             ),
           ],
         ),
@@ -309,222 +264,104 @@ class Notify extends StatelessWidget {
 }
 
 class Functions extends StatelessWidget {
-  const Functions({
-    super.key,
-  });
+  const Functions({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return GridView.count(
-      crossAxisCount: 3,
-      shrinkWrap: true,
-      physics: NeverScrollableScrollPhysics(),
-      children: [
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            border: Border.all(color: Colors.grey.shade200),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.edit_calendar_outlined,
-                size: 30,
-                color: Colors.grey.shade600,
-              ),
-              SizedBox(height: 8.0),
-              Text(
-                'សំណើរ',
-                style: TextStyle(color: Colors.grey.shade600),
-              ),
-            ],
-          ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      child: GridView.count(
+        crossAxisCount: 3,
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        crossAxisSpacing: 12.0,
+        mainAxisSpacing: 12.0,
+        children: [
+          _buildFunctionTile(context, Icons.edit_calendar_outlined, 'សំណើរ',
+              AppRoutes.request),
+          _buildFunctionTile(context, Icons.face, 'ស្កេន', AppRoutes.scan),
+          _buildFunctionTile(
+              context, Icons.access_time, 'ប្រចាំថ្ងៃ', AppRoutes.daily),
+          _buildFunctionTile(
+              context, Icons.data_thresholding_outlined, 'វាយតម្លៃ', ''),
+          _buildFunctionTile(
+              context, Icons.person_outline_outlined, 'ព័ត៌មានផ្ទាល់ខ្លួន', ''),
+          _buildFunctionTile(context, Icons.work_outline, 'ការងារ', ''),
+          _buildFunctionTile(
+              context, Icons.monetization_on_outlined, 'ប្រាក់បៀវត្សរ៍', ''),
+          _buildFunctionTile(
+              context, Icons.account_box_outlined, 'ប័ណ្ណសម្គាល់ខ្លួន', ''),
+          _buildFunctionTile(context, Icons.file_copy_outlined, 'ឯកសារ', ''),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFunctionTile(
+      BuildContext context, IconData icon, String label, String route) {
+    return GestureDetector(
+      onTap: route.isNotEmpty ? () => context.push(route) : null,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12.0),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 6,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            border: Border.all(color: Colors.grey.shade200),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.face,
-                size: 30,
-                color: Colors.grey.shade600,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              size: 32.0,
+              color: Colors.blue[700],
+            ),
+            const SizedBox(height: 8.0),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 14.0,
+                fontWeight: FontWeight.w600,
+                color: Colors.grey.shade800,
               ),
-              SizedBox(height: 8.0),
-              Text(
-                'ស្កេន',
-                style: TextStyle(color: Colors.grey.shade600),
-              ),
-            ],
-          ),
+              textAlign: TextAlign.center,
+            ),
+          ],
         ),
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            border: Border.all(color: Colors.grey.shade200),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.access_time,
-                size: 30,
-                color: Colors.grey.shade600,
-              ),
-              SizedBox(height: 8.0),
-              Text(
-                'ប្រចាំថ្ងៃ',
-                style: TextStyle(color: Colors.grey.shade600),
-              ),
-            ],
-          ),
-        ),
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            border: Border.all(color: Colors.grey.shade200),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.data_thresholding_outlined,
-                size: 30,
-                color: Colors.grey.shade600,
-              ),
-              SizedBox(height: 8.0),
-              Text(
-                'វាយតម្លៃ',
-                style: TextStyle(color: Colors.grey.shade600),
-              ),
-            ],
-          ),
-        ),
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            border: Border.all(color: Colors.grey.shade200),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.person_outline_outlined,
-                size: 30,
-                color: Colors.grey.shade600,
-              ),
-              SizedBox(height: 8.0),
-              Text(
-                'ព័ត៌មានផ្ទាល់ខ្លួន',
-                style: TextStyle(color: Colors.grey.shade600),
-              ),
-            ],
-          ),
-        ),
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            border: Border.all(color: Colors.grey.shade200),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.work_outline,
-                size: 30,
-                color: Colors.grey.shade600,
-              ),
-              SizedBox(height: 8.0),
-              Text(
-                'ការងារ',
-                style: TextStyle(color: Colors.grey.shade600),
-              ),
-            ],
-          ),
-        ),
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            border: Border.all(color: Colors.grey.shade200),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.monetization_on_outlined,
-                size: 30,
-                color: Colors.grey.shade600,
-              ),
-              SizedBox(height: 8.0),
-              Text(
-                'ប្រាក់បៀវត្សរ៍',
-                style: TextStyle(color: Colors.grey.shade600),
-              ),
-            ],
-          ),
-        ),
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            border: Border.all(color: Colors.grey.shade200),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.account_box_outlined,
-                size: 30,
-                color: Colors.grey.shade600,
-              ),
-              SizedBox(height: 8.0),
-              Text(
-                'ប័ណ្ណសម្គាល់ខ្លួន',
-                style: TextStyle(color: Colors.grey.shade600),
-              ),
-            ],
-          ),
-        ),
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            border: Border.all(color: Colors.grey.shade200),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.file_copy_outlined,
-                size: 30,
-                color: Colors.grey.shade600,
-              ),
-              SizedBox(height: 8.0),
-              Text(
-                'ឯកសារ',
-                style: TextStyle(color: Colors.grey.shade600),
-              ),
-            ],
-          ),
-        ),
-      ],
+      ),
     );
   }
 }
 
 class Header extends StatelessWidget {
-  const Header({
-    super.key,
-  });
+  const Header({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(16.0),
       child: Container(
-        padding: EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(12.0),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.blue[50]!, Colors.white],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(16.0),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -532,26 +369,44 @@ class Header extends StatelessWidget {
               child: Row(
                 children: [
                   Container(
-                    margin: EdgeInsets.only(right: 8.0),
                     width: 60.0,
                     height: 60.0,
                     decoration: BoxDecoration(
-                      color: Colors.grey[300],
                       shape: BoxShape.circle,
+                      gradient: LinearGradient(
+                        colors: [Colors.blue[200]!, Colors.blue[400]!],
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.blue[100]!,
+                          blurRadius: 6,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
                     ),
-                    child: Center(
-                        child: Icon(
-                      Icons.person,
-                      size: 30,
-                    )),
+                    child: const Center(
+                      child: Icon(
+                        Icons.person,
+                        size: 30.0,
+                        color: Colors.white,
+                      ),
+                    ),
                   ),
+                  const SizedBox(width: 12.0),
                   Flexible(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('ខួច គឿន'),
                         Text(
-                          'អនុប្រធាននាកយកដ្ឋាន​ | អគលេខាធិការដ្ឋាននៃ ក.អ.ក',
+                          'ខួច គឿន',
+                          style: TextStyle(
+                            fontSize: 18.0,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey.shade800,
+                          ),
+                        ),
+                        Text(
+                          'អនុប្រធាននាកយកដ្ឋាន | អគលេខាធិការដ្ឋាននៃ ក.អ.ក',
                           style: TextStyle(
                             fontSize: 12.0,
                             color: Colors.grey.shade600,
@@ -566,25 +421,9 @@ class Header extends StatelessWidget {
             ),
             Row(
               children: [
-                Container(
-                  width: 35.0,
-                  height: 35.0,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                    shape: BoxShape.circle,
-                  ),
-                  child: Center(child: Icon(Icons.download)),
-                ),
-                SizedBox(width: 8.0),
-                Container(
-                  width: 35.0,
-                  height: 35.0,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                    shape: BoxShape.circle,
-                  ),
-                  child: Center(child: Icon(Icons.notifications)),
-                ),
+                _buildIconButton(Icons.download, Colors.blue[600]!),
+                const SizedBox(width: 8.0),
+                _buildIconButton(Icons.notifications, Colors.blue[600]!),
               ],
             ),
           ],
@@ -592,12 +431,31 @@ class Header extends StatelessWidget {
       ),
     );
   }
+
+  Widget _buildIconButton(IconData icon, Color color) {
+    return Container(
+      width: 40.0,
+      height: 40.0,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Center(
+        child: Icon(icon, color: color, size: 22.0),
+      ),
+    );
+  }
 }
 
 class FirstDashboard extends StatefulWidget {
-  const FirstDashboard({
-    super.key,
-  });
+  const FirstDashboard({super.key});
 
   @override
   State<FirstDashboard> createState() => _FirstDashboardState();
@@ -622,9 +480,9 @@ class _FirstDashboardState extends State<FirstDashboard> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(top: 8.0, left: 8.0, right: 8.0),
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: SizedBox(
-        height: 250,
+        height: 260,
         child: Column(
           children: [
             Expanded(
@@ -645,24 +503,25 @@ class _FirstDashboardState extends State<FirstDashboard> {
                 ],
               ),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 12),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: List.generate(3, (index) {
-                return Container(
-                  width: 8.0,
+                return AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  width: _currentPage == index ? 12.0 : 8.0,
                   height: 8.0,
-                  margin: EdgeInsets.symmetric(horizontal: 4.0),
+                  margin: const EdgeInsets.symmetric(horizontal: 4.0),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: _currentPage == index
-                        ? Colors.blue.shade600
-                        : Colors.grey.shade300,
+                        ? Colors.blue[700]
+                        : Colors.grey[300],
                   ),
                 );
               }),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 12),
           ],
         ),
       ),
@@ -672,22 +531,23 @@ class _FirstDashboardState extends State<FirstDashboard> {
   Widget _buildDashboardCard(String day, String date, String hours,
       String minutes, String time, String location) {
     return Container(
-      padding: EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: Colors.white,
+        gradient: LinearGradient(
+          colors: [Colors.white, Colors.grey[50]!],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
         borderRadius: BorderRadius.circular(16.0),
-        border: Border.all(color: Colors.grey.shade300, width: 1.0),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.shade200,
-            spreadRadius: 2,
-            blurRadius: 5,
-            offset: Offset(0, 2),
+            color: Colors.black12,
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
       child: Column(
-        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
@@ -696,9 +556,9 @@ class _FirstDashboardState extends State<FirstDashboard> {
               Text(
                 day,
                 style: TextStyle(
-                  fontSize: 16.0,
+                  fontSize: 18.0,
                   fontWeight: FontWeight.bold,
-                  color: Colors.grey.shade800,
+                  color: Colors.blue[900],
                 ),
               ),
               Text(
@@ -710,156 +570,111 @@ class _FirstDashboardState extends State<FirstDashboard> {
               ),
             ],
           ),
-          SizedBox(height: 15),
+          const SizedBox(height: 16.0),
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Container(
-                width: 100.0,
-                height: 100.0,
-                decoration: BoxDecoration(
-                  color: Colors.blue.shade600,
-                  shape: BoxShape.circle,
-                ),
-                child: Center(
-                  child: Container(
-                    width: 80.0,
-                    height: 80.0,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          hours,
-                          style: TextStyle(
-                            fontSize: 16.0,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.blue.shade800,
-                          ),
-                        ),
-                        Text(
-                          minutes,
-                          style: TextStyle(
-                            fontSize: 14.0,
-                            color: Colors.grey.shade600,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(width: 20.0),
-              Expanded(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
+              CircularPercentIndicator(
+                radius: 50.0,
+                lineWidth: 10.0,
+                percent: 0.7,
+                center: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Container(
-                      padding: EdgeInsets.only(left: 10, right: 10),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12.0),
-                        border:
-                            Border.all(color: Colors.grey.shade200, width: 1.0),
-                      ),
-                      child: Row(
-                        children: [
-                          Container(
-                            padding: EdgeInsets.all(6.0),
-                            decoration: BoxDecoration(
-                              color: Colors.grey.shade200,
-                              borderRadius: BorderRadius.circular(8.0),
-                            ),
-                            child: Icon(
-                              Icons.logout,
-                              size: 20.0,
-                              color: Colors.grey.shade700,
-                            ),
-                          ),
-                          SizedBox(width: 12.0),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  time,
-                                  style: TextStyle(
-                                    fontSize: 14.0,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.grey.shade800,
-                                  ),
-                                ),
-                                SizedBox(height: 4.0),
-                                Text(
-                                  location,
-                                  style: TextStyle(
-                                    fontSize: 13.0,
-                                    color: Colors.grey.shade600,
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
+                    Text(
+                      hours,
+                      style: TextStyle(
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue[800],
                       ),
                     ),
-                    SizedBox(height: 12.0),
-                    Container(
-                      padding: EdgeInsets.only(left: 10, right: 10),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12.0),
-                        border:
-                            Border.all(color: Colors.grey.shade200, width: 1.0),
-                      ),
-                      child: Row(
-                        children: [
-                          Container(
-                            padding: EdgeInsets.all(6.0),
-                            decoration: BoxDecoration(
-                              color: Colors.grey.shade200,
-                              borderRadius: BorderRadius.circular(8.0),
-                            ),
-                            child: Icon(
-                              Icons.logout,
-                              size: 20.0,
-                              color: Colors.grey.shade700,
-                            ),
-                          ),
-                          SizedBox(width: 12.0),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  time,
-                                  style: TextStyle(
-                                    fontSize: 14.0,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.grey.shade800,
-                                  ),
-                                ),
-                                SizedBox(height: 4.0),
-                                Text(
-                                  location,
-                                  style: TextStyle(
-                                    fontSize: 13.0,
-                                    color: Colors.grey.shade600,
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
+                    Text(
+                      minutes,
+                      style: TextStyle(
+                        fontSize: 14.0,
+                        color: Colors.grey.shade600,
                       ),
                     ),
                   ],
                 ),
+                progressColor: Colors.blue[700],
+                backgroundColor: Colors.grey[200]!,
+                circularStrokeCap: CircularStrokeCap.round,
+                animation: true,
+                animationDuration: 1000,
+              ),
+              const SizedBox(width: 20.0),
+              Expanded(
+                child: Column(
+                  children: [
+                    _buildTimeLocationTile(time, location),
+                    const SizedBox(height: 12.0),
+                    _buildTimeLocationTile(time, location),
+                  ],
+                ),
               ),
             ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTimeLocationTile(String time, String location) {
+    return Container(
+      padding: const EdgeInsets.all(12.0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12.0),
+        border: Border.all(color: Colors.grey.shade200),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(6.0),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.blue[100]!, Colors.blue[200]!],
+              ),
+              borderRadius: BorderRadius.circular(8.0),
+            ),
+            child: Icon(
+              Icons.logout,
+              size: 20.0,
+              color: Colors.blue[800],
+            ),
+          ),
+          const SizedBox(width: 12.0),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  time,
+                  style: TextStyle(
+                    fontSize: 14.0,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.grey.shade800,
+                  ),
+                ),
+                Text(
+                  location,
+                  style: TextStyle(
+                    fontSize: 12.0,
+                    color: Colors.grey.shade600,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
           ),
         ],
       ),
