@@ -10,8 +10,8 @@ class AuthService {
   }) async {
     try {
       final response = await DioClient.dio.post(
-        "/auth/login",
-        data: {"username": username, "password": password},
+        "/account/auth/login-password",
+        data: {"credential": username, "password": password},
       );
       return response.data;
     } on DioException catch (dioError) {
