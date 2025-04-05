@@ -8,25 +8,16 @@ class AboutScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.grey[100], // Softer background
       appBar: AppBar(
+        backgroundColor: Colors.white,
         title: const Text(
           'អំពីប្រព័ន្ធ',
           style: TextStyle(
             fontWeight: FontWeight.bold,
-            color: Colors.white,
+            color: Colors.black,
           ),
         ),
         centerTitle: true,
-        backgroundColor: Colors.blue[800], // Professional blue
         elevation: 0,
-        flexibleSpace: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.blue[800]!, Colors.blue[600]!],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-          ),
-        ),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -40,19 +31,16 @@ class AboutScreen extends StatelessWidget {
                 icon: Icons.access_time,
                 title: '08 ម៉ោង / ថ្ងៃ',
                 subtitle: 'ម៉ោងធ្វើការ',
-                gradientColors: [Colors.blue[100]!, Colors.blue[200]!],
               ),
               _buildInfoTile(
                 icon: Icons.calendar_month,
                 title: '05 ថ្ងៃ / សប្តាហ៍',
                 subtitle: 'ចំនួនថ្ងៃ',
-                gradientColors: [Colors.blue[100]!, Colors.blue[200]!],
               ),
               _buildInfoTile(
                 icon: Icons.av_timer,
                 title: '40 ម៉ោង / សប្តាហ៍',
                 subtitle: 'ចំនួនម៉ោង',
-                gradientColors: [Colors.blue[100]!, Colors.blue[200]!],
               ),
               const SizedBox(height: 24),
               _buildSectionHeader('ការស្កេនប្រចាំថ្ងៃ', Icons.face),
@@ -61,19 +49,16 @@ class AboutScreen extends StatelessWidget {
                 icon: Icons.login,
                 title: '07:30AM',
                 subtitle: 'ស្កេនចូល',
-                gradientColors: [Colors.green[100]!, Colors.green[200]!],
               ),
               _buildInfoTile(
                 icon: Icons.logout,
                 title: '05:50PM',
                 subtitle: 'ស្កេនចេញ',
-                gradientColors: [Colors.green[100]!, Colors.green[200]!],
               ),
               _buildInfoTile(
                 icon: Icons.message_outlined,
                 title: 'លើកលែងម៉ោងបាយថ្ងៃត្រង់ 2 ម៉ោង',
                 subtitle: 'សម្គាល់',
-                gradientColors: [Colors.green[100]!, Colors.green[200]!],
               ),
               const SizedBox(height: 24),
               _buildSectionHeader('ម៉ាស៊ីនស្កេនមុខ', Icons.face),
@@ -111,15 +96,15 @@ class AboutScreen extends StatelessWidget {
           style: TextStyle(
             fontSize: 22.0,
             fontWeight: FontWeight.bold,
-            color: Colors.blue[900],
+            color: Colors.black,
           ),
         ),
         const SizedBox(width: 8.0),
-        Icon(
-          icon,
-          size: 24.0,
-          color: Colors.blue[700],
-        ),
+        // Icon(
+        //   icon,
+        //   size: 24.0,
+        //   color: Colors.blue[700],
+        // ),
       ],
     );
   }
@@ -128,7 +113,6 @@ class AboutScreen extends StatelessWidget {
     required IconData icon,
     required String title,
     required String subtitle,
-    required List<Color> gradientColors,
   }) {
     return Container(
       margin: const EdgeInsets.only(bottom: 4.0),
@@ -136,13 +120,6 @@ class AboutScreen extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12.0),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
-        ],
       ),
       child: Row(
         children: [
@@ -150,25 +127,14 @@ class AboutScreen extends StatelessWidget {
             height: 50.0,
             width: 50.0,
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: gradientColors,
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
+              color: Colors.grey[200],
               shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black12,
-                  blurRadius: 4,
-                  offset: const Offset(0, 2),
-                ),
-              ],
             ),
             child: Center(
               child: Icon(
                 icon,
                 size: 24.0,
-                color: Colors.white,
+                color: Colors.grey[700],
               ),
             ),
           ),
@@ -214,13 +180,6 @@ class AboutScreen extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12.0),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
-        ],
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -232,18 +191,14 @@ class AboutScreen extends StatelessWidget {
                   height: 40.0,
                   width: 40.0,
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [Colors.blue[100]!, Colors.blue[200]!],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
+                    color: Colors.grey[200],
                     borderRadius: BorderRadius.circular(8.0),
                   ),
-                  child: const Center(
+                  child: Center(
                     child: Icon(
                       Icons.face,
                       size: 24.0,
-                      color: Colors.blue,
+                      color: Colors.grey[700],
                     ),
                   ),
                 ),
