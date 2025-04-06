@@ -25,57 +25,66 @@ class AboutScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildSectionHeader('អនុក្រឹត', Icons.edit_document),
+              _buildSectionHeader(context, 'អនុក្រឹត', Icons.edit_document),
               const SizedBox(height: 12),
               _buildInfoTile(
+                context: context,
                 icon: Icons.access_time,
                 title: '08 ម៉ោង / ថ្ងៃ',
                 subtitle: 'ម៉ោងធ្វើការ',
               ),
               _buildInfoTile(
+                context: context,
                 icon: Icons.calendar_month,
                 title: '05 ថ្ងៃ / សប្តាហ៍',
                 subtitle: 'ចំនួនថ្ងៃ',
               ),
               _buildInfoTile(
+                context: context,
                 icon: Icons.av_timer,
                 title: '40 ម៉ោង / សប្តាហ៍',
                 subtitle: 'ចំនួនម៉ោង',
               ),
               const SizedBox(height: 24),
-              _buildSectionHeader('ការស្កេនប្រចាំថ្ងៃ', Icons.face),
+              _buildSectionHeader(context, 'ការស្កេនប្រចាំថ្ងៃ', Icons.face),
               const SizedBox(height: 12),
               _buildInfoTile(
+                context: context,
                 icon: Icons.login,
                 title: '07:30AM',
                 subtitle: 'ស្កេនចូល',
               ),
               _buildInfoTile(
+                context: context,
                 icon: Icons.logout,
                 title: '05:50PM',
                 subtitle: 'ស្កេនចេញ',
               ),
               _buildInfoTile(
+                context: context,
                 icon: Icons.message_outlined,
                 title: 'លើកលែងម៉ោងបាយថ្ងៃត្រង់ 2 ម៉ោង',
                 subtitle: 'សម្គាល់',
               ),
               const SizedBox(height: 24),
-              _buildSectionHeader('ម៉ាស៊ីនស្កេនមុខ', Icons.face),
+              _buildSectionHeader(context, 'ម៉ាស៊ីនស្កេនមុខ', Icons.face),
               const SizedBox(height: 12),
               _buildScannerTile(
+                context: context,
                 title: 'Terminal 001',
                 subtitle: '# FC002 | អគារ ក | ស្កេនចូល',
                 status: 'សកម្ម',
                 count: '12 ដង',
               ),
               _buildScannerTile(
+                context: context,
                 title: 'Terminal 001',
                 subtitle: '# FC002 | អគារ ក | ស្កេនចូល',
                 status: 'សកម្ម',
                 count: '12 ដង',
               ),
               _buildScannerTile(
+                context: context,
                 title: 'Terminal 001',
                 subtitle: '# FC002 | អគារ ក | ស្កេនចូល',
                 status: 'សកម្ម',
@@ -88,13 +97,14 @@ class AboutScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSectionHeader(String title, IconData icon) {
+  Widget _buildSectionHeader(
+      BuildContext context, String title, IconData icon) {
     return Row(
       children: [
         Text(
           title,
           style: TextStyle(
-            fontSize: 22.0,
+            fontSize: Theme.of(context).textTheme.bodyLarge!.fontSize,
             fontWeight: FontWeight.bold,
             color: Colors.black,
           ),
@@ -110,6 +120,7 @@ class AboutScreen extends StatelessWidget {
   }
 
   Widget _buildInfoTile({
+    required BuildContext context,
     required IconData icon,
     required String title,
     required String subtitle,
@@ -146,7 +157,7 @@ class AboutScreen extends StatelessWidget {
                 Text(
                   title,
                   style: TextStyle(
-                    fontSize: 16.0,
+                    fontSize: Theme.of(context).textTheme.bodyLarge!.fontSize,
                     fontWeight: FontWeight.w600,
                     color: Colors.grey.shade800,
                   ),
@@ -155,7 +166,7 @@ class AboutScreen extends StatelessWidget {
                 Text(
                   subtitle,
                   style: TextStyle(
-                    fontSize: 12.0,
+                    fontSize: Theme.of(context).textTheme.bodyMedium!.fontSize,
                     color: Colors.grey.shade600,
                   ),
                   overflow: TextOverflow.ellipsis,
@@ -169,6 +180,7 @@ class AboutScreen extends StatelessWidget {
   }
 
   Widget _buildScannerTile({
+    required BuildContext context,
     required String title,
     required String subtitle,
     required String status,
@@ -210,7 +222,8 @@ class AboutScreen extends StatelessWidget {
                       Text(
                         title,
                         style: TextStyle(
-                          fontSize: 16.0,
+                          fontSize:
+                              Theme.of(context).textTheme.bodyLarge!.fontSize,
                           fontWeight: FontWeight.w600,
                           color: Colors.grey.shade800,
                         ),
@@ -219,7 +232,8 @@ class AboutScreen extends StatelessWidget {
                       Text(
                         subtitle,
                         style: TextStyle(
-                          fontSize: 12.0,
+                          fontSize:
+                              Theme.of(context).textTheme.bodyMedium!.fontSize,
                           color: Colors.grey.shade600,
                         ),
                         overflow: TextOverflow.ellipsis,
@@ -245,7 +259,7 @@ class AboutScreen extends StatelessWidget {
                 child: Text(
                   status,
                   style: TextStyle(
-                    fontSize: 14.0,
+                    fontSize: Theme.of(context).textTheme.bodyMedium!.fontSize,
                     color: Colors.green.shade800,
                     fontWeight: FontWeight.w500,
                   ),
@@ -255,7 +269,7 @@ class AboutScreen extends StatelessWidget {
               Text(
                 count,
                 style: TextStyle(
-                  fontSize: 14.0,
+                  fontSize: Theme.of(context).textTheme.bodyMedium!.fontSize,
                   color: Colors.grey.shade700,
                 ),
               ),

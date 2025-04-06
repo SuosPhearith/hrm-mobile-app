@@ -79,17 +79,21 @@ class _HomeScreenState extends State<HomeScreen> {
                                           Text(
                                             homeProvider.name ?? 'មិនមានឈ្មោះ',
                                             style: TextStyle(
-                                              fontSize: 16.0,
+                                              fontSize: Theme.of(context)
+                                                  .textTheme
+                                                  .bodyLarge!
+                                                  .fontSize,
                                               fontWeight: FontWeight.bold,
-                                              color: Colors.grey.shade800,
                                             ),
                                           ),
                                           Text(
                                             homeProvider.department ??
                                                 'មិនមានផ្នែក',
                                             style: TextStyle(
-                                              fontSize: 12.0,
-                                              color: Colors.grey.shade600,
+                                              fontSize: Theme.of(context)
+                                                  .textTheme
+                                                  .bodySmall!
+                                                  .fontSize,
                                             ),
                                             overflow: TextOverflow.ellipsis,
                                           ),
@@ -173,7 +177,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 Text(
                                                   'ថ្ងៃនេះ',
                                                   style: TextStyle(
-                                                    fontSize: 16.0,
+                                                    fontSize: Theme.of(context)
+                                                        .textTheme
+                                                        .bodyLarge!
+                                                        .fontSize,
                                                     fontWeight: FontWeight.bold,
                                                     color: Colors.blue[900],
                                                   ),
@@ -194,9 +201,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                                       Text(
                                                         '03-03-2025',
                                                         style: TextStyle(
-                                                          fontSize: 12.0,
-                                                          color: Colors
-                                                              .grey.shade600,
+                                                          fontSize:
+                                                              Theme.of(context)
+                                                                  .textTheme
+                                                                  .bodySmall!
+                                                                  .fontSize,
                                                         ),
                                                       ),
                                                       SizedBox(width: 4.0),
@@ -226,7 +235,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                                       Text(
                                                         '${homeProvider.scanByDayData?.data['sampleData']['working_hour'] ?? "..."} ម៉ោង',
                                                         style: TextStyle(
-                                                          fontSize: 16.0,
+                                                          fontSize:
+                                                              Theme.of(context)
+                                                                  .textTheme
+                                                                  .bodyLarge!
+                                                                  .fontSize,
                                                           fontWeight:
                                                               FontWeight.bold,
                                                           color:
@@ -236,9 +249,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                                       Text(
                                                         '30 នាទី',
                                                         style: TextStyle(
-                                                          fontSize: 16.0,
-                                                          color: Colors
-                                                              .grey.shade600,
+                                                          fontSize:
+                                                              Theme.of(context)
+                                                                  .textTheme
+                                                                  .bodyLarge!
+                                                                  .fontSize,
                                                         ),
                                                       ),
                                                     ],
@@ -309,25 +324,25 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                         'check_in']),
                                                                     style:
                                                                         TextStyle(
-                                                                      fontSize:
-                                                                          12.0,
+                                                                      fontSize: Theme.of(
+                                                                              context)
+                                                                          .textTheme
+                                                                          .bodySmall!
+                                                                          .fontSize,
                                                                       fontWeight:
                                                                           FontWeight
                                                                               .w600,
-                                                                      color: Colors
-                                                                          .grey
-                                                                          .shade800,
                                                                     ),
                                                                   ),
                                                                   Text(
                                                                     '${homeProvider.scanByDayData?.data['sampleData']['first_terminal_log']['terminal_device']['name'] ?? '...'} | ${homeProvider.scanByDayData?.data['sampleData']['first_terminal_log']['terminal_device']['group'] ?? '...'}',
                                                                     style:
                                                                         TextStyle(
-                                                                      fontSize:
-                                                                          12.0,
-                                                                      color: Colors
-                                                                          .grey
-                                                                          .shade600,
+                                                                      fontSize: Theme.of(
+                                                                              context)
+                                                                          .textTheme
+                                                                          .bodySmall!
+                                                                          .fontSize,
                                                                     ),
                                                                     overflow:
                                                                         TextOverflow
@@ -394,25 +409,25 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                         'check_out']),
                                                                     style:
                                                                         TextStyle(
-                                                                      fontSize:
-                                                                          12.0,
+                                                                      fontSize: Theme.of(
+                                                                              context)
+                                                                          .textTheme
+                                                                          .bodySmall!
+                                                                          .fontSize,
                                                                       fontWeight:
                                                                           FontWeight
                                                                               .w600,
-                                                                      color: Colors
-                                                                          .grey
-                                                                          .shade800,
                                                                     ),
                                                                   ),
                                                                   Text(
                                                                     '${homeProvider.scanByDayData?.data['sampleData']['last_terminal_log']['terminal_device']['name'] ?? '...'} | ${homeProvider.scanByDayData?.data['sampleData']['last_terminal_log']['terminal_device']['group'] ?? '...'}',
                                                                     style:
                                                                         TextStyle(
-                                                                      fontSize:
-                                                                          12.0,
-                                                                      color: Colors
-                                                                          .grey
-                                                                          .shade600,
+                                                                      fontSize: Theme.of(
+                                                                              context)
+                                                                          .textTheme
+                                                                          .bodySmall!
+                                                                          .fontSize,
                                                                     ),
                                                                     overflow:
                                                                         TextOverflow
@@ -458,7 +473,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 Text(
                                                   'ប្រចាំខែ',
                                                   style: TextStyle(
-                                                    fontSize: 16.0,
+                                                    fontSize: Theme.of(context)
+                                                        .textTheme
+                                                        .bodyLarge!
+                                                        .fontSize,
                                                     fontWeight: FontWeight.bold,
                                                     color: Colors.blue[900],
                                                   ),
@@ -479,9 +497,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                                       Text(
                                                         'កុម្ភះ 2025',
                                                         style: TextStyle(
-                                                          fontSize: 12.0,
-                                                          color: Colors
-                                                              .grey.shade600,
+                                                          fontSize:
+                                                              Theme.of(context)
+                                                                  .textTheme
+                                                                  .bodySmall!
+                                                                  .fontSize,
                                                         ),
                                                       ),
                                                       SizedBox(width: 4.0),
@@ -537,16 +557,20 @@ class _HomeScreenState extends State<HomeScreen> {
                                                               Text(
                                                                 '${homeProvider.scanByMonthData?.data['sum_hour'] ?? '...'} ម៉ោង',
                                                                 style: TextStyle(
-                                                                    color: Colors
-                                                                        .black,
-                                                                    fontSize:
-                                                                        14),
+                                                                    fontSize: Theme.of(
+                                                                            context)
+                                                                        .textTheme
+                                                                        .bodyMedium!
+                                                                        .fontSize),
                                                               ),
                                                               Text(
                                                                 'មធ្យម​ 8 ម៉ោង/ថ្ងៃ',
                                                                 style: TextStyle(
-                                                                    fontSize:
-                                                                        10),
+                                                                    fontSize: Theme.of(
+                                                                            context)
+                                                                        .textTheme
+                                                                        .bodySmall!
+                                                                        .fontSize),
                                                               ),
                                                             ],
                                                           ),
@@ -656,15 +680,21 @@ class _HomeScreenState extends State<HomeScreen> {
                                                     Text(
                                                       'សរុបម៉ោងធ្វើការ',
                                                       style: TextStyle(
-                                                        fontSize: 12.0,
-                                                        color: Colors.grey[600],
+                                                        fontSize:
+                                                            Theme.of(context)
+                                                                .textTheme
+                                                                .bodySmall!
+                                                                .fontSize,
                                                       ),
                                                     ),
                                                     Text(
                                                       'ទទួលនិទ្ទេស​ ${homeProvider.scanByMonthData?.data['grade'] ?? '...'}',
                                                       style: TextStyle(
-                                                        fontSize: 12.0,
-                                                        color: Colors.grey[600],
+                                                        fontSize:
+                                                            Theme.of(context)
+                                                                .textTheme
+                                                                .bodySmall!
+                                                                .fontSize,
                                                       ),
                                                     ),
                                                   ],
@@ -686,10 +716,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                                         center: Text(
                                                           "${homeProvider.scanByMonthData?.data['sum_hour'] ?? '...'} ម៉ោង / ${homeProvider.scanByMonthData?.data['max_hour'] ?? '...'} ម៉ោង",
                                                           style: TextStyle(
-                                                            fontSize: 12.0,
+                                                            fontSize: Theme.of(
+                                                                    context)
+                                                                .textTheme
+                                                                .bodySmall!
+                                                                .fontSize,
                                                             fontWeight:
                                                                 FontWeight.w600,
-                                                            color: Colors.black,
                                                           ),
                                                         ),
                                                         percent:
@@ -774,9 +807,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                       Text(
                                         'សំណើរ',
                                         style: TextStyle(
-                                          fontSize: 14.0,
+                                          fontSize: Theme.of(context)
+                                              .textTheme
+                                              .bodyMedium!
+                                              .fontSize,
                                           fontWeight: FontWeight.w600,
-                                          color: Colors.grey.shade800,
                                         ),
                                         textAlign: TextAlign.center,
                                       ),
@@ -802,9 +837,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                       Text(
                                         'ស្កេន',
                                         style: TextStyle(
-                                          fontSize: 14.0,
+                                          fontSize: Theme.of(context)
+                                              .textTheme
+                                              .bodyMedium!
+                                              .fontSize,
                                           fontWeight: FontWeight.w600,
-                                          color: Colors.grey.shade800,
                                         ),
                                         textAlign: TextAlign.center,
                                       ),
@@ -830,9 +867,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                       Text(
                                         'ប្រចាំថ្ងៃ',
                                         style: TextStyle(
-                                          fontSize: 14.0,
+                                          fontSize: Theme.of(context)
+                                              .textTheme
+                                              .bodyMedium!
+                                              .fontSize,
                                           fontWeight: FontWeight.w600,
-                                          color: Colors.grey.shade800,
                                         ),
                                         textAlign: TextAlign.center,
                                       ),
@@ -858,9 +897,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                       Text(
                                         'វាយតម្លៃ',
                                         style: TextStyle(
-                                          fontSize: 14.0,
+                                          fontSize: Theme.of(context)
+                                              .textTheme
+                                              .bodyMedium!
+                                              .fontSize,
                                           fontWeight: FontWeight.w600,
-                                          color: Colors.grey.shade800,
                                         ),
                                         textAlign: TextAlign.center,
                                       ),
@@ -886,9 +927,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                       Text(
                                         'ព័ត៌មានផ្ទាល់ខ្លួន',
                                         style: TextStyle(
-                                          fontSize: 14.0,
+                                          fontSize: Theme.of(context)
+                                              .textTheme
+                                              .bodyMedium!
+                                              .fontSize,
                                           fontWeight: FontWeight.w600,
-                                          color: Colors.grey.shade800,
                                         ),
                                         textAlign: TextAlign.center,
                                       ),
@@ -914,9 +957,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                       Text(
                                         'ការងារ',
                                         style: TextStyle(
-                                          fontSize: 14.0,
+                                          fontSize: Theme.of(context)
+                                              .textTheme
+                                              .bodyMedium!
+                                              .fontSize,
                                           fontWeight: FontWeight.w600,
-                                          color: Colors.grey.shade800,
                                         ),
                                         textAlign: TextAlign.center,
                                       ),
@@ -942,9 +987,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                       Text(
                                         'ប្រាក់បៀវត្សរ៍',
                                         style: TextStyle(
-                                          fontSize: 14.0,
+                                          fontSize: Theme.of(context)
+                                              .textTheme
+                                              .bodyMedium!
+                                              .fontSize,
                                           fontWeight: FontWeight.w600,
-                                          color: Colors.grey.shade800,
                                         ),
                                         textAlign: TextAlign.center,
                                       ),
@@ -970,9 +1017,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                       Text(
                                         'ប័ណ្ណសម្គាល់ខ្លួន',
                                         style: TextStyle(
-                                          fontSize: 14.0,
+                                          fontSize: Theme.of(context)
+                                              .textTheme
+                                              .bodyMedium!
+                                              .fontSize,
                                           fontWeight: FontWeight.w600,
-                                          color: Colors.grey.shade800,
                                         ),
                                         textAlign: TextAlign.center,
                                       ),
@@ -998,9 +1047,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                       Text(
                                         'ឯកសារ',
                                         style: TextStyle(
-                                          fontSize: 14.0,
+                                          fontSize: Theme.of(context)
+                                              .textTheme
+                                              .bodyMedium!
+                                              .fontSize,
                                           fontWeight: FontWeight.w600,
-                                          color: Colors.grey.shade800,
                                         ),
                                         textAlign: TextAlign.center,
                                       ),
@@ -1050,7 +1101,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                             child: Text(
                                               'ស្នើសុំ',
                                               style: TextStyle(
-                                                fontSize: 12.0,
+                                                fontSize: Theme.of(context)
+                                                    .textTheme
+                                                    .bodySmall!
+                                                    .fontSize,
                                                 fontWeight: FontWeight.bold,
                                                 color:
                                                     selectedIndex == 'Pending'
@@ -1083,7 +1137,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                             child: Text(
                                               'ត្រួតពិនិត្យ',
                                               style: TextStyle(
-                                                fontSize: 12.0,
+                                                fontSize: Theme.of(context)
+                                                    .textTheme
+                                                    .bodySmall!
+                                                    .fontSize,
                                                 fontWeight: FontWeight.bold,
                                                 color:
                                                     selectedIndex == 'Success'
@@ -1130,9 +1187,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                             Text(
                                               'P-12345',
                                               style: TextStyle(
-                                                fontSize: 14.0,
+                                                fontSize: Theme.of(context)
+                                                    .textTheme
+                                                    .bodyMedium!
+                                                    .fontSize,
                                                 fontWeight: FontWeight.bold,
-                                                color: Colors.grey.shade800,
                                               ),
                                             ),
                                             Container(
@@ -1153,8 +1212,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                               child: Text(
                                                 '${item['request_status']['name_kh'] ?? '...'}',
                                                 style: TextStyle(
-                                                  fontSize: 12.0,
-                                                  color: Colors.black87,
+                                                  fontSize: Theme.of(context)
+                                                      .textTheme
+                                                      .bodySmall!
+                                                      .fontSize,
                                                 ),
                                               ),
                                             ),
@@ -1165,8 +1226,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                             Text(
                                               '${formatDateToDDMMYY(item['start_datetime'])} ដល់ ${formatDateToDDMMYY(item['end_datetime'])}',
                                               style: TextStyle(
-                                                fontSize: 12.0,
-                                                color: Colors.grey.shade700,
+                                                fontSize: Theme.of(context)
+                                                    .textTheme
+                                                    .bodySmall!
+                                                    .fontSize,
                                               ),
                                             ),
                                             const SizedBox(width: 8.0),
@@ -1188,7 +1251,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                               child: Text(
                                                 '4 ថ្ងៃ',
                                                 style: TextStyle(
-                                                  fontSize: 12.0,
+                                                  fontSize: Theme.of(context)
+                                                      .textTheme
+                                                      .bodySmall!
+                                                      .fontSize,
                                                   color: Colors.blue.shade800,
                                                 ),
                                               ),
@@ -1198,8 +1264,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                         Text(
                                           '${item['request_type']['name_kh']} ${item['request_category']['name_kh']}',
                                           style: TextStyle(
-                                            fontSize: 12.0,
-                                            color: Colors.grey.shade600,
+                                            fontSize: Theme.of(context)
+                                                .textTheme
+                                                .bodySmall!
+                                                .fontSize,
                                           ),
                                         ),
                                       ],

@@ -58,15 +58,11 @@ class MyApp extends StatelessWidget {
           surface: Colors.white,
         ),
         textTheme: const TextTheme(
-          bodyLarge: TextStyle(fontSize: 18, color: Color(0xFF002458)),
-          bodyMedium: TextStyle(fontSize: 16, color: Colors.grey),
-          titleLarge: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Color(0xFF002458),
-          ),
+          bodyLarge: TextStyle(fontSize: 16, color: Colors.black),
+          bodyMedium: TextStyle(fontSize: 14, color: Colors.black),
+          bodySmall: TextStyle(fontSize: 12, color: Colors.grey),
         ),
-        scaffoldBackgroundColor: Colors.grey[100],
+        scaffoldBackgroundColor: Color(0xFF002458),
         appBarTheme: const AppBarTheme(
           backgroundColor: Color(0xFF002458),
           foregroundColor: Colors.white,
