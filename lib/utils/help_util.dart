@@ -26,3 +26,29 @@ String formatTimeToHour(String? isoTimestamp) {
     return '...';
   }
 }
+
+Map<String, int> convertToHoursAndMinutes(double value) {
+  int hours = value.floor();
+  int minutes = ((value - hours) * 60).round();
+  if (minutes == 60) {
+    hours += 1;
+    minutes = 0;
+  }
+  return {'hours': hours, 'minutes': minutes};
+}
+
+double clampToZeroOne(double value) {
+  if (value < 0.0) return 0.0;
+  if (value > 1.0) return 1.0;
+  return value;
+}
+
+String convertNumberToString(dynamic value) {
+  if (value == null) return '';
+
+  if (value is int || value is double) {
+    return value.toString();
+  }
+
+  return '';
+}

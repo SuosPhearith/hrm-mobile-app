@@ -14,7 +14,7 @@ class ScanScreenState extends State<ScanScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100], // Softer, professional background
+      backgroundColor: Colors.grey[100],
       appBar: AppBar(
         title: GestureDetector(
           onTap: () {
@@ -29,31 +29,25 @@ class ScanScreenState extends State<ScanScreen> {
                     : "ស្កេន - មីនា",
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: Colors.black,
                 ),
               ),
               const SizedBox(width: 4.0),
-              const Icon(Icons.arrow_drop_down, color: Colors.white),
+              const Icon(Icons.arrow_drop_down, color: Colors.black),
             ],
           ),
         ),
         centerTitle: true,
-        backgroundColor: Colors.blue[800],
-        elevation: 0,
-        flexibleSpace: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.blue[800]!, Colors.blue[600]!],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-          ),
+        backgroundColor: Colors.white,
+        iconTheme: const IconThemeData(
+          color: Colors.black,
         ),
+        elevation: 0,
         actions: [
           IconButton(
             icon: Icon(
               Icons.sync,
-              color: Colors.white,
+              color: Colors.black,
               size: 28.0,
             ),
             onPressed: () {},
@@ -283,16 +277,9 @@ class ScanScreenState extends State<ScanScreen> {
     return Container(
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12.0),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12.0),
+          border: Border.all(color: Colors.grey, width: 1)),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [

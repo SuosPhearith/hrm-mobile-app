@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:mobile_app/app_routes.dart';
 import 'package:mobile_app/providers/local/home_provider.dart';
 import 'package:mobile_app/utils/help_util.dart';
+import 'package:mobile_app/widgets/skeleton.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:provider/provider.dart';
@@ -17,13 +18,6 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
   String selectedIndex = 'Pending';
-
-  double _calculatePercent(dynamic sumHour, dynamic maxHour) {
-    final double sum = (sumHour is num ? sumHour.toDouble() : 0.0);
-    final double max = (maxHour is num ? maxHour.toDouble() : 1.0);
-    if (max == 0) return 0.0;
-    return (sum / max).clamp(0.0, 1.0);
-  }
 
   String formatDateToDDMMYY(String dateStr) {
     final dateTime = DateTime.parse(dateStr);
@@ -43,7 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
           return Scaffold(
             backgroundColor: Colors.grey[100],
             body: homeProvider.isLoading
-                ? Text("")
+                ? Skeleton()
                 : SingleChildScrollView(
                     child: Column(
                       children: [
@@ -226,14 +220,18 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 CircularPercentIndicator(
                                                   radius: 50.0,
                                                   lineWidth: 8.0,
-                                                  percent: 0.7,
+                                                  percent: clampToZeroOne(
+                                                      homeProvider.scanByDayData
+                                                                  ?.data[
+                                                              'percentage'] ??
+                                                          0),
                                                   center: Column(
                                                     mainAxisAlignment:
                                                         MainAxisAlignment
                                                             .center,
                                                     children: [
                                                       Text(
-                                                        '${homeProvider.scanByDayData?.data['sampleData']['working_hour'] ?? "..."} ម៉ោង',
+                                                        '${convertToHoursAndMinutes(homeProvider.scanByDayData?.data['working_hour'])['hours']} ម៉ោង',
                                                         style: TextStyle(
                                                           fontSize:
                                                               Theme.of(context)
@@ -247,7 +245,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                         ),
                                                       ),
                                                       Text(
-                                                        '30 នាទី',
+                                                        '${convertToHoursAndMinutes(homeProvider.scanByDayData?.data['working_hour'])['minutes']} នាទី',
                                                         style: TextStyle(
                                                           fontSize:
                                                               Theme.of(context)
@@ -318,10 +316,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                 children: [
                                                                   Text(
                                                                     formatTimeToHour(homeProvider
-                                                                            .scanByDayData
-                                                                            ?.data['sampleData']
-                                                                        [
-                                                                        'check_in']),
+                                                                        .scanByDayData
+                                                                        ?.data['check_in']),
                                                                     style:
                                                                         TextStyle(
                                                                       fontSize: Theme.of(
@@ -335,7 +331,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                     ),
                                                                   ),
                                                                   Text(
-                                                                    '${homeProvider.scanByDayData?.data['sampleData']['first_terminal_log']['terminal_device']['name'] ?? '...'} | ${homeProvider.scanByDayData?.data['sampleData']['first_terminal_log']['terminal_device']['group'] ?? '...'}',
+                                                                    '${homeProvider.scanByDayData?.data['first_terminal_log']['terminal_device']['name'] ?? '...'} | ${homeProvider.scanByDayData?.data['first_terminal_log']['terminal_device']['group'] ?? '...'}',
                                                                     style:
                                                                         TextStyle(
                                                                       fontSize: Theme.of(
@@ -403,10 +399,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                 children: [
                                                                   Text(
                                                                     formatTimeToHour(homeProvider
-                                                                            .scanByDayData
-                                                                            ?.data['sampleData']
-                                                                        [
-                                                                        'check_out']),
+                                                                        .scanByDayData
+                                                                        ?.data['check_out']),
                                                                     style:
                                                                         TextStyle(
                                                                       fontSize: Theme.of(
@@ -420,7 +414,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                     ),
                                                                   ),
                                                                   Text(
-                                                                    '${homeProvider.scanByDayData?.data['sampleData']['last_terminal_log']['terminal_device']['name'] ?? '...'} | ${homeProvider.scanByDayData?.data['sampleData']['last_terminal_log']['terminal_device']['group'] ?? '...'}',
+                                                                    '${homeProvider.scanByDayData?.data['last_terminal_log']['terminal_device']['name'] ?? '...'} | ${homeProvider.scanByDayData?.data['last_terminal_log']['terminal_device']['group'] ?? '...'}',
                                                                     style:
                                                                         TextStyle(
                                                                       fontSize: Theme.of(
@@ -564,7 +558,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                         .fontSize),
                                                               ),
                                                               Text(
-                                                                'មធ្យម​ 8 ម៉ោង/ថ្ងៃ',
+                                                                'មធ្យម​ ${convertToHoursAndMinutes(homeProvider.scanByMonthData?.data['avg_per_day'])['hours']}ម៉ោង ${convertToHoursAndMinutes(homeProvider.scanByMonthData?.data['avg_per_day'])['minutes']}នាទី/ថ្ងៃ',
                                                                 style: TextStyle(
                                                                     fontSize: Theme.of(
                                                                             context)
@@ -603,7 +597,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                 Colors.red[800],
                                                           ),
                                                           Text(
-                                                              '${homeProvider.scanByMonthData?.data['absent'] ?? '...'}'),
+                                                              '${homeProvider.scanByMonthData?.data['absence'] ?? '...'}'),
                                                         ],
                                                       ),
                                                     ),
@@ -633,7 +627,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                 .orange[800],
                                                           ),
                                                           Text(
-                                                              '${homeProvider.scanByMonthData?.data['reqeust'] ?? '...'}'),
+                                                              '${homeProvider.scanByMonthData?.data['leave'] ?? '...'}'),
                                                         ],
                                                       ),
                                                     ),
@@ -725,15 +719,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                 FontWeight.w600,
                                                           ),
                                                         ),
-                                                        percent:
-                                                            _calculatePercent(
-                                                          homeProvider
-                                                              .scanByMonthData
-                                                              ?.data['sum_hour'],
-                                                          homeProvider
-                                                              .scanByMonthData
-                                                              ?.data['max_hour'],
-                                                        ),
+                                                        percent: clampToZeroOne(
+                                                            homeProvider
+                                                                    .scanByMonthData
+                                                                    ?.data[
+                                                                'percentage']),
                                                         backgroundColor:
                                                             Colors.grey[300],
                                                         progressColor:

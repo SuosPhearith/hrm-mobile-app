@@ -1,98 +1,117 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_app/providers/local/about_provider.dart';
+import 'package:mobile_app/utils/help_util.dart';
+import 'package:mobile_app/widgets/skeleton.dart';
+import 'package:provider/provider.dart';
 
 class AboutScreen extends StatelessWidget {
   const AboutScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey[100], // Softer background
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        title: const Text(
-          'អំពីប្រព័ន្ធ',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
-          ),
-        ),
-        centerTitle: true,
-        elevation: 0,
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildSectionHeader(context, 'អនុក្រឹត', Icons.edit_document),
-              const SizedBox(height: 12),
-              _buildInfoTile(
-                context: context,
-                icon: Icons.access_time,
-                title: '08 ម៉ោង / ថ្ងៃ',
-                subtitle: 'ម៉ោងធ្វើការ',
+    return ChangeNotifierProvider(
+      create: (_) => AboutProvider(),
+      child: Consumer<AboutProvider>(
+        builder: (context, aboutProvider, child) {
+          return Scaffold(
+            backgroundColor: Colors.grey[100], // Softer background
+            appBar: AppBar(
+              backgroundColor: Colors.white,
+              title: const Text(
+                'អំពីប្រព័ន្ធ',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
               ),
-              _buildInfoTile(
-                context: context,
-                icon: Icons.calendar_month,
-                title: '05 ថ្ងៃ / សប្តាហ៍',
-                subtitle: 'ចំនួនថ្ងៃ',
-              ),
-              _buildInfoTile(
-                context: context,
-                icon: Icons.av_timer,
-                title: '40 ម៉ោង / សប្តាហ៍',
-                subtitle: 'ចំនួនម៉ោង',
-              ),
-              const SizedBox(height: 24),
-              _buildSectionHeader(context, 'ការស្កេនប្រចាំថ្ងៃ', Icons.face),
-              const SizedBox(height: 12),
-              _buildInfoTile(
-                context: context,
-                icon: Icons.login,
-                title: '07:30AM',
-                subtitle: 'ស្កេនចូល',
-              ),
-              _buildInfoTile(
-                context: context,
-                icon: Icons.logout,
-                title: '05:50PM',
-                subtitle: 'ស្កេនចេញ',
-              ),
-              _buildInfoTile(
-                context: context,
-                icon: Icons.message_outlined,
-                title: 'លើកលែងម៉ោងបាយថ្ងៃត្រង់ 2 ម៉ោង',
-                subtitle: 'សម្គាល់',
-              ),
-              const SizedBox(height: 24),
-              _buildSectionHeader(context, 'ម៉ាស៊ីនស្កេនមុខ', Icons.face),
-              const SizedBox(height: 12),
-              _buildScannerTile(
-                context: context,
-                title: 'Terminal 001',
-                subtitle: '# FC002 | អគារ ក | ស្កេនចូល',
-                status: 'សកម្ម',
-                count: '12 ដង',
-              ),
-              _buildScannerTile(
-                context: context,
-                title: 'Terminal 001',
-                subtitle: '# FC002 | អគារ ក | ស្កេនចូល',
-                status: 'សកម្ម',
-                count: '12 ដង',
-              ),
-              _buildScannerTile(
-                context: context,
-                title: 'Terminal 001',
-                subtitle: '# FC002 | អគារ ក | ស្កេនចូល',
-                status: 'សកម្ម',
-                count: '12 ដង',
-              ),
-            ],
-          ),
-        ),
+              centerTitle: true,
+              elevation: 0,
+            ),
+            body: aboutProvider.isLoading
+                ? Skeleton()
+                : SingleChildScrollView(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildSectionHeader(
+                              context, 'អនុក្រឹត', Icons.edit_document),
+                          const SizedBox(height: 12),
+                          _buildInfoTile(
+                            context: context,
+                            icon: Icons.access_time,
+                            title:
+                                '${convertNumberToString(aboutProvider.aboutListData?.data['attendent_rule'][0]['working_hour_per_day'])} ម៉ោង / ថ្ងៃ',
+                            subtitle: 'ម៉ោងធ្វើការ',
+                          ),
+                          _buildInfoTile(
+                            context: context,
+                            icon: Icons.calendar_month,
+                            title:
+                                '${convertNumberToString(aboutProvider.aboutListData?.data['attendent_rule'][0]['working_day_per_week'])} ថ្ងៃ / សប្តាហ៍',
+                            subtitle: 'ចំនួនថ្ងៃ',
+                          ),
+                          _buildInfoTile(
+                            context: context,
+                            icon: Icons.av_timer,
+                            title:
+                                '${convertNumberToString(aboutProvider.aboutListData?.data['attendent_rule'][0]['working_hour_per_week'])} ម៉ោង / សប្តាហ៍',
+                            subtitle: 'ចំនួនម៉ោង',
+                          ),
+                          const SizedBox(height: 24),
+                          _buildSectionHeader(
+                              context, 'ការស្កេនប្រចាំថ្ងៃ', Icons.face),
+                          const SizedBox(height: 12),
+                          _buildInfoTile(
+                            context: context,
+                            icon: Icons.login,
+                            title: '07:30AM',
+                            subtitle: 'ស្កេនចូល',
+                          ),
+                          _buildInfoTile(
+                            context: context,
+                            icon: Icons.logout,
+                            title: '05:50PM',
+                            subtitle: 'ស្កេនចេញ',
+                          ),
+                          _buildInfoTile(
+                            context: context,
+                            icon: Icons.message_outlined,
+                            title: 'លើកលែងម៉ោងបាយថ្ងៃត្រង់ 2 ម៉ោង',
+                            subtitle: 'សម្គាល់',
+                          ),
+                          const SizedBox(height: 24),
+                          _buildSectionHeader(
+                              context, 'ម៉ាស៊ីនស្កេនមុខ', Icons.face),
+                          const SizedBox(height: 12),
+                          _buildScannerTile(
+                            context: context,
+                            title: 'Terminal 001',
+                            subtitle: '# FC002 | អគារ ក | ស្កេនចូល',
+                            status: 'សកម្ម',
+                            count: '12 ដង',
+                          ),
+                          _buildScannerTile(
+                            context: context,
+                            title: 'Terminal 001',
+                            subtitle: '# FC002 | អគារ ក | ស្កេនចូល',
+                            status: 'សកម្ម',
+                            count: '12 ដង',
+                          ),
+                          _buildScannerTile(
+                            context: context,
+                            title: 'Terminal 001',
+                            subtitle: '# FC002 | អគារ ក | ស្កេនចូល',
+                            status: 'សកម្ម',
+                            count: '12 ដង',
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+          );
+        },
       ),
     );
   }

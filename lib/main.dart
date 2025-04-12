@@ -62,7 +62,7 @@ class MyApp extends StatelessWidget {
           bodyMedium: TextStyle(fontSize: 14, color: Colors.black),
           bodySmall: TextStyle(fontSize: 12, color: Colors.grey),
         ),
-        scaffoldBackgroundColor: Color(0xFF002458),
+        // scaffoldBackgroundColor: Color(0xFF002458),
         appBarTheme: const AppBarTheme(
           backgroundColor: Color(0xFF002458),
           foregroundColor: Colors.white,
@@ -227,19 +227,6 @@ class _MainLayoutState extends State<MainLayout> {
   Widget _buildNavIcon(IconData icon, int index, {bool active = false}) {
     return Container(
       padding: const EdgeInsets.all(6.0),
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        gradient: active
-            ? LinearGradient(
-                colors: [
-                  Color.fromARGB(255, 255, 235, 169),
-                  Color.fromARGB(255, 255, 235, 176),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              )
-            : null,
-      ),
       child: Icon(
         icon,
         size: 28.0,

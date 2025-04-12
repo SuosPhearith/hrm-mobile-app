@@ -28,20 +28,23 @@ class _DailyScreenState extends State<DailyScreen> {
                     : "ប្រចាំថ្ងៃ - មីនា",
                 style: const TextStyle(
                   fontWeight: FontWeight.w600,
-                  color: Colors.white,
+                  color: Colors.black,
                 ),
               ),
               const SizedBox(width: 4.0),
-              const Icon(Icons.arrow_drop_down, color: Colors.white),
+              const Icon(Icons.arrow_drop_down, color: Colors.black),
             ],
           ),
         ),
         centerTitle: true,
-        backgroundColor: Colors.blue[800],
+        backgroundColor: Colors.white,
+        iconTheme: const IconThemeData(
+          color: Colors.black,
+        ),
         elevation: 0,
         actions: [
           IconButton(
-            icon: const Icon(Icons.sync, color: Colors.white),
+            icon: const Icon(Icons.sync, color: Colors.black),
             onPressed: () {},
             splashRadius: 20.0,
           ),
@@ -269,16 +272,9 @@ class _DailyScreenState extends State<DailyScreen> {
     return Container(
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12.0),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 6.0,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12.0),
+          border: Border.all(color: Colors.grey, width: 1)),
       child: Row(
         children: [
           Container(

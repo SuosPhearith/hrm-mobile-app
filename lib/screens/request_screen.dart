@@ -6,27 +6,21 @@ class RequestScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100], // Softer, professional background
+      backgroundColor: Colors.grey[100],
       appBar: AppBar(
         title: const Text(
           'សំណើរ',
           style: TextStyle(
             fontWeight: FontWeight.bold,
-            color: Colors.white,
+            color: Colors.black,
           ),
         ),
         centerTitle: true,
-        backgroundColor: Colors.blue[800],
-        elevation: 0,
-        flexibleSpace: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.blue[800]!, Colors.blue[600]!],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-          ),
+        backgroundColor: Colors.white,
+        iconTheme: const IconThemeData(
+          color: Colors.black,
         ),
+        elevation: 0,
         actions: [
           GestureDetector(
             onTap: () {
@@ -185,16 +179,9 @@ class RequestScreen extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12.0),
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16.0),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16.0),
+          border: Border.all(width: 1, color: Colors.grey)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -204,7 +191,7 @@ class RequestScreen extends StatelessWidget {
               Text(
                 id,
                 style: TextStyle(
-                  fontSize: 16.0,
+                  fontSize: 12.0,
                   fontWeight: FontWeight.bold,
                   color: Colors.grey.shade800,
                 ),
@@ -221,7 +208,7 @@ class RequestScreen extends StatelessWidget {
                 child: Text(
                   status,
                   style: TextStyle(
-                    fontSize: 14.0,
+                    fontSize: 10.0,
                     color: Colors.black87,
                     fontWeight: FontWeight.w500,
                   ),
@@ -229,7 +216,6 @@ class RequestScreen extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 12.0),
           Row(
             children: [
               Text(
@@ -252,7 +238,7 @@ class RequestScreen extends StatelessWidget {
                 child: Text(
                   days,
                   style: TextStyle(
-                    fontSize: 14.0,
+                    fontSize: 10.0,
                     color: Colors.blue[800],
                     fontWeight: FontWeight.w500,
                   ),
@@ -260,7 +246,6 @@ class RequestScreen extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 12.0),
           Text(
             description,
             style: TextStyle(

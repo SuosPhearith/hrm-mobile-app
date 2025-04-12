@@ -38,17 +38,15 @@ class HomeProvider extends ChangeNotifier {
 
   // Initialize
   HomeProvider() {
-    getProfile();
-    getScanByDay();
-    getScanByMonth();
-    getRequest();
+    getHome();
   }
 
   // Functions
-  Future<void> getProfile() async {
+  Future<void> getHome() async {
     _isLoading = true;
     notifyListeners();
     try {
+      // =================================================
       final storage = FlutterSecureStorage();
       final String loadedName = await storage.read(key: 'name_kh') ?? '';
       final String loadedEmail = await storage.read(key: 'avatar') ?? '';
@@ -56,54 +54,15 @@ class HomeProvider extends ChangeNotifier {
       _name = loadedName;
       _email = loadedEmail;
       _department = loadedDepart;
-    } catch (e) {
-      _error = "Invalid Credential.";
-    } finally {
-      _isLoading = false;
-      notifyListeners();
-    }
-  }
-
-  Future<void> getScanByDay() async {
-    _isLoading = true;
-    notifyListeners();
-    try {
+      // =================================================
       final response = await _homeService.scanByDay();
       _scanByDayData = response;
-    } on Exception catch (e) {
-      _error = e.toString();
-    } catch (e) {
-      _error = "Invalid Credential.";
-    } finally {
-      _isLoading = false;
-      notifyListeners();
-    }
-  }
-
-  Future<void> getScanByMonth() async {
-    _isLoading = true;
-    notifyListeners();
-    try {
-      final response = await _homeService.scanByMonth();
-      _scanByMonthData = response;
-    } on Exception catch (e) {
-      _error = e.toString();
-    } catch (e) {
-      _error = "Invalid Credential.";
-    } finally {
-      _isLoading = false;
-      notifyListeners();
-    }
-  }
-
-  Future<void> getRequest() async {
-    _isLoading = true;
-    notifyListeners();
-    try {
-      final response = await _homeService.request();
-      _requestData = response;
-    } on Exception catch (e) {
-      _error = e.toString();
+      // =================================================
+      final response2 = await _homeService.scanByMonth();
+      _scanByMonthData = response2;
+      // =================================================
+      final response3 = await _homeService.request();
+      _requestData = response3;
     } catch (e) {
       _error = "Invalid Credential.";
     } finally {
