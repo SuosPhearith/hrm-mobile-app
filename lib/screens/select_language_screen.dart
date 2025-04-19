@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile_app/app_routes.dart';
 import 'package:mobile_app/providers/global/auth_provider.dart';
+import 'package:mobile_app/providers/global/setting_provider.dart';
 import 'package:provider/provider.dart';
 
 class SelectLanguageScreen extends StatelessWidget {
@@ -9,7 +10,8 @@ class SelectLanguageScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<AuthProvider>(builder: (context, provider, child) {
+    return Consumer2<AuthProvider, SettingProvider>(
+        builder: (context, provider, setting, child) {
       return Scaffold(
         body: Center(
           child: Column(
@@ -45,7 +47,7 @@ class SelectLanguageScreen extends StatelessWidget {
                 children: [
                   GestureDetector(
                     onTap: () async {
-                      await provider.handleSetLanguage('kh');
+                      await setting.handleSetLanguage('kh');
                       provider.setIsChecking(true);
                       if (context.mounted) {
                         context.go(AppRoutes.welcome);
@@ -55,7 +57,7 @@ class SelectLanguageScreen extends StatelessWidget {
                   ),
                   GestureDetector(
                     onTap: () async {
-                      await provider.handleSetLanguage('en');
+                      await setting.handleSetLanguage('en');
                       provider.setIsChecking(true);
                       if (context.mounted) {
                         context.go(AppRoutes.welcome);

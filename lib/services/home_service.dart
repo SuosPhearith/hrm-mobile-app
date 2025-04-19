@@ -68,7 +68,7 @@ class HomeService {
       request() async {
     try {
       final response = await DioClient.dio.get(
-        "/user/home/request?limit=50&offset=1",
+        "/user/home/request?limit=50",
       );
       return ResponseStructure<
           PaginationStructure<Map<String, dynamic>>>.fromJson(

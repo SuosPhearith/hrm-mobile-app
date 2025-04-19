@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_app/app_lang.dart';
+import 'package:mobile_app/providers/global/setting_provider.dart';
 import 'package:mobile_app/providers/local/about_provider.dart';
 import 'package:mobile_app/utils/help_util.dart';
 import 'package:mobile_app/widgets/skeleton.dart';
@@ -9,17 +11,20 @@ class AboutScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => AboutProvider(),
-      child: Consumer<AboutProvider>(
-        builder: (context, aboutProvider, child) {
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AboutProvider()),
+      ],
+      child: Consumer2<AboutProvider, SettingProvider>(
+        builder: (context, aboutProvider, settingProvider, child) {
+          final lang = settingProvider.lang;
           return Scaffold(
-            backgroundColor: Colors.grey[100], // Softer background
+            backgroundColor: Colors.grey[100],
             appBar: AppBar(
               backgroundColor: Colors.white,
-              title: const Text(
-                'អំពីប្រព័ន្ធ',
-                style: TextStyle(
+              title: Text(
+                AppLang.translate(key: 'about_system', lang: lang ?? 'kh'),
+                style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   color: Colors.black,
                 ),
@@ -36,76 +41,93 @@ class AboutScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           _buildSectionHeader(
-                              context, 'អនុក្រឹត', Icons.edit_document),
+                              context,
+                              AppLang.translate(
+                                  key: 'about_rule', lang: lang ?? 'kh'),
+                              Icons.edit_document),
                           const SizedBox(height: 12),
                           _buildInfoTile(
                             context: context,
                             icon: Icons.access_time,
                             title:
-                                '${convertNumberToString(aboutProvider.aboutListData?.data['attendent_rule'][0]['working_hour_per_day'])} ម៉ោង / ថ្ងៃ',
-                            subtitle: 'ម៉ោងធ្វើការ',
+                                '${convertNumberToString(aboutProvider.aboutListData?.data['attendent_rule'][0]['working_hour_per_day'])} ${AppLang.translate(key: 'about_hours', lang: lang ?? 'kh')} / ${AppLang.translate(key: 'about_day', lang: lang ?? 'kh')}',
+                            subtitle: AppLang.translate(
+                                key: 'about_working_hours', lang: lang ?? 'kh'),
                           ),
                           _buildInfoTile(
                             context: context,
                             icon: Icons.calendar_month,
                             title:
-                                '${convertNumberToString(aboutProvider.aboutListData?.data['attendent_rule'][0]['working_day_per_week'])} ថ្ងៃ / សប្តាហ៍',
-                            subtitle: 'ចំនួនថ្ងៃ',
+                                '${convertNumberToString(aboutProvider.aboutListData?.data['attendent_rule'][0]['working_day_per_week'])} ${AppLang.translate(key: 'about_day', lang: lang ?? 'kh')} / ${AppLang.translate(key: 'about_week', lang: lang ?? 'kh')}',
+                            subtitle: AppLang.translate(
+                                key: 'about_number_of_days',
+                                lang: lang ?? 'kh'),
                           ),
                           _buildInfoTile(
                             context: context,
                             icon: Icons.av_timer,
                             title:
-                                '${convertNumberToString(aboutProvider.aboutListData?.data['attendent_rule'][0]['working_hour_per_week'])} ម៉ោង / សប្តាហ៍',
-                            subtitle: 'ចំនួនម៉ោង',
+                                '${convertNumberToString(aboutProvider.aboutListData?.data['attendent_rule'][0]['working_hour_per_week'])} ${AppLang.translate(key: 'about_hours', lang: lang ?? 'kh')} / ${AppLang.translate(key: 'about_week', lang: lang ?? 'kh')}',
+                            subtitle: AppLang.translate(
+                                key: 'about_total_hours', lang: lang ?? 'kh'),
                           ),
                           const SizedBox(height: 24),
                           _buildSectionHeader(
-                              context, 'ការស្កេនប្រចាំថ្ងៃ', Icons.face),
+                              context,
+                              AppLang.translate(
+                                  key: 'about_daily_scan', lang: lang ?? 'kh'),
+                              Icons.face),
                           const SizedBox(height: 12),
                           _buildInfoTile(
                             context: context,
                             icon: Icons.login,
-                            title: '07:30AM',
-                            subtitle: 'ស្កេនចូល',
+                            title: formatTimeTo12Hour(aboutProvider
+                                .aboutListData
+                                ?.data['attendent_rule'][0]['check_in']),
+                            subtitle: AppLang.translate(
+                                key: 'about_scan_in', lang: lang ?? 'kh'),
                           ),
                           _buildInfoTile(
                             context: context,
                             icon: Icons.logout,
-                            title: '05:50PM',
-                            subtitle: 'ស្កេនចេញ',
+                            title: formatTimeTo12Hour(aboutProvider
+                                .aboutListData
+                                ?.data['attendent_rule'][0]['check_out']),
+                            subtitle: AppLang.translate(
+                                key: 'about_scan_out', lang: lang ?? 'kh'),
                           ),
                           _buildInfoTile(
                             context: context,
                             icon: Icons.message_outlined,
-                            title: 'លើកលែងម៉ោងបាយថ្ងៃត្រង់ 2 ម៉ោង',
-                            subtitle: 'សម្គាល់',
+                            title: AppLang.translate(
+                                key: 'about_lunch_break', lang: lang ?? 'kh'),
+                            subtitle: AppLang.translate(
+                                key: 'about_note', lang: lang ?? 'kh'),
                           ),
                           const SizedBox(height: 24),
                           _buildSectionHeader(
-                              context, 'ម៉ាស៊ីនស្កេនមុខ', Icons.face),
+                              context,
+                              AppLang.translate(
+                                  key: 'about_face_scanner',
+                                  lang: lang ?? 'kh'),
+                              Icons.face),
                           const SizedBox(height: 12),
-                          _buildScannerTile(
-                            context: context,
-                            title: 'Terminal 001',
-                            subtitle: '# FC002 | អគារ ក | ស្កេនចូល',
-                            status: 'សកម្ម',
-                            count: '12 ដង',
-                          ),
-                          _buildScannerTile(
-                            context: context,
-                            title: 'Terminal 001',
-                            subtitle: '# FC002 | អគារ ក | ស្កេនចូល',
-                            status: 'សកម្ម',
-                            count: '12 ដង',
-                          ),
-                          _buildScannerTile(
-                            context: context,
-                            title: 'Terminal 001',
-                            subtitle: '# FC002 | អគារ ក | ស្កេនចូល',
-                            status: 'សកម្ម',
-                            count: '12 ដង',
-                          ),
+                          ...aboutProvider
+                                  .aboutListData?.data['terminal_devices']
+                                  .map((record) {
+                                return _buildScannerTile(
+                                  context: context,
+                                  title: record['name'],
+                                  subtitle:
+                                      '${record['group']} | ${AppLang.translate(data: record['direction'], lang: lang ?? 'kh')}',
+                                  status: AppLang.translate(
+                                      data: record['health_check_status'],
+                                      lang: lang ?? 'kh'),
+                                  count:
+                                      '${record['count']} ${AppLang.translate(key: 'about_day', lang: lang ?? 'kh')}',
+                                );
+                              }).toList() ??
+                              [],
                         ],
                       ),
                     ),
@@ -129,11 +151,6 @@ class AboutScreen extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 8.0),
-        // Icon(
-        //   icon,
-        //   size: 24.0,
-        //   color: Colors.blue[700],
-        // ),
       ],
     );
   }
@@ -207,7 +224,7 @@ class AboutScreen extends StatelessWidget {
   }) {
     return Container(
       margin: const EdgeInsets.only(bottom: 8.0),
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(12.0),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12.0),

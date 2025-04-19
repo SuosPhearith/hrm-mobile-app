@@ -9,9 +9,9 @@ class HomeProvider extends ChangeNotifier {
   bool _isLoading = false;
   String? _error;
 
-  String? _name;
+  Map<String, dynamic>? _name;
   String? _email;
-  String? _department;
+  Map<String, dynamic>? _department;
 
   ResponseStructure<Map<String, dynamic>>? _scanByDayData;
   ResponseStructure<Map<String, dynamic>>? _scanByMonthData;
@@ -24,9 +24,9 @@ class HomeProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get error => _error;
 
-  String? get name => _name;
+  Map<String, dynamic>? get name => _name;
   String? get email => _email;
-  String? get department => _department;
+  Map<String, dynamic>? get department => _department;
 
   ResponseStructure<Map<String, dynamic>>? get scanByDayData => _scanByDayData;
   ResponseStructure<Map<String, dynamic>>? get scanByMonthData =>
@@ -48,12 +48,16 @@ class HomeProvider extends ChangeNotifier {
     try {
       // =================================================
       final storage = FlutterSecureStorage();
-      final String loadedName = await storage.read(key: 'name_kh') ?? '';
+      final String loadedNameKh = await storage.read(key: 'name_kh') ?? '';
+      final String loadedNameEn = await storage.read(key: 'name_en') ?? '';
       final String loadedEmail = await storage.read(key: 'avatar') ?? '';
-      final String loadedDepart = await storage.read(key: 'department') ?? '';
-      _name = loadedName;
+      final String loadedDepartKh =
+          await storage.read(key: 'department_kh') ?? '';
+      final String loadedDepartEn =
+          await storage.read(key: 'department_en') ?? '';
+      _name = {'name_kh': loadedNameKh, 'name_en': loadedNameEn};
       _email = loadedEmail;
-      _department = loadedDepart;
+      _department = {'name_kh': loadedDepartKh, 'name_en': loadedDepartEn};
       // =================================================
       final response = await _homeService.scanByDay();
       _scanByDayData = response;

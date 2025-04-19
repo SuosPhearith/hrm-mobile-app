@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mobile_app/app_lang.dart';
+import 'package:mobile_app/providers/global/setting_provider.dart';
 import 'package:mobile_app/screens/about_screen.dart';
 import 'package:mobile_app/screens/daily_screen.dart';
 import 'package:mobile_app/screens/holliday_screen.dart';
@@ -34,6 +36,7 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => SettingProvider()),
       ],
       child: const MyApp(),
     ),
@@ -161,6 +164,7 @@ class _MainLayoutState extends State<MainLayout> {
 
   @override
   Widget build(BuildContext context) {
+    final lang = Provider.of<SettingProvider>(context).lang;
     return Scaffold(
       body: SafeArea(
           child: widget.child), // Use router child instead of static pages
@@ -200,23 +204,24 @@ class _MainLayoutState extends State<MainLayout> {
             BottomNavigationBarItem(
               icon: _buildNavIcon(Icons.home, 0),
               activeIcon: _buildNavIcon(Icons.home, 0, active: true),
-              label: "ទំព័រដើម",
+              label: AppLang.translate(key: 'layout_home', lang: lang ?? 'kh'),
             ),
             BottomNavigationBarItem(
               icon: _buildNavIcon(Icons.info, 1),
               activeIcon: _buildNavIcon(Icons.info, 1, active: true),
-              label: "អំពីប្រព័ន្ធ",
+              label: AppLang.translate(key: 'layout_about', lang: lang ?? 'kh'),
             ),
             BottomNavigationBarItem(
               icon: _buildNavIcon(Icons.calendar_month, 2),
               activeIcon: _buildNavIcon(Icons.calendar_month, 2, active: true),
-              label: "ឈប់សម្រាក",
+              label:
+                  AppLang.translate(key: 'layout_holiday', lang: lang ?? 'kh'),
             ),
             BottomNavigationBarItem(
               icon: _buildNavIcon(Icons.grid_view_rounded, 3),
               activeIcon:
                   _buildNavIcon(Icons.grid_view_rounded, 3, active: true),
-              label: "ផ្សេងៗ",
+              label: AppLang.translate(key: 'layout_other', lang: lang ?? 'kh'),
             ),
           ],
         ),

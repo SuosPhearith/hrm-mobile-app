@@ -1,72 +1,92 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_app/app_lang.dart';
+import 'package:mobile_app/providers/global/setting_provider.dart';
+import 'package:mobile_app/providers/local/request_provider.dart';
+import 'package:mobile_app/utils/help_util.dart';
+import 'package:provider/provider.dart';
 
-class RequestScreen extends StatelessWidget {
+class RequestScreen extends StatefulWidget {
   const RequestScreen({super.key});
 
   @override
+  State<RequestScreen> createState() => _RequestScreenState();
+}
+
+class _RequestScreenState extends State<RequestScreen> {
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey[100],
-      appBar: AppBar(
-        title: const Text(
-          'សំណើរ',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
-          ),
-        ),
-        centerTitle: true,
-        backgroundColor: Colors.white,
-        iconTheme: const IconThemeData(
-          color: Colors.black,
-        ),
-        elevation: 0,
-        actions: [
-          GestureDetector(
-            onTap: () {
-              _showAddRequestBottomSheet(context);
-            },
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                padding: const EdgeInsets.all(6.0),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white,
-                ),
-                child: Icon(
-                  Icons.add,
-                  size: 28.0,
-                  color: Colors.blue[800],
-                ),
+    return ChangeNotifierProvider(
+      create: (_) => RequestProvider(),
+      child: Consumer2<RequestProvider, SettingProvider>(
+          builder: (context, requestProvider, settingProvider, chold) {
+        return Scaffold(
+          backgroundColor: Colors.grey[100],
+          appBar: AppBar(
+            title: Text(
+              AppLang.translate(
+                  key: 'request', lang: settingProvider.lang ?? 'kh'),
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
               ),
             ),
-          ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              _buildRequestCard(
-                id: 'P-12345',
-                status: 'កំពុងរង់ចាំ',
-                dates: '20-01-2025 ដល់ 23-01-2025',
-                days: '4 ថ្ងៃ',
-                description: 'បេសកម្ម (ក្នុងប្រទេស) គ្រោះថ្នាក់ចរាចណ៍',
-              ),
-              _buildRequestCard(
-                id: 'P-12345',
-                status: 'កំពុងរង់ចាំ',
-                dates: '20-01-2025 ដល់ 23-01-2025',
-                days: '4 ថ្ងៃ',
-                description: 'បេសកម្ម (ក្នុងប្រទេស) គ្រោះថ្នាក់ចរាចណ៍',
+            centerTitle: true,
+            backgroundColor: Colors.white,
+            iconTheme: const IconThemeData(
+              color: Colors.black,
+            ),
+            elevation: 0,
+            actions: [
+              GestureDetector(
+                onTap: () {
+                  _showAddRequestBottomSheet(context);
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                    padding: const EdgeInsets.all(6.0),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white,
+                    ),
+                    child: Icon(
+                      Icons.add,
+                      size: 28.0,
+                      color: Colors.blue[800],
+                    ),
+                  ),
+                ),
               ),
             ],
           ),
-        ),
-      ),
+          body: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  ...requestProvider.requestData?.data.results.map((record) {
+                        return _buildRequestCard(
+                          id: AppLang.translate(
+                              data: record['request_category'],
+                              lang: settingProvider.lang ?? 'kh'),
+                          status: AppLang.translate(
+                              data: record['request_status'],
+                              lang: settingProvider.lang ?? 'kh'),
+                          dates:
+                              '${formatDate(record['start_datetime'])} ដល់ ${formatDate(record['end_datetime'])}',
+                          days: calculateDateDifference(
+                              record['start_datetime'], record['end_datetime']),
+                          description:
+                              '${AppLang.translate(data: record['request_type'], lang: settingProvider.lang ?? 'kh')} | ${formatStringValue(record['objective'])}',
+                        );
+                      }).toList() ??
+                      [],
+                ],
+              ),
+            ),
+          ),
+        );
+      }),
     );
   }
 

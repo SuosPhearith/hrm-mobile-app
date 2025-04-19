@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_app/providers/global/setting_provider.dart';
 import 'package:mobile_app/screens/select_language_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:mobile_app/providers/global/auth_provider.dart';
@@ -10,7 +11,8 @@ class AuthMiddleware extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<AuthProvider>(builder: (context, auth, _) {
+    return Consumer2<AuthProvider, SettingProvider>(
+        builder: (context, auth, setting, _) {
       if (auth.isChecking) {
         return Scaffold(
           backgroundColor: Colors.grey[200],
@@ -19,7 +21,7 @@ class AuthMiddleware extends StatelessWidget {
           ),
         );
       }
-      if (!auth.isSelectingLanguage) {
+      if (!setting.isSelectingLanguage) {
         return const SelectLanguageScreen();
       }
       if (auth.isLoggedIn) {

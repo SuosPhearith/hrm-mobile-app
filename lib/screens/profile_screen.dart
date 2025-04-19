@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:go_router/go_router.dart';
+import 'package:mobile_app/app_routes.dart';
 import 'package:mobile_app/providers/global/auth_provider.dart';
 import 'package:mobile_app/widgets/helper.dart';
 import 'package:provider/provider.dart';
@@ -22,13 +24,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _loadData() async {
-    final String loadedName = await storage.read(key: 'username') ?? '';
-    final String loadedEmail = await storage.read(key: 'email') ?? '';
-    if (!mounted) return;
-    setState(() {
-      name = loadedName;
-      email = loadedEmail;
-    });
+    try {
+      final String? loadedName = await storage.read(key: 'username');
+      final String? loadedEmail = await storage.read(key: 'email');
+      if (!mounted) return;
+      setState(() {
+        name = loadedName ?? '';
+        email = loadedEmail ?? '';
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        name = '';
+        email = '';
+      });
+    }
   }
 
   @override
@@ -97,6 +107,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       icon: Icons.lock_outline,
                       text: 'ផ្លាស់ប្តូរពាក្យសម្ងាត់',
                       onTap: () {},
+                    ),
+                    const SizedBox(height: 8),
+                    ProfileActionItem(
+                      icon: Icons.lock_outline,
+                      text: 'ផ្លាស់ប្តូរភាសា',
+                      onTap: () {
+                        context.push(AppRoutes.selectLanguage);
+                      },
                     ),
                     const SizedBox(height: 8),
                     ProfileActionItem(
