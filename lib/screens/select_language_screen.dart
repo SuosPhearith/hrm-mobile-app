@@ -48,9 +48,10 @@ class SelectLanguageScreen extends StatelessWidget {
                   GestureDetector(
                     onTap: () async {
                       await setting.handleSetLanguage('kh');
-                      provider.setIsChecking(true);
+                      // provider.setIsChecking(true);
                       if (context.mounted) {
-                        context.go(AppRoutes.welcome);
+                        // context.go(AppRoutes.welcome);
+                        context.go(AppRoutes.home);
                       }
                     },
                     child: _buildLanguageOption('ភាសាខ្មែរ', '🇰🇭'),
@@ -58,9 +59,10 @@ class SelectLanguageScreen extends StatelessWidget {
                   GestureDetector(
                     onTap: () async {
                       await setting.handleSetLanguage('en');
-                      provider.setIsChecking(true);
+                      // provider.setIsChecking(true);
                       if (context.mounted) {
-                        context.go(AppRoutes.welcome);
+                        // context.go(AppRoutes.welcome);
+                        context.go(AppRoutes.home);
                       }
                     },
                     child: _buildLanguageOption('English', '🇺🇸'),

@@ -136,7 +136,10 @@ String calculateDateDifference(String? startDatetime, String? endDatetime) {
   }
 }
 
-String formatTimeTo12Hour(String timeStr) {
+String formatTimeTo12Hour(String? timeStr) {
+  // Return early if timeStr is null
+  if (timeStr == null) return '';
+
   try {
     // Parse the input time string (e.g., "06:00:00")
     final dateTime = DateTime.parse('1970-01-01 $timeStr');

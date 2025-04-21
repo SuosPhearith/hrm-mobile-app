@@ -168,6 +168,31 @@ class _MainLayoutState extends State<MainLayout> {
     return Scaffold(
       body: SafeArea(
           child: widget.child), // Use router child instead of static pages
+      floatingActionButton: Container(
+        margin: const EdgeInsets.only(top: 20),
+        height: 64, // Set a consistent size
+        width: 64,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black26,
+              blurRadius: 8,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: FloatingActionButton(
+          onPressed: () {
+            _showAddRequestBottomSheet(context);
+          },
+          backgroundColor: Theme.of(context).colorScheme.secondary,
+          elevation: 0, // Remove default shadow as we've added our own
+          shape: const CircleBorder(), // Explicitly set the shape to circle
+          child: const Icon(Icons.add, size: 32),
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: Colors.white,
@@ -191,10 +216,10 @@ class _MainLayoutState extends State<MainLayout> {
               case 1:
                 context.go(AppRoutes.about);
                 break;
-              case 2:
+              case 3:
                 context.go(AppRoutes.holliday);
                 break;
-              case 3:
+              case 4:
                 context.go(AppRoutes.profile);
                 break;
             }
@@ -211,6 +236,11 @@ class _MainLayoutState extends State<MainLayout> {
               activeIcon: _buildNavIcon(Icons.info, 1, active: true),
               label: AppLang.translate(key: 'layout_about', lang: lang ?? 'kh'),
             ),
+            // Add empty space in the middle for the FAB
+            BottomNavigationBarItem(
+              icon: Container(width: 24), // Empty space
+              label: '',
+            ),
             BottomNavigationBarItem(
               icon: _buildNavIcon(Icons.calendar_month, 2),
               activeIcon: _buildNavIcon(Icons.calendar_month, 2, active: true),
@@ -222,6 +252,82 @@ class _MainLayoutState extends State<MainLayout> {
               activeIcon:
                   _buildNavIcon(Icons.grid_view_rounded, 3, active: true),
               label: AppLang.translate(key: 'layout_other', lang: lang ?? 'kh'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showAddRequestBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
+      ),
+      backgroundColor: Colors.white,
+      builder: (BuildContext context) {
+        return Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 16.0),
+              _buildBottomSheetOption(
+                icon: Icons.account_circle,
+                label: 'សំណើរច្បាប់',
+                onTap: () {},
+              ),
+              const SizedBox(height: 12.0),
+              _buildBottomSheetOption(
+                icon: Icons.airplanemode_active_rounded,
+                label: 'សំណើរបេសកកម្ម',
+                onTap: () {},
+              ),
+              const SizedBox(height: 16.0),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildBottomSheetOption({
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(12.0),
+        decoration: BoxDecoration(
+          color: Colors.grey[100],
+          borderRadius: BorderRadius.circular(12.0),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8.0),
+              decoration: BoxDecoration(
+                color: Colors.grey[200],
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                icon,
+                size: 24.0,
+                color: Colors.blue[800],
+              ),
+            ),
+            const SizedBox(width: 12.0),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 16.0,
+                fontWeight: FontWeight.w600,
+                color: Colors.grey.shade800,
+              ),
             ),
           ],
         ),

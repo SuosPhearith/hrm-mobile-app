@@ -2,6 +2,8 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:mobile_app/providers/global/auth_provider.dart';
+import 'package:provider/provider.dart';
 
 class DioClient {
   static final Dio _dio = Dio(BaseOptions(
@@ -15,6 +17,7 @@ class DioClient {
 
   // Initialize Dio with Interceptors
   static void setupInterceptors(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
     _dio.interceptors.clear(); // Clear previous interceptors
 
     _dio.interceptors.add(
@@ -70,6 +73,12 @@ class DioClient {
         },
         onError: (DioException e, handler) {
           print("\x1B[31m❌ onError Triggered: ${e.requestOptions.path}\x1B[0m");
+
+          if (e.response != null &&
+              (e.response?.statusCode == 401 ||
+                  e.response?.statusCode == 403)) {
+            authProvider.setIsLoggedIn(false);
+          }
 
           if (e.response != null) {
             print(

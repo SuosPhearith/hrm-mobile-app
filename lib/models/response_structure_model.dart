@@ -61,8 +61,8 @@ class Message {
   /// Creates a Message from JSON
   factory Message.fromJson(Map<String, dynamic> json) {
     return Message(
-      kh: json['kh'] as String,
-      en: json['en'] as String,
+      kh: json['name_kh'] as String,
+      en: json['name_en'] as String,
     );
   }
 

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:mobile_app/app_routes.dart';
 import 'package:provider/provider.dart';
 import 'package:mobile_app/providers/global/auth_provider.dart';
 
@@ -19,7 +21,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void initState() {
-    _emailController.text = '070522111';
+    _emailController.text = '077677599';
     _passwordController.text = 'Hrm@1234';
     super.initState();
   }
@@ -155,10 +157,13 @@ class _LoginScreenState extends State<LoginScreen> {
                               authProvider.isLoading) {
                             return;
                           }
-                          authProvider.handleLogin(
+                          await authProvider.handleLogin(
                             username: _emailController.text,
                             password: _passwordController.text,
                           );
+                          if (context.mounted) {
+                            context.push(AppRoutes.home);
+                          }
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Theme.of(context).primaryColor,

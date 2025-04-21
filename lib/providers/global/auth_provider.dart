@@ -25,6 +25,11 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setIsLoggedIn(bool value) {
+    _isLoggedIn = value;
+    notifyListeners();
+  }
+
   // Initialize
   AuthProvider() {
     handleCheckAuth();
@@ -73,8 +78,7 @@ class AuthProvider extends ChangeNotifier {
   Future<bool> _validateToken() async {
     // Verrify token in here
     try {
-      // await _authService.checkAuth();
-      return true;
+      return await _authService.checkAuth();
     } catch (e) {
       return false;
     }

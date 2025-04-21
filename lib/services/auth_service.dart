@@ -34,12 +34,15 @@ class AuthService {
     }
   }
 
-  Future<Map<String, dynamic>> checkAuth() async {
+  Future<bool> checkAuth() async {
     try {
       final response = await DioClient.dio.get(
-        "/auth/me",
+        "/account/profile",
       );
-      return response.data;
+      if (response.data['status_code'] == 200) {
+        return true;
+      }
+      return false;
     } on DioException catch (dioError) {
       if (dioError.response != null) {
         printError(
