@@ -38,7 +38,7 @@ class _HollidayScreenState extends State<HollidayScreen> {
         title: const Text(
           'ឈប់សម្រាក',
           style: TextStyle(
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w500,
             color: Colors.black,
           ),
         ),

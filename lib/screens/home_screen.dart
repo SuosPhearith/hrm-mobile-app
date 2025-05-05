@@ -4,24 +4,30 @@ import 'package:mobile_app/app_lang.dart';
 import 'package:mobile_app/app_routes.dart';
 import 'package:mobile_app/providers/global/setting_provider.dart';
 import 'package:mobile_app/providers/local/home_provider.dart';
+import 'package:mobile_app/shared/color/colors.dart';
+import 'package:mobile_app/shared/component/custom_progresbar.dart';
 import 'package:mobile_app/utils/help_util.dart';
+import 'package:mobile_app/widgets/alert_banner.dart';
 import 'package:mobile_app/widgets/skeleton.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
-import 'package:percent_indicator/linear_percent_indicator.dart';
+// import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:provider/provider.dart';
+
+
 
 // Main HomeScreen widget
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({super.key, required this.controller});
+ final ScrollController controller;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  
   int _currentIndex = 0;
   String selectedIndex = 'Pending';
-
   String formatDateToDDMMYY(String dateStr) {
     final dateTime = DateTime.parse(dateStr);
     final day = dateTime.day.toString().padLeft(2, '0');
@@ -29,6 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final year = dateTime.year.toString();
     return '$day-$month-$year';
   }
+  
 
   @override
   Widget build(BuildContext context) {
@@ -39,10 +46,11 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Consumer2<HomeProvider, SettingProvider>(
         builder: (context, homeProvider, settingProvider, child) {
           return Scaffold(
-            backgroundColor: Colors.grey[100],
+            backgroundColor: HColors.darkgrey.withOpacity(0.1),
             body: homeProvider.isLoading
                 ? const Skeleton()
                 : SingleChildScrollView(
+                  controller: widget.controller,
                     child: Column(
                       children: [
                         UserProfileHeader(homeProvider: homeProvider),
@@ -53,6 +61,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           homeProvider: homeProvider,
                           formatDateToDDMMYY: formatDateToDDMMYY,
                         ),
+                        const AlertBanner(),
                         MenuGrid(),
                         RequestSection(
                           selectedIndex: selectedIndex,
@@ -80,20 +89,79 @@ class UserProfileHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final lang = Provider.of<SettingProvider>(context).lang;
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Row(
+    // return Padding(
+    //   padding: const EdgeInsets.all(16.0),
+    // child: Row(
+    //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    //   children: [
+    //     Flexible(
+    //       child: Row(
+    //         children: [
+    //           Container(
+    //             width: 40.0,
+    //             height: 40.0,
+    //             decoration: BoxDecoration(
+    //               shape: BoxShape.circle,
+    //               color: HColors.darkgrey.withOpacity(0.7),
+    //             ),
+    //             child: const Center(
+    //               child: Icon(Icons.person, size: 30.0, color: Colors.white),
+    //             ),
+    //           ),
+    //           const SizedBox(width: 6.0),
+    //           Flexible(
+    //             child: Column(
+    //               crossAxisAlignment: CrossAxisAlignment.start,
+    //               children: [
+    //                 Text(
+    //                   AppLang.translate(
+    //                       data: homeProvider.name, lang: lang ?? 'kh'),
+    //                   style: TextStyle(
+    //                     fontSize:
+    //                         Theme.of(context).textTheme.bodyLarge!.fontSize,
+    //                     fontWeight: FontWeight.w500,
+    //                   ),
+    //                 ),
+    //                 Text(
+    //                   AppLang.translate(
+    //                       data: homeProvider.department, lang: lang ?? 'kh'),
+    //                   style: TextStyle(
+    //                     fontSize:
+    //                         Theme.of(context).textTheme.bodySmall!.fontSize,
+    //                   ),
+    //                   overflow: TextOverflow.ellipsis,
+    //                 ),
+    //               ],
+    //             ),
+    //           ),
+    //         ],
+    //       ),
+    //     ),
+    // Row(
+    //   children: [
+    //     _IconButton(icon: Icons.download, onPressed: null),
+    //     const SizedBox(width: 8.0),
+    //     _IconButton(icon: Icons.notifications, onPressed: null),
+    //   ],
+    // ),
+    //     ],
+    //   ),
+    // );
+    return AppBar(
+      backgroundColor: Colors.transparent,
+      scrolledUnderElevation: 0,
+      title: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Flexible(
             child: Row(
               children: [
                 Container(
-                  width: 40.0,
-                  height: 40.0,
+                  width: 35.0,
+                  height: 35.0,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Colors.grey[600],
+                    color: HColors.darkgrey.withOpacity(0.7),
                   ),
                   child: const Center(
                     child: Icon(Icons.person, size: 30.0, color: Colors.white),
@@ -108,18 +176,20 @@ class UserProfileHeader extends StatelessWidget {
                         AppLang.translate(
                             data: homeProvider.name, lang: lang ?? 'kh'),
                         style: TextStyle(
-                          fontSize:
-                              Theme.of(context).textTheme.bodyLarge!.fontSize,
-                          fontWeight: FontWeight.bold,
-                        ),
+                            fontSize: Theme.of(context)
+                                .textTheme
+                                .bodyMedium!
+                                .fontSize,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black),
                       ),
                       Text(
                         AppLang.translate(
                             data: homeProvider.department, lang: lang ?? 'kh'),
                         style: TextStyle(
-                          fontSize:
-                              Theme.of(context).textTheme.bodySmall!.fontSize,
-                        ),
+                            fontSize:
+                                Theme.of(context).textTheme.bodySmall!.fontSize,
+                            color: Colors.black),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ],
@@ -127,16 +197,21 @@ class UserProfileHeader extends StatelessWidget {
                 ),
               ],
             ),
-          ),
-          Row(
+          )
+        ],
+      ),
+      actions: [
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Row(
             children: [
               _IconButton(icon: Icons.download, onPressed: null),
               const SizedBox(width: 8.0),
               _IconButton(icon: Icons.notifications, onPressed: null),
             ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
@@ -151,14 +226,14 @@ class _IconButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 40.0,
-      height: 40.0,
+      width: 35.0,
+      height: 35.0,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: Colors.grey[200],
+        color: HColors.darkgrey.withOpacity(0.1),
       ),
       child: Center(
-        child: Icon(icon, color: Colors.grey[600], size: 22.0),
+        child: Icon(icon, color: HColors.darkgrey, size: 22.0),
       ),
     );
   }
@@ -212,8 +287,8 @@ class DailyMonthlyView extends StatelessWidget {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: index == currentIndex
-                        ? Colors.blue[700]
-                        : Colors.grey[300],
+                        ? const Color(0xFFD4AD38)
+                        : HColors.blue,
                   ),
                 );
               }),
@@ -248,6 +323,7 @@ class DailyView extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
+        border: Border.all(color: HColors.darkgrey.withOpacity(0.4)),
         borderRadius: BorderRadius.circular(16.0),
       ),
       child: Column(
@@ -260,7 +336,7 @@ class DailyView extends StatelessWidget {
                 AppLang.translate(key: 'home_today', lang: lang ?? 'kh'),
                 style: TextStyle(
                   fontSize: Theme.of(context).textTheme.bodyLarge!.fontSize,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w500,
                   color: Colors.blue[900],
                 ),
               ),
@@ -305,7 +381,7 @@ class DailyView extends StatelessWidget {
                       style: TextStyle(
                         fontSize:
                             Theme.of(context).textTheme.bodyLarge!.fontSize,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w500,
                         color: Colors.blue[800],
                       ),
                     ),
@@ -405,7 +481,7 @@ class CheckInOutCard extends StatelessWidget {
                   time ?? '...',
                   style: TextStyle(
                     fontSize: Theme.of(context).textTheme.bodySmall!.fontSize,
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
                 Text(
@@ -434,15 +510,15 @@ class MonthlyView extends StatelessWidget {
   Widget build(BuildContext context) {
     final lang = Provider.of<SettingProvider>(context).lang;
     return Container(
-      padding: const EdgeInsets.all(13.0),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Colors.white, Colors.grey[50]!],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(16.0),
-      ),
+          gradient: LinearGradient(
+            colors: [Colors.white, Colors.grey[50]!],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(16.0),
+          border: Border.all(color: HColors.darkgrey.withOpacity(0.3))),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -453,7 +529,7 @@ class MonthlyView extends StatelessWidget {
                 AppLang.translate(key: 'home_monthly', lang: lang ?? 'kh'),
                 style: TextStyle(
                   fontSize: Theme.of(context).textTheme.bodyLarge!.fontSize,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w500,
                   color: Colors.blue[900],
                 ),
               ),
@@ -461,7 +537,7 @@ class MonthlyView extends StatelessWidget {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 10.0, vertical: 4.0),
                 decoration: BoxDecoration(
-                  color: Colors.grey[100],
+                  color: HColors.darkgrey.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(20.0),
                 ),
                 child: Row(
@@ -481,7 +557,7 @@ class MonthlyView extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 16.0),
+          const SizedBox(height: 5.0),
           Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -516,7 +592,7 @@ class MonthlyView extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 6.0),
+              const SizedBox(height: 4.0),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -535,25 +611,28 @@ class MonthlyView extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 4.0),
-              LinearPercentIndicator(
-                padding: const EdgeInsets.symmetric(horizontal: 0.0),
-                lineHeight: 25.0,
-                center: Text(
-                  "${getHoursFromSumHour(homeProvider.scanByMonthData?.data['sum_hour'])} ${AppLang.translate(key: 'hour', lang: lang ?? 'kh')} / ${homeProvider.scanByMonthData?.data['max_hour'] ?? '...'} ${AppLang.translate(key: 'hour', lang: lang ?? 'kh')}",
-                  style: TextStyle(
-                    fontSize: Theme.of(context).textTheme.bodySmall!.fontSize,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                percent: clampToZeroOne(
-                    homeProvider.scanByMonthData?.data['percentage'] ?? 0),
-                backgroundColor: Colors.grey[300],
-                progressColor: Colors.blue[400],
-                barRadius: const Radius.circular(4.0),
-                animation: true,
-                animationDuration: 500,
-              ),
+              const SizedBox(height: 8.0),
+              // LinearPercentIndicator(
+              //   padding: const EdgeInsets.symmetric(horizontal: 0.0),
+              //   lineHeight: 25.0,
+              //   center: Text(
+              //     "${getHoursFromSumHour(homeProvider.scanByMonthData?.data['sum_hour'])} ${AppLang.translate(key: 'hour', lang: lang ?? 'kh')} / ${homeProvider.scanByMonthData?.data['max_hour'] ?? '...'} ${AppLang.translate(key: 'hour', lang: lang ?? 'kh')}",
+              //     style: TextStyle(
+              //       fontSize: Theme.of(context).textTheme.bodySmall!.fontSize,
+              //       fontWeight: FontWeight.w500,
+              //     ),
+              //   ),
+              //   percent: clampToZeroOne(
+              //       homeProvider.scanByMonthData?.data['percentage'] ?? 0),
+              //   backgroundColor: Colors.grey[300],
+              //   progressColor: Colors.blue[400],
+              //   barRadius: const Radius.circular(4.0),
+              //   animation: true,
+              //   animationDuration: 500,
+              // ),
+              CustomProgressBar(
+                  percent: homeProvider.scanByMonthData?.data['percentage'] ??
+                      0), // 30% progress
             ],
           ),
         ],
@@ -580,15 +659,16 @@ class StatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(5.0),
+      padding: const EdgeInsets.all(2),
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey[300]!, width: 1.0),
+        border:
+            Border.all(color: HColors.darkgrey.withOpacity(0.2), width: 1.0),
         borderRadius: BorderRadius.circular(6.0),
       ),
       child: Row(
         children: [
           Icon(icon, size: 28.0, color: iconColor),
-          const SizedBox(width: 12),
+          const SizedBox(width: 8),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -627,9 +707,10 @@ class StatIcon extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding:
-          const EdgeInsets.only(top: 5.0, bottom: 5.0, right: 15, left: 15),
+          const EdgeInsets.only(top: 2.0, bottom: 2.0, right: 10, left: 10),
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey[300]!, width: 1.0),
+        border:
+            Border.all(color: HColors.darkgrey.withOpacity(0.2), width: 1.0),
         borderRadius: BorderRadius.circular(6.0),
       ),
       child: Column(
@@ -698,46 +779,50 @@ class MenuGrid extends StatelessWidget {
       },
     ];
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16.0),
-      child: GridView.count(
-        crossAxisCount: 3,
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        crossAxisSpacing: 3.0,
-        mainAxisSpacing: 3.0,
-        childAspectRatio: 1.3,
-        children: menuItems.map((item) {
-          return GestureDetector(
-            onTap: item['route'] != null
-                ? () => context.push(item['route'] as String)
-                : null,
-            child: Container(
-              decoration: const BoxDecoration(color: Colors.white),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    item['icon'] as IconData,
-                    size: 24.0,
-                    color: Colors.grey[700],
-                  ),
-                  const SizedBox(height: 8.0),
-                  Text(
-                    item['label'] as String,
-                    style: TextStyle(
-                      fontSize:
-                          Theme.of(context).textTheme.bodyMedium!.fontSize,
-                      fontWeight: FontWeight.w600,
+    return Column(
+      children: [
+        GridView.count(
+          crossAxisCount: 3,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          crossAxisSpacing: 1.0,
+          mainAxisSpacing: 1.0,
+          childAspectRatio: 1.3,
+          children: menuItems.map((item) {
+            return GestureDetector(
+              onTap: item['route'] != null
+                  ? () => context.push(item['route'] as String)
+                  : null,
+              child: Container(
+                decoration: const BoxDecoration(color: Colors.white),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      item['icon'] as IconData,
+                      size: 24.0,
+                      color: HColors.darkgrey,
                     ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
+                    const SizedBox(height: 8.0),
+                    Text(
+                      item['label'] as String,
+                      style: TextStyle(
+                        fontSize:
+                            Theme.of(context).textTheme.bodyMedium!.fontSize,
+                        fontWeight: FontWeight.w400,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
               ),
-            ),
-          );
-        }).toList(),
-      ),
+            );
+          }).toList(),
+        ),
+        SizedBox(
+          height: 15,
+        )
+      ],
     );
   }
 }
@@ -763,7 +848,8 @@ class RequestSection extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16.0),
+        borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(16), topRight: Radius.circular(16)),
       ),
       padding: const EdgeInsets.all(16.0),
       child: Column(
@@ -772,7 +858,7 @@ class RequestSection extends StatelessWidget {
             decoration: BoxDecoration(
               color: Colors.grey[200],
               borderRadius: BorderRadius.circular(20.0),
-              border: Border.all(color: Colors.grey.shade300),
+              border: Border.all(color: HColors.darkgrey.withOpacity(0.2)),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -795,10 +881,10 @@ class RequestSection extends StatelessWidget {
                           style: TextStyle(
                             fontSize:
                                 Theme.of(context).textTheme.bodySmall!.fontSize,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w500,
                             color: selectedIndex == 'Pending'
-                                ? Colors.blue
-                                : Colors.grey.shade700,
+                                ? HColors.blue
+                                : HColors.darkgrey,
                           ),
                         ),
                       ),
@@ -823,10 +909,10 @@ class RequestSection extends StatelessWidget {
                           style: TextStyle(
                             fontSize:
                                 Theme.of(context).textTheme.bodySmall!.fontSize,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w500,
                             color: selectedIndex == 'Reviewing'
-                                ? Colors.blue
-                                : Colors.grey.shade700,
+                                ? HColors.blue
+                                : HColors.darkgrey,
                           ),
                         ),
                       ),
@@ -872,7 +958,7 @@ class RequestCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12.0),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(color: HColors.darkgrey.withOpacity(0.2)),
         boxShadow: [
           BoxShadow(
             color: Colors.grey[100]!,
@@ -892,7 +978,7 @@ class RequestCard extends StatelessWidget {
                     data: item['request_category'], lang: lang ?? 'kh'),
                 style: TextStyle(
                   fontSize: Theme.of(context).textTheme.bodyMedium!.fontSize,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
               Container(

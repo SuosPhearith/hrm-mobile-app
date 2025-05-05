@@ -162,7 +162,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             password: _passwordController.text,
                           );
                           if (context.mounted) {
-                            context.push(AppRoutes.home);
+                            context.pushReplacement(AppRoutes.home);
                           }
                         },
                         style: ElevatedButton.styleFrom(

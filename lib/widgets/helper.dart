@@ -31,7 +31,7 @@ void showConfirmDialog(
                 Text(
                   title,
                   style: const TextStyle(
-                      fontSize: 20, fontWeight: FontWeight.bold),
+                      fontSize: 20, fontWeight: FontWeight.w500),
                 ),
               ],
             ),
@@ -84,7 +84,7 @@ void showConfirmDialog(
                         "បាទ/ចាស",
                         style: TextStyle(
                           fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w500,
                           color: Colors.white,
                         ),
                       ),
@@ -131,7 +131,7 @@ void showErrorDialog(
               title,
               style: const TextStyle(
                 fontSize: 20,
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w500,
                 color: Colors.black87,
               ),
               textAlign: TextAlign.center, // Center title
@@ -153,7 +153,7 @@ void showErrorDialog(
                   "បិទ", // "OK" in Khmer
                   style: TextStyle(
                     fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w500,
                     color: Colors.blue,
                   ),
                 ),
@@ -197,7 +197,7 @@ void showConfirmDialogWithNavigation(
                 Text(
                   title,
                   style: const TextStyle(
-                      fontSize: 20, fontWeight: FontWeight.bold),
+                      fontSize: 20, fontWeight: FontWeight.w500),
                 ),
               ],
             ),
@@ -252,7 +252,7 @@ void showConfirmDialogWithNavigation(
                         "បាទ/ចាស",
                         style: TextStyle(
                           fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w500,
                           color: Colors.white,
                         ),
                       ),
@@ -289,7 +289,7 @@ void showConfirmDialogWithNavigationOfSaleInvoice(BuildContext context,
                 size: 28),
             const SizedBox(width: 8),
             Text(title,
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500)),
           ],
         ),
         content: message,
@@ -310,7 +310,7 @@ void showConfirmDialogWithNavigationOfSaleInvoice(BuildContext context,
             label: const Text("បាទ/ចាស",
                 style: TextStyle(
                     fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w500,
                     color: Colors.white)),
             style: ElevatedButton.styleFrom(
               backgroundColor:

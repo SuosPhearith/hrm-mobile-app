@@ -87,9 +87,19 @@ flutter:
   # list giving the asset and other descriptors for the font. For
   # example:
   fonts:
-    - family: Kantumruy
+    - family: KantumruyPro
       fonts:
-        - asset: lib/assets/fonts/Kantumruy.ttf
+      - asset: lib/assets/fonts/kantumruy-pro-khmer-400-normal.ttf
+        weight: 400
+      - asset: lib/assets/fonts/kantumruy-pro-khmer-500-normal.ttf
+        weight: 500
+      - asset: lib/assets/fonts/kantumruy-pro-khmer-600-normal.ttf
+        weight: 600
+      - asset: lib/assets/fonts/kantumruy-pro-khmer-700-normal.ttf
+        weight: 700
+    - family:  NewsIcon
+      fonts:
+        - asset: lib/assets/fonts/NewsIcon.ttf
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
 

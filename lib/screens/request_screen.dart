@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:mobile_app/app_lang.dart';
 import 'package:mobile_app/providers/global/setting_provider.dart';
 import 'package:mobile_app/providers/local/request_provider.dart';
+import 'package:mobile_app/shared/color/colors.dart';
+import 'package:mobile_app/shared/component/bottom_appbar.dart';
 import 'package:mobile_app/utils/help_util.dart';
 import 'package:provider/provider.dart';
 
@@ -20,14 +22,15 @@ class _RequestScreenState extends State<RequestScreen> {
       child: Consumer2<RequestProvider, SettingProvider>(
           builder: (context, requestProvider, settingProvider, chold) {
         return Scaffold(
-          backgroundColor: Colors.grey[100],
+          backgroundColor: Colors.white,
           appBar: AppBar(
             title: Text(
               AppLang.translate(
                   key: 'request', lang: settingProvider.lang ?? 'kh'),
               style: TextStyle(
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w500,
                 color: Colors.black,
+                fontSize: 16
               ),
             ),
             centerTitle: true,
@@ -43,21 +46,15 @@ class _RequestScreenState extends State<RequestScreen> {
                 },
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Container(
-                    padding: const EdgeInsets.all(6.0),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.white,
-                    ),
-                    child: Icon(
-                      Icons.add,
-                      size: 28.0,
-                      color: Colors.blue[800],
-                    ),
+                  child: Icon(
+                    Icons.add,
+                    size: 24,
+                    color: HColors.darkgrey,
                   ),
                 ),
               ),
             ],
+            bottom: CustomHeader(),
           ),
           body: SingleChildScrollView(
             child: Padding(
@@ -108,7 +105,7 @@ class _RequestScreenState extends State<RequestScreen> {
                 'បន្ថែមសំណើថ្មី',
                 style: TextStyle(
                   fontSize: 20.0,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w500,
                   color: Colors.blue[900],
                 ),
               ),
@@ -177,7 +174,7 @@ class _RequestScreenState extends State<RequestScreen> {
               label,
               style: TextStyle(
                 fontSize: 16.0,
-                fontWeight: FontWeight.w600,
+                fontWeight: FontWeight.w500,
                 color: Colors.grey.shade800,
               ),
             ),
@@ -201,7 +198,8 @@ class _RequestScreenState extends State<RequestScreen> {
       decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16.0),
-          border: Border.all(width: 1, color: Colors.grey)),
+          border:
+              Border.all(width: 1, color: HColors.darkgrey.withOpacity(0.5))),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -212,7 +210,7 @@ class _RequestScreenState extends State<RequestScreen> {
                 id,
                 style: TextStyle(
                   fontSize: 12.0,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w500,
                   color: Colors.grey.shade800,
                 ),
               ),
@@ -266,10 +264,11 @@ class _RequestScreenState extends State<RequestScreen> {
               ),
             ],
           ),
+          SizedBox(height: 2,),
           Text(
             description,
             style: TextStyle(
-              fontSize: 14.0,
+              fontSize: 12.0,
               color: Colors.grey.shade600,
             ),
           ),

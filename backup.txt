@@ -24,7 +24,7 @@
   //                     'ជ្រើសរើសខែ',
   //                     style: TextStyle(
   //                       fontSize: 20.0,
-  //                       fontWeight: FontWeight.bold,
+  //                       fontWeight: FontWeight.w500,
   //                       color: Colors.grey[800],
   //                     ),
   //                   ),
@@ -64,7 +64,7 @@
   //                         },
   //                         titleTextStyle: TextStyle(
   //                           fontSize: 18.0,
-  //                           fontWeight: FontWeight.w600,
+  //                           fontWeight: FontWeight.w500,
   //                           color: Colors.blue[900],
   //                         ),
   //                         leftChevronIcon:

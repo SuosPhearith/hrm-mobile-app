@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile_app/app_lang.dart';
@@ -10,6 +11,8 @@ import 'package:mobile_app/screens/request_screen.dart';
 import 'package:mobile_app/screens/scan_screen.dart';
 import 'package:mobile_app/screens/select_language_screen.dart';
 import 'package:mobile_app/screens/welcome_screen.dart';
+import 'package:mobile_app/shared/color/colors.dart';
+import 'package:mobile_app/shared/icon/news_icon_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:mobile_app/app_routes.dart';
 import 'package:mobile_app/middlewares/auth_middleware.dart';
@@ -53,17 +56,19 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       routerConfig: _router,
       theme: ThemeData(
-        fontFamily: 'Kantumruy',
+        fontFamily: 'KantumruyPro',
         primaryColor: const Color(0xFF002458),
         colorScheme: const ColorScheme.light(
           primary: Color(0xFF002458),
           secondary: Color(0xFFD4AD38),
           surface: Colors.white,
         ),
-        textTheme: const TextTheme(
+        
+        textTheme: TextTheme(
           bodyLarge: TextStyle(fontSize: 16, color: Colors.black),
           bodyMedium: TextStyle(fontSize: 14, color: Colors.black),
-          bodySmall: TextStyle(fontSize: 12, color: Colors.grey),
+          bodySmall:
+              TextStyle(fontSize: 12, color: HColors.darkgrey.withOpacity(0.1)),
         ),
         // scaffoldBackgroundColor: Color(0xFF002458),
         appBarTheme: const AppBarTheme(
@@ -74,11 +79,13 @@ class MyApp extends StatelessWidget {
         bottomNavigationBarTheme: BottomNavigationBarThemeData(
           backgroundColor: Colors.white,
           selectedItemColor: const Color(0xFFD4AD38),
-          unselectedItemColor: Colors.grey[600],
-          selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600),
-          unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500),
+          unselectedItemColor: HColors.darkgrey,
+          selectedLabelStyle:
+              const TextStyle(fontWeight: FontWeight.w500, fontSize: 12),
+          unselectedLabelStyle:
+              const TextStyle(fontWeight: FontWeight.w500, fontSize: 12),
           showUnselectedLabels: true,
-          elevation: 8,
+          elevation: 0,
         ),
       ),
     );
@@ -97,7 +104,14 @@ final GoRouter _router = GoRouter(
       routes: [
         GoRoute(
           path: AppRoutes.home,
-          builder: (context, state) => const HomeScreen(),
+          pageBuilder: (context, state) {
+            return MaterialPage(
+              child: ScrollControllerAwareBuilder(
+                builder: (scrollController) =>
+                    HomeScreen(controller: scrollController),
+              ),
+            );
+          },
         ),
         GoRoute(
           path: AppRoutes.about,
@@ -151,6 +165,24 @@ final GoRouter _router = GoRouter(
 );
 
 /// Main Layout with Enhanced Bottom Navigation Bar
+typedef ScrollControllerWidgetBuilder = Widget Function(
+    ScrollController controller);
+
+class ScrollControllerAwareBuilder extends StatelessWidget {
+  final ScrollControllerWidgetBuilder builder;
+
+  const ScrollControllerAwareBuilder({super.key, required this.builder});
+
+  @override
+  Widget build(BuildContext context) {
+    final state = context.findAncestorStateOfType<_MainLayoutState>();
+    if (state == null) {
+      throw Exception('Must be used inside MainLayout');
+    }
+    return builder(state._scrollController);
+  }
+}
+
 class MainLayout extends StatefulWidget {
   final Widget child;
   const MainLayout({required this.child, super.key});
@@ -159,102 +191,202 @@ class MainLayout extends StatefulWidget {
   State<MainLayout> createState() => _MainLayoutState();
 }
 
-class _MainLayoutState extends State<MainLayout> {
+class _MainLayoutState extends State<MainLayout> with TickerProviderStateMixin {
   int _currentIndex = 0;
+  late ScrollController _scrollController;
+  late AnimationController _animationController;
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    )..forward(); // Initially visible
+
+    _scrollController.addListener(() {
+      if (_scrollController.position.userScrollDirection ==
+          ScrollDirection.reverse) {
+        _animationController.reverse(); // hide
+      } else if (_scrollController.position.userScrollDirection ==
+          ScrollDirection.forward) {
+        _animationController.forward(); // show
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    _animationController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final lang = Provider.of<SettingProvider>(context).lang;
     return Scaffold(
-      body: SafeArea(
-          child: widget.child), // Use router child instead of static pages
-      floatingActionButton: Container(
-        margin: const EdgeInsets.only(top: 20),
-        height: 64, // Set a consistent size
-        width: 64,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black26,
-              blurRadius: 8,
-              offset: const Offset(0, 3),
+      // backgroundColor: HColors.darkgrey.withOpacity(0.15),
+      body: widget.child is ScrollControllerAwareBuilder
+          ? (widget.child as ScrollControllerAwareBuilder)
+          : widget.child,
+      // Use router child instead of static pages
+      // floatingActionButton: MediaQuery.of(context).viewInsets.bottom == 0
+      //     ? Transform.translate(
+      //         offset: const Offset(0, 12),
+      //         child: FloatingActionButton(
+      //           elevation: 0,
+      //           shape: const CircleBorder(),
+      //           onPressed: () => _showAddRequestBottomSheet(context),
+      //           backgroundColor: HColors.blue,
+      //           child: Icon(Icons.add, color: HColors.yellow),
+      //         ),
+      //       )
+      //     : null,
+// floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+// floatingActionButton: SizeTransition(
+//   sizeFactor: CurvedAnimation(
+//     parent: _animationController,
+//     curve: Curves.easeOut,
+//   ),
+//   axisAlignment: -1.0, // Hides when scrolling down
+//   child: Transform.translate(
+//     offset: const Offset(0, -10), // Adjust vertical position
+//     child: FloatingActionButton(
+//       elevation: 0,
+//       shape: const CircleBorder(),
+//       onPressed: () => _showAddRequestBottomSheet(context),
+//       backgroundColor: HColors.blue,
+//       child: const Icon(Icons.add, color: HColors.yellow),
+//     ),
+//   ),
+// ),
+      // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: LayoutBuilder(
+        builder: (context, constraints) {
+          final navBarWidth = constraints.maxWidth;
+          return SizeTransition(
+            sizeFactor: CurvedAnimation(
+              parent: _animationController,
+              curve: Curves.easeOut,
+            ),
+            axisAlignment: -1.0,
+            child: Transform.translate(
+              offset: Offset(navBarWidth * 0.43, -0), // 50% of navbar width
+              child: FloatingActionButton(
+                elevation: 0,
+                shape: const CircleBorder(),
+                onPressed: () => _showAddRequestBottomSheet(context),
+                backgroundColor: HColors.blue,
+                child: const Icon(Icons.add, color: HColors.yellow),
+              ),
+            ),
+          );
+        },
+      ),
+
+      bottomNavigationBar: SizeTransition(
+        sizeFactor: CurvedAnimation(
+          parent: _animationController,
+          curve: Curves.easeOut,
+        ),
+        axisAlignment: -1.0,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Divider(
+              height: 1,
+              color: HColors.darkgrey.withOpacity(0.1),
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric( vertical: 8),
+              decoration: BoxDecoration(color: Colors.white),
+              child: SafeArea(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    // Left icons
+                    ...List.generate(2, (index) {
+                      final isSelected = _currentIndex == index;
+                      final icon = [
+                        isSelected ? Icons.home : Icons.home_outlined,
+                        isSelected ? Icons.info : Icons.info_outline,
+                      ][index];
+                      final label = [
+                        AppLang.translate(
+                            key: 'layout_home', lang: lang ?? 'kh'),
+                        AppLang.translate(
+                            key: 'layout_about', lang: lang ?? 'kh'),
+                      ][index];
+
+                      return buildNavItem(icon, label, isSelected, () {
+                        setState(() => _currentIndex = index);
+                        if (index == 0) context.go(AppRoutes.home);
+                        if (index == 1) context.go(AppRoutes.about);
+                      });
+                    }),
+                    const SizedBox(width: 48),
+                    // Right icons
+                    ...List.generate(2, (i) {
+                      final index = i + 3;
+                      final isSelected = _currentIndex == index;
+                      final icon = [
+                        isSelected
+                            ? Icons.calendar_month
+                            : NewsIcon.mdi__calendar_month_outline,
+                        isSelected
+                            ? Icons.grid_view_rounded
+                            : Icons.grid_view_outlined,
+                      ][i];
+                      final label = [
+                        AppLang.translate(
+                            key: 'layout_holiday', lang: lang ?? 'kh'),
+                        AppLang.translate(
+                            key: 'layout_other', lang: lang ?? 'kh'),
+                      ][i];
+
+                      return buildNavItem(icon, label, isSelected, () {
+                        setState(() => _currentIndex = index);
+                        if (index == 3) context.go(AppRoutes.holliday);
+                        if (index == 4) context.go(AppRoutes.profile);
+                      });
+                    }),
+                  ],
+                ),
+              ),
             ),
           ],
-        ),
-        child: FloatingActionButton(
-          onPressed: () {
-            _showAddRequestBottomSheet(context);
-          },
-          backgroundColor: Theme.of(context).colorScheme.secondary,
-          elevation: 0, // Remove default shadow as we've added our own
-          shape: const CircleBorder(), // Explicitly set the shape to circle
-          child: const Icon(Icons.add, size: 32),
         ),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black12,
-              blurRadius: 10,
-              offset: const Offset(0, -2),
+    );
+  }
+
+  Widget buildNavItem(
+    IconData icon,
+    String label,
+    bool isSelected,
+    VoidCallback onTap,
+  ) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon,
+            color: isSelected ? HColors.blue : HColors.darkgrey,
+            size: 24,
+          ),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              fontFamily: 'Kantumruy Pro',
+              color: isSelected ? HColors.blue : HColors.darkgrey,
             ),
-          ],
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(16.0)),
-        ),
-        child: BottomNavigationBar(
-          currentIndex: _currentIndex,
-          onTap: (index) {
-            setState(() => _currentIndex = index);
-            switch (index) {
-              case 0:
-                context.go(AppRoutes.home);
-                break;
-              case 1:
-                context.go(AppRoutes.about);
-                break;
-              case 3:
-                context.go(AppRoutes.holliday);
-                break;
-              case 4:
-                context.go(AppRoutes.profile);
-                break;
-            }
-          },
-          type: BottomNavigationBarType.fixed,
-          items: [
-            BottomNavigationBarItem(
-              icon: _buildNavIcon(Icons.home, 0),
-              activeIcon: _buildNavIcon(Icons.home, 0, active: true),
-              label: AppLang.translate(key: 'layout_home', lang: lang ?? 'kh'),
-            ),
-            BottomNavigationBarItem(
-              icon: _buildNavIcon(Icons.info, 1),
-              activeIcon: _buildNavIcon(Icons.info, 1, active: true),
-              label: AppLang.translate(key: 'layout_about', lang: lang ?? 'kh'),
-            ),
-            // Add empty space in the middle for the FAB
-            BottomNavigationBarItem(
-              icon: Container(width: 24), // Empty space
-              label: '',
-            ),
-            BottomNavigationBarItem(
-              icon: _buildNavIcon(Icons.calendar_month, 2),
-              activeIcon: _buildNavIcon(Icons.calendar_month, 2, active: true),
-              label:
-                  AppLang.translate(key: 'layout_holiday', lang: lang ?? 'kh'),
-            ),
-            BottomNavigationBarItem(
-              icon: _buildNavIcon(Icons.grid_view_rounded, 3),
-              activeIcon:
-                  _buildNavIcon(Icons.grid_view_rounded, 3, active: true),
-              label: AppLang.translate(key: 'layout_other', lang: lang ?? 'kh'),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -325,7 +457,7 @@ class _MainLayoutState extends State<MainLayout> {
               label,
               style: TextStyle(
                 fontSize: 16.0,
-                fontWeight: FontWeight.w600,
+                fontWeight: FontWeight.w500,
                 color: Colors.grey.shade800,
               ),
             ),
@@ -335,17 +467,17 @@ class _MainLayoutState extends State<MainLayout> {
     );
   }
 
-  Widget _buildNavIcon(IconData icon, int index, {bool active = false}) {
-    return Container(
-      padding: const EdgeInsets.all(6.0),
-      child: Icon(
-        icon,
-        size: 28.0,
-        color:
-            active ? Theme.of(context).colorScheme.secondary : Colors.grey[600],
-      ),
-    );
-  }
+  // Widget _buildNavIcon(IconData icon, int index, {bool active = false}) {
+  //   return Container(
+  //     padding: const EdgeInsets.all(6.0),
+  //     child: Icon(
+  //       icon,
+  //       size: 28.0,
+  //       color:
+  //           active ? Theme.of(context).colorScheme.secondary : HColors.darkgrey,
+  //     ),
+  //   );
+  // }
 }
 
 /// Auth Layout with Professional Design

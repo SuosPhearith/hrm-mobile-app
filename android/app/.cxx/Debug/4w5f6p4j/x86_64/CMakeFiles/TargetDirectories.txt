@@ -1,0 +1,2 @@
+/Users/camcyber/Desktop/Camcyber/HRM/hrm-mobile-app/android/app/.cxx/Debug/4w5f6p4j/x86_64/CMakeFiles/edit_cache.dir
+/Users/camcyber/Desktop/Camcyber/HRM/hrm-mobile-app/android/app/.cxx/Debug/4w5f6p4j/x86_64/CMakeFiles/rebuild_cache.dir
