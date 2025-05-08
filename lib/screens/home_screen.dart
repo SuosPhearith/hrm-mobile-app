@@ -22,6 +22,12 @@ class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
   String selectedIndex = 'Pending';
 
+  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
+      GlobalKey<RefreshIndicatorState>();
+  Future<void> _refreshData(HomeProvider provider) async {
+    return await provider.getHome();
+  }
+
   String formatDateToDDMMYY(String dateStr) {
     final dateTime = DateTime.parse(dateStr);
     final day = dateTime.day.toString().padLeft(2, '0');
@@ -40,30 +46,37 @@ class _HomeScreenState extends State<HomeScreen> {
         builder: (context, homeProvider, settingProvider, child) {
           return Scaffold(
             backgroundColor: Colors.grey[100],
-            body: homeProvider.isLoading
-                ? const Skeleton()
-                : SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        UserProfileHeader(homeProvider: homeProvider),
-                        DailyMonthlyView(
-                          currentIndex: _currentIndex,
-                          onPageChanged: (index) =>
-                              setState(() => _currentIndex = index),
-                          homeProvider: homeProvider,
-                          formatDateToDDMMYY: formatDateToDDMMYY,
-                        ),
-                        MenuGrid(),
-                        RequestSection(
-                          selectedIndex: selectedIndex,
-                          onTabChanged: (index) =>
-                              setState(() => selectedIndex = index),
-                          homeProvider: homeProvider,
-                          formatDateToDDMMYY: formatDateToDDMMYY,
-                        ),
-                      ],
+            body: RefreshIndicator(
+              key: _refreshIndicatorKey,
+              color: Colors.blue[800],
+              backgroundColor: Colors.white,
+              onRefresh: () => _refreshData(homeProvider),
+              child: homeProvider.isLoading
+                  ? const Skeleton()
+                  : SingleChildScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      child: Column(
+                        children: [
+                          UserProfileHeader(homeProvider: homeProvider),
+                          DailyMonthlyView(
+                            currentIndex: _currentIndex,
+                            onPageChanged: (index) =>
+                                setState(() => _currentIndex = index),
+                            homeProvider: homeProvider,
+                            formatDateToDDMMYY: formatDateToDDMMYY,
+                          ),
+                          MenuGrid(),
+                          RequestSection(
+                            selectedIndex: selectedIndex,
+                            onTabChanged: (index) =>
+                                setState(() => selectedIndex = index),
+                            homeProvider: homeProvider,
+                            formatDateToDDMMYY: formatDateToDDMMYY,
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
+            ),
           );
         },
       ),

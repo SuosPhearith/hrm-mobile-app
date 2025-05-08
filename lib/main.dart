@@ -19,12 +19,12 @@ import 'package:mobile_app/screens/login_screen.dart';
 import 'package:mobile_app/screens/profile_screen.dart';
 import 'package:mobile_app/utils/dio.client.dart';
 
+// Main function remains unchanged
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   const flavor = String.fromEnvironment('FLAVOR', defaultValue: 'dev');
   await dotenv.load(fileName: '.env.$flavor');
 
-  // Validate required variables
   final requiredVars = ['APP_NAME', 'API_URL', 'API_KEY'];
   for (var variable in requiredVars) {
     if (!dotenv.env.containsKey(variable)) {
@@ -65,7 +65,6 @@ class MyApp extends StatelessWidget {
           bodyMedium: TextStyle(fontSize: 14, color: Colors.black),
           bodySmall: TextStyle(fontSize: 12, color: Colors.grey),
         ),
-        // scaffoldBackgroundColor: Color(0xFF002458),
         appBarTheme: const AppBarTheme(
           backgroundColor: Color(0xFF002458),
           foregroundColor: Colors.white,
@@ -85,31 +84,57 @@ class MyApp extends StatelessWidget {
   }
 }
 
-// Fixed Router Configuration
+// Updated Router Configuration with StatefulShellRoute
 final GoRouter _router = GoRouter(
   initialLocation: AppRoutes.home,
   navigatorKey: GlobalKey<NavigatorState>(),
   routes: [
-    ShellRoute(
-      navigatorKey: GlobalKey<NavigatorState>(),
-      builder: (context, state, child) =>
-          AuthMiddleware(child: MainLayout(child: child)),
-      routes: [
-        GoRoute(
-          path: AppRoutes.home,
-          builder: (context, state) => const HomeScreen(),
+    StatefulShellRoute.indexedStack(
+      builder: (context, state, navigationShell) {
+        // Wrap the MainLayout with AuthMiddleware
+        return AuthMiddleware(
+            child: MainLayout(navigationShell: navigationShell));
+      },
+      branches: [
+        // Home Tab
+        StatefulShellBranch(
+          navigatorKey: GlobalKey<NavigatorState>(),
+          routes: [
+            GoRoute(
+              path: AppRoutes.home,
+              builder: (context, state) => const HomeScreen(),
+            ),
+          ],
         ),
-        GoRoute(
-          path: AppRoutes.about,
-          builder: (context, state) => const AboutScreen(),
+        // About Tab
+        StatefulShellBranch(
+          navigatorKey: GlobalKey<NavigatorState>(),
+          routes: [
+            GoRoute(
+              path: AppRoutes.about,
+              builder: (context, state) => const AboutScreen(),
+            ),
+          ],
         ),
-        GoRoute(
-          path: AppRoutes.holliday,
-          builder: (context, state) => const HollidayScreen(),
+        // Holiday Tab
+        StatefulShellBranch(
+          navigatorKey: GlobalKey<NavigatorState>(),
+          routes: [
+            GoRoute(
+              path: AppRoutes.holliday,
+              builder: (context, state) => const HollidayScreen(),
+            ),
+          ],
         ),
-        GoRoute(
-          path: AppRoutes.profile,
-          builder: (context, state) => const ProfileScreen(),
+        // Profile Tab
+        StatefulShellBranch(
+          navigatorKey: GlobalKey<NavigatorState>(),
+          routes: [
+            GoRoute(
+              path: AppRoutes.profile,
+              builder: (context, state) => const ProfileScreen(),
+            ),
+          ],
         ),
       ],
     ),
@@ -150,27 +175,35 @@ final GoRouter _router = GoRouter(
   ),
 );
 
-/// Main Layout with Enhanced Bottom Navigation Bar
+/// Main Layout with Stateful Navigation
 class MainLayout extends StatefulWidget {
-  final Widget child;
-  const MainLayout({required this.child, super.key});
+  final StatefulNavigationShell navigationShell;
+
+  const MainLayout({required this.navigationShell, super.key});
 
   @override
   State<MainLayout> createState() => _MainLayoutState();
 }
 
 class _MainLayoutState extends State<MainLayout> {
-  int _currentIndex = 0;
+  // Track the actual selected index including the FAB space
+  int _selectedIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedIndex = widget.navigationShell.currentIndex;
+  }
 
   @override
   Widget build(BuildContext context) {
     final lang = Provider.of<SettingProvider>(context).lang;
+
     return Scaffold(
-      body: SafeArea(
-          child: widget.child), // Use router child instead of static pages
+      body: SafeArea(child: widget.navigationShell),
       floatingActionButton: Container(
         margin: const EdgeInsets.only(top: 20),
-        height: 64, // Set a consistent size
+        height: 64,
         width: 64,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
@@ -187,8 +220,8 @@ class _MainLayoutState extends State<MainLayout> {
             _showAddRequestBottomSheet(context);
           },
           backgroundColor: Theme.of(context).colorScheme.secondary,
-          elevation: 0, // Remove default shadow as we've added our own
-          shape: const CircleBorder(), // Explicitly set the shape to circle
+          elevation: 0,
+          shape: const CircleBorder(),
           child: const Icon(Icons.add, size: 32),
         ),
       ),
@@ -206,23 +239,22 @@ class _MainLayoutState extends State<MainLayout> {
           borderRadius: const BorderRadius.vertical(top: Radius.circular(16.0)),
         ),
         child: BottomNavigationBar(
-          currentIndex: _currentIndex,
+          currentIndex: _selectedIndex,
           onTap: (index) {
-            setState(() => _currentIndex = index);
-            switch (index) {
-              case 0:
-                context.go(AppRoutes.home);
-                break;
-              case 1:
-                context.go(AppRoutes.about);
-                break;
-              case 3:
-                context.go(AppRoutes.holliday);
-                break;
-              case 4:
-                context.go(AppRoutes.profile);
-                break;
-            }
+            setState(() {
+              _selectedIndex = index;
+            });
+
+            if (index == 2) return; // FAB placeholder, do nothing
+
+            // Map bottom nav indices to branch indices
+            // 0 -> 0 (Home)
+            // 1 -> 1 (About)
+            // 2 -> FAB (skip)
+            // 3 -> 2 (Holiday)
+            // 4 -> 3 (Other/Profile)
+            final branchIndex = index >= 3 ? index - 1 : index;
+            widget.navigationShell.goBranch(branchIndex);
           },
           type: BottomNavigationBarType.fixed,
           items: [
@@ -236,21 +268,20 @@ class _MainLayoutState extends State<MainLayout> {
               activeIcon: _buildNavIcon(Icons.info, 1, active: true),
               label: AppLang.translate(key: 'layout_about', lang: lang ?? 'kh'),
             ),
-            // Add empty space in the middle for the FAB
             BottomNavigationBarItem(
-              icon: Container(width: 24), // Empty space
+              icon: Container(width: 24), // Empty space for FAB
               label: '',
             ),
             BottomNavigationBarItem(
-              icon: _buildNavIcon(Icons.calendar_month, 2),
-              activeIcon: _buildNavIcon(Icons.calendar_month, 2, active: true),
+              icon: _buildNavIcon(Icons.calendar_month, 3),
+              activeIcon: _buildNavIcon(Icons.calendar_month, 3, active: true),
               label:
                   AppLang.translate(key: 'layout_holiday', lang: lang ?? 'kh'),
             ),
             BottomNavigationBarItem(
-              icon: _buildNavIcon(Icons.grid_view_rounded, 3),
+              icon: _buildNavIcon(Icons.grid_view_rounded, 4),
               activeIcon:
-                  _buildNavIcon(Icons.grid_view_rounded, 3, active: true),
+                  _buildNavIcon(Icons.grid_view_rounded, 4, active: true),
               label: AppLang.translate(key: 'layout_other', lang: lang ?? 'kh'),
             ),
           ],
@@ -336,19 +367,23 @@ class _MainLayoutState extends State<MainLayout> {
   }
 
   Widget _buildNavIcon(IconData icon, int index, {bool active = false}) {
+    // Check if this icon's index matches the currently selected index
+    bool isSelected = index == _selectedIndex;
+
     return Container(
       padding: const EdgeInsets.all(6.0),
       child: Icon(
         icon,
         size: 28.0,
-        color:
-            active ? Theme.of(context).colorScheme.secondary : Colors.grey[600],
+        color: isSelected || active
+            ? Theme.of(context).colorScheme.secondary
+            : Colors.grey[600],
       ),
     );
   }
 }
 
-/// Auth Layout with Professional Design
+/// Auth Layout remains unchanged
 class AuthLayout extends StatelessWidget {
   final Widget child;
   const AuthLayout({required this.child, super.key});

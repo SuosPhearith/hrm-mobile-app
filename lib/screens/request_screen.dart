@@ -13,6 +13,12 @@ class RequestScreen extends StatefulWidget {
 }
 
 class _RequestScreenState extends State<RequestScreen> {
+  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
+      GlobalKey<RefreshIndicatorState>();
+  Future<void> _refreshData(RequestProvider provider) async {
+    return await provider.getHome();
+  }
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
@@ -59,31 +65,46 @@ class _RequestScreenState extends State<RequestScreen> {
               ),
             ],
           ),
-          body: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                children: [
-                  ...requestProvider.requestData?.data.results.map((record) {
-                        return _buildRequestCard(
-                          id: AppLang.translate(
-                              data: record['request_category'],
-                              lang: settingProvider.lang ?? 'kh'),
-                          status: AppLang.translate(
-                              data: record['request_status'],
-                              lang: settingProvider.lang ?? 'kh'),
-                          dates:
-                              '${formatDate(record['start_datetime'])} ដល់ ${formatDate(record['end_datetime'])}',
-                          days: calculateDateDifference(
-                              record['start_datetime'], record['end_datetime']),
-                          description:
-                              '${AppLang.translate(data: record['request_type'], lang: settingProvider.lang ?? 'kh')} | ${formatStringValue(record['objective'])}',
-                        );
-                      }).toList() ??
-                      [],
-                ],
-              ),
-            ),
+          // Wrap SingleChildScrollView with RefreshIndicator
+          body: RefreshIndicator(
+            key: _refreshIndicatorKey,
+            color: Colors.blue[800],
+            backgroundColor: Colors.white,
+            onRefresh: () => _refreshData(requestProvider),
+            child: requestProvider.isLoading
+                ? Center(child: Text('Loading...'))
+                : SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        children: [
+                          ...requestProvider.requestData?.data.results
+                                  .map((record) {
+                                return _buildRequestCard(
+                                  id: AppLang.translate(
+                                      data: record['request_category'],
+                                      lang: settingProvider.lang ?? 'kh'),
+                                  status: AppLang.translate(
+                                      data: record['request_status'],
+                                      lang: settingProvider.lang ?? 'kh'),
+                                  dates:
+                                      '${formatDate(record['start_datetime'])} ដល់ ${formatDate(record['end_datetime'])}',
+                                  days: calculateDateDifference(
+                                      record['start_datetime'],
+                                      record['end_datetime']),
+                                  description:
+                                      '${AppLang.translate(data: record['request_type'], lang: settingProvider.lang ?? 'kh')} | ${formatStringValue(record['objective'])}',
+                                );
+                              }).toList() ??
+                              [],
+                          // Add empty container with minimum height to ensure scrollability when empty
+                          SizedBox(
+                              height: MediaQuery.of(context).size.height * 0.7),
+                        ],
+                      ),
+                    ),
+                  ),
           ),
         );
       }),
@@ -220,9 +241,7 @@ class _RequestScreenState extends State<RequestScreen> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 10.0, vertical: 4.0),
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Colors.yellow[300]!, Colors.yellow[500]!],
-                  ),
+                  color: const Color.fromARGB(255, 255, 225, 135),
                   borderRadius: BorderRadius.circular(20.0),
                 ),
                 child: Text(
@@ -250,9 +269,7 @@ class _RequestScreenState extends State<RequestScreen> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Colors.blue[100]!, Colors.blue[200]!],
-                  ),
+                  color: const Color.fromARGB(255, 135, 195, 244),
                   borderRadius: BorderRadius.circular(20.0),
                 ),
                 child: Text(
