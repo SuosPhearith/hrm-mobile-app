@@ -10,4 +10,6 @@ class AppRoutes {
   static const String request = '/request';
   static const String scan = '/scan';
   static const String daily = '/daily';
+  static const String evaluate = '/evaluate';
+  static const String personalInfo = '/personal-info';
 }

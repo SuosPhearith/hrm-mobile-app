@@ -7,7 +7,7 @@ void printError({required String? errorMessage, int? statusCode}) {
 
 String formatTimeToHour(String? isoTimestamp) {
   try {
-    if (isoTimestamp == null || isoTimestamp.isEmpty) return '...';
+    if (isoTimestamp == null || isoTimestamp.isEmpty) return 'N/A';
     // Parse the ISO 8601 string into a DateTime object
     DateTime dateTime = DateTime.parse(isoTimestamp);
 
@@ -148,4 +148,11 @@ String formatTimeTo12Hour(String? timeStr) {
   } catch (e) {
     return timeStr; // Return original string if parsing fails
   }
+}
+
+String getSafeString({dynamic value, String? safeValue}) {
+  if (value is String && value.isNotEmpty) {
+    return value;
+  }
+  return safeValue ?? '...';
 }

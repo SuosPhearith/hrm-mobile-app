@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:mobile_app/app_lang.dart';
 import 'package:mobile_app/app_routes.dart';
 import 'package:mobile_app/providers/global/setting_provider.dart';
@@ -287,7 +288,7 @@ class DailyView extends StatelessWidget {
                 child: Row(
                   children: [
                     Text(
-                      '03-03-2025',
+                      DateFormat('dd-MM-yyyy').format(DateTime.now()),
                       style: TextStyle(
                         fontSize:
                             Theme.of(context).textTheme.bodySmall!.fontSize,
@@ -308,13 +309,15 @@ class DailyView extends StatelessWidget {
               CircularPercentIndicator(
                 radius: 50.0,
                 lineWidth: 8.0,
-                percent: clampToZeroOne(
-                    homeProvider.scanByDayData?.data['percentage'] ?? 0),
+                percent: clampToZeroOne(double.tryParse(homeProvider
+                        .scanByDayData?.data['percentage']
+                        ?.toString() ??
+                    '0.0')),
                 center: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      '${convertToHoursAndMinutes(homeProvider.scanByDayData?.data['working_hour'] ?? 0)['hours']} ${AppLang.translate(key: 'hour', lang: lang ?? 'kh')}',
+                      '${convertToHoursAndMinutes(double.tryParse(homeProvider.scanByDayData?.data['working_hour']?.toString() ?? '0.0'))['hours']} ${AppLang.translate(key: 'hour', lang: lang ?? 'kh')}',
                       style: TextStyle(
                         fontSize:
                             Theme.of(context).textTheme.bodyLarge!.fontSize,
@@ -323,7 +326,7 @@ class DailyView extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      '${convertToHoursAndMinutes(homeProvider.scanByDayData?.data['working_hour'] ?? 0)['minutes']} ${AppLang.translate(key: 'minute', lang: lang ?? 'kh')}',
+                      '${convertToHoursAndMinutes(double.tryParse(homeProvider.scanByDayData?.data['working_hour']?.toString() ?? '0.0'))['minutes']} ${AppLang.translate(key: 'minute', lang: lang ?? 'kh')}',
                       style: TextStyle(
                         fontSize:
                             Theme.of(context).textTheme.bodyLarge!.fontSize,
@@ -345,24 +348,28 @@ class DailyView extends StatelessWidget {
                       isCheckIn: true,
                       time: formatTimeToHour(
                           homeProvider.scanByDayData?.data['check_in']),
-                      terminal:
-                          homeProvider.scanByDayData?.data['first_terminal_log']
-                              ['terminal_device']['name'],
-                      group:
-                          homeProvider.scanByDayData?.data['first_terminal_log']
-                              ['terminal_device']['group'],
+                      terminal: getSafeString(
+                          value: homeProvider
+                                  .scanByDayData?.data['first_terminal_log']
+                              ?['terminal_device']?['name']),
+                      group: getSafeString(
+                          value: homeProvider
+                                  .scanByDayData?.data['first_terminal_log']
+                              ?['terminal_device']?['group']),
                     ),
                     const SizedBox(height: 12.0),
                     CheckInOutCard(
                       isCheckIn: false,
                       time: formatTimeToHour(
                           homeProvider.scanByDayData?.data['check_out']),
-                      terminal:
-                          homeProvider.scanByDayData?.data['last_terminal_log']
-                              ['terminal_device']['name'],
-                      group:
-                          homeProvider.scanByDayData?.data['last_terminal_log']
-                              ['terminal_device']['group'],
+                      terminal: getSafeString(
+                          value: homeProvider
+                                  .scanByDayData?.data['last_terminal_log']
+                              ?['terminal_device']?['name']),
+                      group: getSafeString(
+                          value: homeProvider
+                                  .scanByDayData?.data['last_terminal_log']
+                              ?['terminal_device']?['group']),
                     ),
                   ],
                 ),
@@ -480,7 +487,7 @@ class MonthlyView extends StatelessWidget {
                 child: Row(
                   children: [
                     Text(
-                      lang == 'en' ? 'February 2025' : 'កុម្ភៈ 2025',
+                      DateFormat('MMMM yyyy', 'en_US').format(DateTime.now()),
                       style: TextStyle(
                         fontSize:
                             Theme.of(context).textTheme.bodySmall!.fontSize,
@@ -681,13 +688,13 @@ class MenuGrid extends StatelessWidget {
       {
         'icon': Icons.data_thresholding_outlined,
         'label': AppLang.translate(key: 'home_evaluation', lang: lang ?? 'kh'),
-        'route': null
+        'route': AppRoutes.evaluate
       },
       {
         'icon': Icons.person_outline_outlined,
         'label':
             AppLang.translate(key: 'home_personal_info', lang: lang ?? 'kh'),
-        'route': null
+        'route': AppRoutes.personalInfo
       },
       {
         'icon': Icons.work_outline,

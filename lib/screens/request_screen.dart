@@ -77,32 +77,37 @@ class _RequestScreenState extends State<RequestScreen> {
                     physics: const AlwaysScrollableScrollPhysics(),
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        children: [
-                          ...requestProvider.requestData?.data.results
-                                  .map((record) {
-                                return _buildRequestCard(
-                                  id: AppLang.translate(
-                                      data: record['request_category'],
-                                      lang: settingProvider.lang ?? 'kh'),
-                                  status: AppLang.translate(
-                                      data: record['request_status'],
-                                      lang: settingProvider.lang ?? 'kh'),
-                                  dates:
-                                      '${formatDate(record['start_datetime'])} ដល់ ${formatDate(record['end_datetime'])}',
-                                  days: calculateDateDifference(
-                                      record['start_datetime'],
-                                      record['end_datetime']),
-                                  description:
-                                      '${AppLang.translate(data: record['request_type'], lang: settingProvider.lang ?? 'kh')} | ${formatStringValue(record['objective'])}',
-                                );
-                              }).toList() ??
-                              [],
-                          // Add empty container with minimum height to ensure scrollability when empty
-                          SizedBox(
-                              height: MediaQuery.of(context).size.height * 0.7),
-                        ],
-                      ),
+                      child: (requestProvider.requestData?.data.results !=
+                                  null &&
+                              requestProvider.requestData!.data.results.isEmpty)
+                          ? Text("No data found")
+                          : Column(
+                              children: [
+                                ...requestProvider.requestData?.data.results
+                                        .map((record) {
+                                      return _buildRequestCard(
+                                        id: AppLang.translate(
+                                            data: record['request_category'],
+                                            lang: settingProvider.lang ?? 'kh'),
+                                        status: AppLang.translate(
+                                            data: record['request_status'],
+                                            lang: settingProvider.lang ?? 'kh'),
+                                        dates:
+                                            '${formatDate(record['start_datetime'])} ដល់ ${formatDate(record['end_datetime'])}',
+                                        days: calculateDateDifference(
+                                            record['start_datetime'],
+                                            record['end_datetime']),
+                                        description:
+                                            '${AppLang.translate(data: record['request_type'], lang: settingProvider.lang ?? 'kh')} | ${formatStringValue(record['objective'])}',
+                                      );
+                                    }).toList() ??
+                                    [],
+                                // Add empty container with minimum height to ensure scrollability when empty
+                                SizedBox(
+                                    height: MediaQuery.of(context).size.height *
+                                        0.7),
+                              ],
+                            ),
                     ),
                   ),
           ),

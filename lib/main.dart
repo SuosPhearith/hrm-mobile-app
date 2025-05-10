@@ -5,7 +5,9 @@ import 'package:mobile_app/app_lang.dart';
 import 'package:mobile_app/providers/global/setting_provider.dart';
 import 'package:mobile_app/screens/about_screen.dart';
 import 'package:mobile_app/screens/daily_screen.dart';
+import 'package:mobile_app/screens/evaluate_screen.dart';
 import 'package:mobile_app/screens/holliday_screen.dart';
+import 'package:mobile_app/screens/personal_info_screen.dart';
 import 'package:mobile_app/screens/request_screen.dart';
 import 'package:mobile_app/screens/scan_screen.dart';
 import 'package:mobile_app/screens/select_language_screen.dart';
@@ -66,8 +68,8 @@ class MyApp extends StatelessWidget {
           bodySmall: TextStyle(fontSize: 12, color: Colors.grey),
         ),
         appBarTheme: const AppBarTheme(
-          backgroundColor: Color(0xFF002458),
-          foregroundColor: Colors.white,
+          // backgroundColor: Color(0xFF002458),
+          // foregroundColor: Colors.white,
           elevation: 0,
         ),
         bottomNavigationBarTheme: BottomNavigationBarThemeData(
@@ -163,6 +165,14 @@ final GoRouter _router = GoRouter(
     GoRoute(
       path: AppRoutes.daily,
       builder: (context, state) => const DailyScreen(),
+    ),
+    GoRoute(
+      path: AppRoutes.evaluate,
+      builder: (context, state) => const EvaluateScreen(),
+    ),
+    GoRoute(
+      path: AppRoutes.personalInfo,
+      builder: (context, state) => const PersonalInfoScreen(),
     ),
   ],
   errorBuilder: (context, state) => Scaffold(

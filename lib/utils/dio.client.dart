@@ -8,8 +8,8 @@ import 'package:provider/provider.dart';
 class DioClient {
   static final Dio _dio = Dio(BaseOptions(
     baseUrl: dotenv.get('API_URL'),
-    connectTimeout: Duration(seconds: 10),
-    receiveTimeout: Duration(seconds: 10),
+    connectTimeout: Duration(seconds: 60),
+    receiveTimeout: Duration(seconds: 60),
     headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
   ));
 
