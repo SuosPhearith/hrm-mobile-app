@@ -1,4 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_app/app_lang.dart';
+import 'package:mobile_app/providers/global/setting_provider.dart';
+import 'package:mobile_app/providers/local/scan_provider.dart';
+import 'package:mobile_app/utils/help_util.dart';
+import 'package:mobile_app/widgets/date_range_selector.dart';
+import 'package:mobile_app/widgets/month_picker_widget.dart';
+import 'package:provider/provider.dart';
 
 class ScanScreen extends StatefulWidget {
   const ScanScreen({super.key});
@@ -8,263 +15,149 @@ class ScanScreen extends StatefulWidget {
 }
 
 class ScanScreenState extends State<ScanScreen> {
-  DateTime _focusedDay = DateTime.now();
   DateTime? _selectedMonth;
+  DateTime? _startDate;
+  DateTime? _endDate;
+
+  @override
+  void initState() {
+    super.initState();
+    // Use current month as default
+    final now = DateTime.now();
+    _selectedMonth = now;
+
+    // Set start date to first day of current month
+    _startDate = DateTime(now.year, now.month, 1);
+    // Set end date to last day of current month
+    _endDate = DateTime(now.year, now.month + 1, 0);
+  }
+
+  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
+      GlobalKey<RefreshIndicatorState>();
+  Future<void> _refreshData(ScanProvider provider) async {
+    return await provider.getHome(
+        startDate: _startDate?.toIso8601String().split('T')[0],
+        endDate: _endDate?.toIso8601String().split('T')[0]);
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey[100],
-      appBar: AppBar(
-        title: GestureDetector(
-          onTap: () {
-            _showMonthPicker(context);
-          },
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                _selectedMonth != null
-                    ? "ស្កេន - ${_getMonthName(_selectedMonth!.month)}"
-                    : "ស្កេន - មីនា",
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
-              ),
-              const SizedBox(width: 4.0),
-              const Icon(Icons.arrow_drop_down, color: Colors.black),
-            ],
-          ),
-        ),
-        centerTitle: true,
-        backgroundColor: Colors.white,
-        iconTheme: const IconThemeData(
-          color: Colors.black,
-        ),
-        elevation: 0,
-        actions: [
-          IconButton(
-            icon: Icon(
-              Icons.sync,
-              color: Colors.black,
-              size: 28.0,
-            ),
-            onPressed: () {},
-            splashRadius: 20.0,
-          ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              _buildScanCard(
-                type: 'ស្កេនចេញ',
-                location: 'UAT TERMINAL 3 | អគារ ក',
-                time: '05:00PM',
-                date: '12-02-2025',
-                icon: Icons.logout,
-              ),
-              const SizedBox(height: 12.0),
-              _buildScanCard(
-                type: 'ស្កេនចេញ',
-                location: 'UAT TERMINAL 3 | អគារ ក',
-                time: '05:00PM',
-                date: '12-02-2025',
-                icon: Icons.logout,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  void _showMonthPicker(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
-      ),
-      backgroundColor: Colors.white,
-      builder: (BuildContext context) {
-        return Container(
-          constraints: BoxConstraints(
-            maxHeight: MediaQuery.of(context).size.height * 0.5,
-          ),
-          child: StatefulBuilder(
-            builder: (BuildContext context, StateSetter setModalState) {
-              return Column(
+    return ChangeNotifierProvider(
+      create: (_) => ScanProvider(
+          startDate: _startDate?.toIso8601String().split('T')[0],
+          endDate: _endDate?.toIso8601String().split('T')[0]),
+      child: Consumer2<ScanProvider, SettingProvider>(
+          builder: (context, scanProvider, settingProvider, child) {
+        return Scaffold(
+          backgroundColor: Colors.grey[100],
+          appBar: AppBar(
+            title: GestureDetector(
+              onTap: () {
+                _showMonthPicker(context, scanProvider);
+              },
+              child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 16.0),
-                    child: Text(
-                      'ជ្រើសរើសខែ និងឆ្នាំ',
-                      style: TextStyle(
-                        fontSize: 20.0,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.blue[900],
-                      ),
-                    ),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      IconButton(
-                        icon: Icon(Icons.chevron_left, color: Colors.blue[700]),
-                        onPressed: () {
-                          setModalState(() {
-                            _focusedDay = DateTime(
-                                _focusedDay.year - 1, _focusedDay.month);
-                          });
-                        },
-                      ),
-                      Text(
-                        '${_focusedDay.year}',
-                        style: TextStyle(
-                          fontSize: 18.0,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.grey.shade800,
-                        ),
-                      ),
-                      IconButton(
-                        icon:
-                            Icon(Icons.chevron_right, color: Colors.blue[700]),
-                        onPressed: () {
-                          setModalState(() {
-                            _focusedDay = DateTime(
-                                _focusedDay.year + 1, _focusedDay.month);
-                          });
-                        },
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12.0),
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                      child: GridView.builder(
-                        shrinkWrap: true,
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 3,
-                          childAspectRatio: 2.5,
-                          crossAxisSpacing: 12.0,
-                          mainAxisSpacing: 12.0,
-                        ),
-                        itemCount: 12,
-                        itemBuilder: (context, index) {
-                          final khmerMonths = [
-                            'មករា',
-                            'កុម្ភៈ',
-                            'មីនា',
-                            'មេសា',
-                            'ឧសភា',
-                            'មិថុនា',
-                            'កក្កដា',
-                            'សីហា',
-                            'កញ្ញា',
-                            'តុលា',
-                            'វិច្ឆិកា',
-                            'ធ្នូ'
-                          ];
-                          return GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                _selectedMonth =
-                                    DateTime(_focusedDay.year, index + 1);
-                              });
-                              Navigator.pop(context);
-                            },
-                            child: Container(
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [
-                                    Colors.blue[50]!,
-                                    Colors.white,
-                                  ],
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                ),
-                                borderRadius: BorderRadius.circular(12.0),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black12,
-                                    blurRadius: 4,
-                                    offset: const Offset(0, 2),
-                                  ),
-                                ],
-                              ),
-                              child: Center(
-                                child: Text(
-                                  khmerMonths[index],
-                                  style: TextStyle(
-                                    fontSize: 16.0,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.blue[800],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: SizedBox(
-                      width: double.infinity,
-                      child: OutlinedButton(
-                        onPressed: () => Navigator.pop(context),
-                        style: OutlinedButton.styleFrom(
-                          side:
-                              BorderSide(color: Colors.blue[700]!, width: 1.5),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12.0),
-                          ),
-                          padding: const EdgeInsets.symmetric(vertical: 12.0),
-                        ),
-                        child: Text(
-                          'បោះបង់',
-                          style: TextStyle(
-                            fontSize: 16.0,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.blue[800],
-                          ),
-                        ),
-                      ),
+                  Text(
+                    'ស្កេន',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
                     ),
                   ),
                 ],
-              );
-            },
+              ),
+            ),
+            centerTitle: true,
+            backgroundColor: Colors.white,
+            iconTheme: const IconThemeData(
+              color: Colors.black,
+            ),
+            elevation: 0,
+            actions: [
+              IconButton(
+                icon: const Icon(
+                  Icons.date_range,
+                  color: Colors.black,
+                  size: 28.0,
+                ),
+                onPressed: () {
+                  _showMonthPicker(context, scanProvider);
+                },
+                splashRadius: 20.0,
+              ),
+            ],
+          ),
+          body: RefreshIndicator(
+            key: _refreshIndicatorKey,
+            color: Colors.blue[800],
+            backgroundColor: Colors.white,
+            onRefresh: () => _refreshData(scanProvider),
+            child: scanProvider.isLoading
+                ? Center(child: Text('Loading...'))
+                : SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        children: [
+                          // Display selected date range
+                          DateRangeSelector(
+                            startDate: _startDate,
+                            endDate: _endDate,
+                            onTap: () {
+                              _showMonthPicker(context, scanProvider);
+                            },
+                          ),
+                          scanProvider.data!.data.results.isEmpty
+                              ? Text("No Data Found")
+                              : SizedBox(),
+                          ...scanProvider.data?.data.results.map((record) {
+                                final result = parseDateTime(
+                                    getSafeString(value: record['datetime']));
+                                return _buildScanCard(
+                                  type: getSafeString(
+                                    value: AppLang.translate(
+                                        data: record['terminal_device']
+                                            ['direction'],
+                                        lang: settingProvider.lang ?? 'kh'),
+                                  ),
+                                  location:
+                                      '${getSafeString(value: record['terminal_device']['name'])} | ${getSafeString(value: record['terminal_device']['group'])}',
+                                  time: getSafeString(value: result['time']),
+                                  date: getSafeString(value: result['date']),
+                                  icon: Icons.logout,
+                                );
+                              }).toList() ??
+                              [],
+                          SizedBox(
+                              height: MediaQuery.of(context).size.height * 0.1),
+                        ],
+                      ),
+                    ),
+                  ),
           ),
         );
-      },
+      }),
     );
   }
 
-  String _getMonthName(int month) {
-    const khmerMonths = [
-      'មករា',
-      'កុម្ភៈ',
-      'មីនា',
-      'មេសា',
-      'ឧសភា',
-      'មិថុនា',
-      'កក្កដា',
-      'សីហា',
-      'កញ្ញា',
-      'តុលា',
-      'វិច្ឆិកា',
-      'ធ្នូ',
-    ];
-    return khmerMonths[month - 1];
+  void _showMonthPicker(BuildContext context, ScanProvider provider) {
+    MonthPickerWidget.show(
+      context,
+      initialSelectedMonth: _selectedMonth,
+      onMonthSelected: (startDate, endDate) {
+        setState(() {
+          _selectedMonth =
+              startDate; // Using startDate as the selected month reference
+          _startDate = startDate;
+          _endDate = endDate;
+        });
+        provider.getHome(
+            startDate: startDate.toIso8601String().split('T')[0],
+            endDate: endDate.toIso8601String().split('T')[0]);
+      },
+    );
   }
 
   Widget _buildScanCard({
@@ -276,6 +169,7 @@ class ScanScreenState extends State<ScanScreen> {
   }) {
     return Container(
       padding: const EdgeInsets.all(16.0),
+      margin: EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12.0),

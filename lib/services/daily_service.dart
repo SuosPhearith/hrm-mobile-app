@@ -1,18 +1,25 @@
 import 'package:dio/dio.dart';
 import 'package:mobile_app/error_type.dart';
+import 'package:mobile_app/models/pagination_structure_model.dart';
 import 'package:mobile_app/models/response_structure_model.dart';
 import 'package:mobile_app/utils/dio.client.dart';
 import 'package:mobile_app/utils/help_util.dart';
 
-class PersonalInfoService {
-  Future<ResponseStructure<Map<String, dynamic>>> userInfo() async {
+class DailyService {
+  Future<ResponseStructure<PaginationStructure<Map<String, dynamic>>>> daily(
+      {String? startDate, String? endDate}) async {
     try {
       final response = await DioClient.dio.get(
-        "/user/personal_information",
+        "/user/home/attendent?limit=50&offset=0&start_date=$startDate&end_date=$endDate",
       );
-      return ResponseStructure<Map<String, dynamic>>.fromJson(
+      return ResponseStructure<
+          PaginationStructure<Map<String, dynamic>>>.fromJson(
         response.data as Map<String, dynamic>,
-        dataFromJson: (json) => json,
+        dataFromJson: (json) =>
+            PaginationStructure<Map<String, dynamic>>.fromJson(
+          json,
+          resultFromJson: (item) => item,
+        ),
       );
     } on DioException catch (dioError) {
       if (dioError.response != null) {

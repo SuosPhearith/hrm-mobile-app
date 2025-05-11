@@ -42,6 +42,19 @@ class AppLang {
     'layout_about': 'About',
     'layout_holiday': 'Holiday',
     'layout_other': 'Other',
+    // User Infor ================================================
+    'user_info_name': 'Name',
+    'user_info_sex': 'Sex',
+    'user_info_phone': 'Phone Number',
+    'user_info_email': 'Email',
+    'user_info_card_id': 'ID Card Number',
+    'user_info_date_of_birth': 'Date of Birth',
+    'user_info_place_of_birth': 'Place of Birth',
+    'user_info_current_address': 'Current Address',
+    'user_info_personal_info': 'Personal Information',
+    'user_info_family': 'Family and Relatives',
+    'user_info_family_add': 'Add Family or Relatives',
+    // Layout ================================================
   };
 
   static const Map<String, String> _khmer = {
@@ -87,6 +100,19 @@ class AppLang {
     'layout_about': 'អំពីប្រព័ន្ធ',
     'layout_holiday': 'ឈប់សម្រាក',
     'layout_other': 'ផ្សេងៗ',
+    // User Infor ================================================
+    'user_info_name': 'ឈ្មោះ',
+    'user_info_sex': 'ភេទ',
+    'user_info_phone': 'លេខទូរស័ព្ទ',
+    'user_info_email': 'អ៊ីមែល',
+    'user_info_card_id': 'អត្តសញ្ញាណប័ណ្ណ',
+    'user_info_date_of_birth': 'ថ្ងៃខែឆ្នាំកំណើត',
+    'user_info_place_of_birth': 'ទីកន្លែងកំណើត',
+    'user_info_current_address': 'អាសយដ្ឋានបច្ចុប្បន្ន',
+    'user_info_personal_info': 'ព័ត៌មានផ្ទាល់ខ្លួន',
+    'user_info_family': 'គ្រួសារនិងសាច់ញាតិ',
+    'user_info_family_add': 'បន្ថែមគ្រួសារនិងសាច់ញាតិ',
+    // Layout ================================================
   };
 
   static String translate({

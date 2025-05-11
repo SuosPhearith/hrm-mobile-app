@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_app/app_lang.dart';
 import 'package:mobile_app/providers/global/setting_provider.dart';
 import 'package:mobile_app/providers/local/personal_info_provider.dart';
+import 'package:mobile_app/utils/help_util.dart';
 import 'package:provider/provider.dart';
 
 class PersonalInfoScreen extends StatefulWidget {
@@ -22,98 +24,167 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
     return ChangeNotifierProvider(
       create: (_) => PersonalInfoProvider(),
       child: Consumer2<PersonalInfoProvider, SettingProvider>(
-        builder: (context, evaluateProvider, settingProvider, child) {
+        builder: (context, provider, settingProvider, child) {
+          final user = provider.data?.data['user'];
           return Scaffold(
             backgroundColor: Colors.grey[100],
             appBar: AppBar(
-              title: Text('Personal info'),
+              title: Text(AppLang.translate(
+                  key: 'user_info_personal_info',
+                  lang: settingProvider.lang ?? 'kh')),
               centerTitle: true,
             ),
             body: RefreshIndicator(
               key: _refreshIndicatorKey,
               color: Colors.blue[800],
               backgroundColor: Colors.white,
-              onRefresh: () => _refreshData(evaluateProvider),
-              child: evaluateProvider.isLoading
+              onRefresh: () => _refreshData(provider),
+              child: provider.isLoading
                   ? Center(child: Text('Loading...'))
                   : SingleChildScrollView(
                       physics: const AlwaysScrollableScrollPhysics(),
-                      child: Column(
-                        children: [
-                          buildContainer(
-                            text: 'រូបភាព',
-                            onEditTap: () => {},
-                          ),
-                          Container(
-                            padding: EdgeInsets.all(16.0),
-                            child: CircleAvatar(
-                              radius: 50.0,
-                              backgroundColor: Colors.blue,
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          children: [
+                            buildContainer(
+                              text: 'រូបភាព',
+                              onEditTap: () => {},
+                            ),
+                            Container(
+                              padding: EdgeInsets.all(16.0),
                               child: CircleAvatar(
-                                radius: 48.0,
-                                backgroundImage: NetworkImage(
-                                    'https://file-v4-api.uat.camcyber.com/upload/file/49892209-72de-401d-9722-73f5501344d0'),
+                                radius: 50.0,
+                                backgroundColor: Colors.blue,
+                                child: CircleAvatar(
+                                  radius: 48.0,
+                                  backgroundImage: NetworkImage(
+                                      '${user?['avatar']?['file_domain']}${user?['avatar']?['uri']}'),
+                                ),
                               ),
                             ),
-                          ),
-                          buildContainer(
-                            text: 'ព័ត៌មានផ្ទាល់ខ្លួន',
-                            onEditTap: () => {},
-                          ),
-                          buildProfileContainer(
-                            name: 'ឃួច កឿន (KHOUCH KOEUN)',
-                            description: 'ប្រុស',
-                            icon: Icons.face,
-                          ),
-                          buildProfileContainer(
-                            name: 'ឃួច កឿន (KHOUCH KOEUN)',
-                            description: 'ប្រុស',
-                            icon: Icons.face,
-                          ),
-                          buildContainer(
-                            text: 'គ្រួសារ និងសាចញាតិ',
-                          ),
-                          buildIconTextContainer(
-                            text: 'អ្នកប្រើប្រាស់ សម្រាប់បាយ',
-                            icon: Icons.group,
-                          ),
-                          buildProfileContainerAction(
-                            name: 'ឃួច ទីទ្ធ (khouch tith)',
-                            description:
-                                '01-01-1965 (60 ឆ្នាំ) • នារីជនជាតិខ្មែរ • សញ្ញាតិ ABA\nភេទ: ស្ត្រី',
-                            icon: Icons.person,
-                          ),
-                          buildContainer(
-                            text: 'ការសិក្សា',
-                          ),
-                          buildIconTextContainer(
-                            text: 'អ្នកប្រើប្រាស់ សម្រាប់បាយ',
-                            icon: Icons.group,
-                          ),
-                          buildProfileContainerAction(
-                            name: 'ឃួច ទីទ្ធ (khouch tith)',
-                            description:
-                                '01-01-1965 (60 ឆ្នាំ) • នារីជនជាតិខ្មែរ • សញ្ញាតិ ABA\nភេទ: ស្ត្រី',
-                            icon: Icons.person,
-                          ),
-                          buildContainer(
-                            text: 'កម្រិតភាសា',
-                          ),
-                          buildProfileContainerAction(
-                            name: 'ឃួច ទីទ្ធ (khouch tith)',
-                            description:
-                                '01-01-1965 (60 ឆ្នាំ) • នារីជនជាតិខ្មែរ • សញ្ញាតិ ABA\nភេទ: ស្ត្រី',
-                            icon: Icons.person,
-                          ),
-                          buildProfileContainerAction(
-                            name: 'ឃួច ទីទ្ធ (khouch tith)',
-                            description:
-                                '01-01-1965 (60 ឆ្នាំ) • នារីជនជាតិខ្មែរ • សញ្ញាតិ ABA\nភេទ: ស្ត្រី',
-                            icon: Icons.person,
-                          ),
-                          SizedBox(
-                              height: MediaQuery.of(context).size.height * 0.1),
-                        ],
+                            buildContainer(
+                              text: AppLang.translate(
+                                  key: 'user_info_personal_info',
+                                  lang: settingProvider.lang ?? 'kh'),
+                              onEditTap: () => {},
+                            ),
+                            buildProfileContainer(
+                              name:
+                                  '${AppLang.translate(data: user?['salute'], lang: settingProvider.lang ?? 'kh')} ${getSafeString(value: user['name_kh'])} (${getSafeString(value: user['name_en'])})',
+                              description: AppLang.translate(
+                                  key: 'user_info_name',
+                                  lang: settingProvider.lang ?? 'kh'),
+                              icon: Icons.person,
+                            ),
+                            buildProfileContainer(
+                              name: AppLang.translate(
+                                  data: user?['sex'],
+                                  lang: settingProvider.lang ?? 'kh'),
+                              description: AppLang.translate(
+                                  key: 'user_info_sex',
+                                  lang: settingProvider.lang ?? 'kh'),
+                              icon: Icons.transgender,
+                            ),
+                            buildProfileContainer(
+                              name: getSafeString(value: user['phone_number']),
+                              description: AppLang.translate(
+                                  key: 'user_info_phone',
+                                  lang: settingProvider.lang ?? 'kh'),
+                              icon: Icons.phone_iphone,
+                            ),
+                            buildProfileContainer(
+                              name: getSafeString(value: user['email']),
+                              description: AppLang.translate(
+                                  key: 'user_info_email',
+                                  lang: settingProvider.lang ?? 'kh'),
+                              icon: Icons.email,
+                            ),
+                            buildProfileContainer(
+                              name: getSafeString(
+                                  value: user['identity_card_number']),
+                              description: AppLang.translate(
+                                  key: 'user_info_card_id',
+                                  lang: settingProvider.lang ?? 'kh'),
+                              icon: Icons.fingerprint,
+                            ),
+                            buildProfileContainer(
+                              name:
+                                  getSafeString(value: formatDate(user['dob'])),
+                              description: AppLang.translate(
+                                  key: 'user_info_date_of_birth',
+                                  lang: settingProvider.lang ?? 'kh'),
+                              icon: Icons.calendar_today,
+                            ),
+                            buildProfileContainer(
+                              name:
+                                  '${AppLang.translate(data: user?['village'], lang: settingProvider.lang ?? 'kh')} ${AppLang.translate(data: user?['commune'], lang: settingProvider.lang ?? 'kh')} ${AppLang.translate(data: user?['district'], lang: settingProvider.lang ?? 'kh')} ${AppLang.translate(data: user?['province'], lang: settingProvider.lang ?? 'kh')}',
+                              description: AppLang.translate(
+                                  key: 'user_info_place_of_birth',
+                                  lang: settingProvider.lang ?? 'kh'),
+                              icon: Icons.location_on,
+                            ),
+                            buildProfileContainer(
+                              name:
+                                  '${AppLang.translate(data: user?['pob_village'], lang: settingProvider.lang ?? 'kh')} ${AppLang.translate(data: user?['pob_commune'], lang: settingProvider.lang ?? 'kh')} ${AppLang.translate(data: user?['pob_district'], lang: settingProvider.lang ?? 'kh')} ${AppLang.translate(data: user?['pob_province'], lang: settingProvider.lang ?? 'kh')}',
+                              description: AppLang.translate(
+                                  key: 'user_info_current_address',
+                                  lang: settingProvider.lang ?? 'kh'),
+                              icon: Icons.location_on,
+                            ),
+                            buildContainer(
+                              text: AppLang.translate(
+                                  key: 'user_info_family',
+                                  lang: settingProvider.lang ?? 'kh'),
+                            ),
+                            buildIconTextContainer(
+                              text: AppLang.translate(
+                                  key: 'user_info_family_add',
+                                  lang: settingProvider.lang ?? 'kh'),
+                              icon: Icons.group,
+                            ),
+                            ...(user['relatives'] as List).map((record) {
+                              return buildProfileContainerAction(
+                                name:
+                                    '${getSafeString(value: record['name_kh'])} (${getSafeString(value: record['name_en'])})',
+                                description:
+                                    '${formatDate(record['dob'])} • ${getSafeString(value: record['job'])} • ${getSafeString(value: record['work_place'])}',
+                                icon: Icons.person,
+                              );
+                            }),
+                            buildContainer(
+                              text: 'ការសិក្សា',
+                            ),
+                            buildIconTextContainer(
+                              text: 'ប',
+                              icon: Icons.group,
+                            ),
+                            buildProfileContainerAction(
+                              name: 'ឃួច ទីទ្ធ (khouch tith)',
+                              description:
+                                  '01-01-1965 (60 ឆ្នាំ) • នារីជនជាតិខ្មែរ • សញ្ញាតិ ABA\nភេទ: ស្ត្រី',
+                              icon: Icons.person,
+                            ),
+                            buildContainer(
+                              text: 'កម្រិតភាសា',
+                            ),
+                            buildProfileContainerAction(
+                              name: 'ឃួច ទីទ្ធ (khouch tith)',
+                              description:
+                                  '01-01-1965 (60 ឆ្នាំ) • នារីជនជាតិខ្មែរ • សញ្ញាតិ ABA\nភេទ: ស្ត្រី',
+                              icon: Icons.person,
+                            ),
+                            buildProfileContainerAction(
+                              name: 'ឃួច ទីទ្ធ (khouch tith)',
+                              description:
+                                  '01-01-1965 (60 ឆ្នាំ) • នារីជនជាតិខ្មែរ • សញ្ញាតិ ABA\nភេទ: ស្ត្រី',
+                              icon: Icons.person,
+                            ),
+                            SizedBox(
+                                height:
+                                    MediaQuery.of(context).size.height * 0.1),
+                          ],
+                        ),
                       )),
             ),
           );
@@ -130,13 +201,13 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
     Color? avatarColor,
   }) {
     return Container(
-      padding: EdgeInsets.all(16.0),
+      padding: EdgeInsets.only(bottom: 16.0),
       child: Row(
         children: [
           CircleAvatar(
-            radius: 20.0,
+            radius: 25.0,
             backgroundColor: avatarColor ?? Colors.grey[300],
-            child: Icon(icon, size: 20.0, color: iconColor),
+            child: Icon(icon, size: 25.0, color: iconColor),
           ),
           SizedBox(width: 8.0),
           Expanded(
@@ -156,7 +227,7 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
     VoidCallback? onEditTap, // Made optional with nullable type
   }) {
     return Container(
-      padding: EdgeInsets.all(16.0),
+      padding: EdgeInsets.only(bottom: 16),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -184,15 +255,15 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
     IconData icon = Icons.person, // Default icon is person
   }) {
     return Container(
-      padding: EdgeInsets.all(16.0),
+      padding: EdgeInsets.only(bottom: 16),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment
             .start, // Align to top so avatar stays at top when text wraps
         children: [
           CircleAvatar(
-            radius: 20.0,
+            radius: 25.0,
             backgroundColor: Colors.grey[300],
-            child: Icon(icon, size: 20.0, color: Colors.grey),
+            child: Icon(icon, size: 25.0, color: Colors.grey),
           ),
           SizedBox(width: 8.0),
           Expanded(
@@ -226,14 +297,14 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
     IconData icon = Icons.person, // Default icon is person
   }) {
     return Container(
-      padding: EdgeInsets.all(16.0),
+      padding: EdgeInsets.only(bottom: 16.0),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           CircleAvatar(
-            radius: 20.0,
+            radius: 25.0,
             backgroundColor: Colors.grey[300],
-            child: Icon(icon, size: 20.0, color: Colors.grey),
+            child: Icon(icon, size: 25.0, color: Colors.grey),
           ),
           SizedBox(width: 8.0),
           Expanded(
