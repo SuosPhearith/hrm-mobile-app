@@ -668,7 +668,7 @@ class MenuGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final lang = Provider.of<SettingProvider>(context).lang;
+    final lang = Provider.of<SettingProvider>(context, listen: false).lang;
     final menuItems = [
       {
         'icon': Icons.edit_calendar_outlined,

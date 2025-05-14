@@ -7,9 +7,7 @@ import 'package:mobile_app/utils/help_util.dart';
 class CreateRequestService {
   Future<ResponseStructure<Map<String, dynamic>>> dataSetup() async {
     try {
-      final response = await DioClient.dio.get(
-        "/user/request/data-setup",
-      );
+      final response = await DioClient.dio.get("/user/request/data-setup");
       return ResponseStructure<Map<String, dynamic>>.fromJson(
         response.data as Map<String, dynamic>,
         dataFromJson: (json) => json,
@@ -22,10 +20,7 @@ class CreateRequestService {
         );
         throw Exception(ErrorType.requestError);
       } else {
-        printError(
-          errorMessage: ErrorType.networkError,
-          statusCode: null,
-        );
+        printError(errorMessage: ErrorType.networkError, statusCode: null);
         throw Exception(ErrorType.networkError);
       }
     } catch (e) {
@@ -40,16 +35,20 @@ class CreateRequestService {
     required String? objective,
     required int requestTypeId,
     required int requestCategoryId,
+    required String attachment,
   }) async {
     try {
-      final response = await DioClient.dio.post("/user/request", data: {
-        "start_date": startDate,
-        "end_date": endDate,
-        "objective": objective ?? '', // opt
-        "request_type_id": requestTypeId,
-        "request_category_id": requestCategoryId,
-        "attachment": ''
-      });
+      final response = await DioClient.dio.post(
+        "/user/request",
+        data: {
+          "start_date": startDate,
+          "end_date": endDate,
+          "objective": objective ?? '', // opt
+          "request_type_id": requestTypeId,
+          "request_category_id": requestCategoryId,
+          "attachment": 'data:application/pdf;base64,$attachment',
+        },
+      );
       return response.data;
     } on DioException catch (dioError) {
       if (dioError.response != null) {
@@ -59,10 +58,7 @@ class CreateRequestService {
         );
         throw Exception(ErrorType.requestError);
       } else {
-        printError(
-          errorMessage: ErrorType.networkError,
-          statusCode: null,
-        );
+        printError(errorMessage: ErrorType.networkError, statusCode: null);
         throw Exception(ErrorType.networkError);
       }
     } catch (e) {

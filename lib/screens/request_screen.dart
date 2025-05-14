@@ -26,97 +26,119 @@ class _RequestScreenState extends State<RequestScreen> {
     return ChangeNotifierProvider(
       create: (_) => RequestProvider(),
       child: Consumer2<RequestProvider, SettingProvider>(
-          builder: (context, requestProvider, settingProvider, child) {
-        return Scaffold(
-          backgroundColor: Colors.grey[100],
-          appBar: AppBar(
-            title: Text(
-              AppLang.translate(
-                  key: 'request', lang: settingProvider.lang ?? 'kh'),
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
-            ),
-            centerTitle: true,
-            backgroundColor: Colors.white,
-            iconTheme: const IconThemeData(
-              color: Colors.black,
-            ),
-            elevation: 0,
-            actions: [
-              GestureDetector(
-                onTap: () {
-                  _showAddRequestBottomSheet(context);
-                },
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Container(
-                    padding: const EdgeInsets.all(6.0),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.white,
-                    ),
-                    child: Icon(
-                      Icons.add,
-                      size: 28.0,
-                      color: Colors.blue[800],
-                    ),
-                  ),
+        builder: (context, requestProvider, settingProvider, child) {
+          final dataSetup = requestProvider.dataSetup?.data;
+          return Scaffold(
+            backgroundColor: Colors.grey[100],
+            appBar: AppBar(
+              title: Text(
+                AppLang.translate(
+                  key: 'request',
+                  lang: settingProvider.lang ?? 'kh',
+                ),
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
                 ),
               ),
-            ],
-          ),
-          body: RefreshIndicator(
-            key: _refreshIndicatorKey,
-            color: Colors.blue[800],
-            backgroundColor: Colors.white,
-            onRefresh: () => _refreshData(requestProvider),
-            child: requestProvider.isLoading
-                ? const Center(child: Text('Loading...'))
-                : SingleChildScrollView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        children: [
-                          if (requestProvider.requestData?.data.results ==
-                                  null ||
-                              requestProvider.requestData!.data.results.isEmpty)
-                            const SizedBox(
-                              height: 200, // Minimal height for empty state
-                              child: Center(child: Text("No data found")),
-                            )
-                          else
-                            ...requestProvider.requestData!.data.results
-                                .map((record) {
-                              return _buildRequestCard(
-                                id: AppLang.translate(
-                                    data: record['request_category'],
-                                    lang: settingProvider.lang ?? 'kh'),
-                                status: AppLang.translate(
-                                    data: record['request_status'],
-                                    lang: settingProvider.lang ?? 'kh'),
-                                dates:
-                                    '${formatDate(record['start_datetime'])} ដល់ ${formatDate(record['end_datetime'])}',
-                                days: calculateDateDifference(
-                                    record['start_datetime'],
-                                    record['end_datetime']),
-                                description:
-                                    '${AppLang.translate(data: record['request_type'], lang: settingProvider.lang ?? 'kh')} | ${formatStringValue(record['objective'])}',
-                              );
-                            }),
-                        ],
+              centerTitle: true,
+              backgroundColor: Colors.white,
+              iconTheme: const IconThemeData(color: Colors.black),
+              elevation: 0,
+              actions: [
+                GestureDetector(
+                  onTap: () {
+                    _showAddRequestBottomSheet(context, dataSetup!);
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Container(
+                      padding: const EdgeInsets.all(6.0),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white,
+                      ),
+                      child: Icon(
+                        Icons.add,
+                        size: 28.0,
+                        color: Colors.blue[800],
                       ),
                     ),
                   ),
-          ),
-        );
-      }),
+                ),
+              ],
+            ),
+            body: RefreshIndicator(
+              key: _refreshIndicatorKey,
+              color: Colors.blue[800],
+              backgroundColor: Colors.white,
+              onRefresh: () => _refreshData(requestProvider),
+              child:
+                  requestProvider.isLoading
+                      ? const Center(child: Text('Loading...'))
+                      : SingleChildScrollView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            children: [
+                              if (requestProvider.requestData?.data.results ==
+                                      null ||
+                                  requestProvider
+                                      .requestData!
+                                      .data
+                                      .results
+                                      .isEmpty)
+                                const SizedBox(
+                                  height: 200, // Minimal height for empty state
+                                  child: Center(child: Text("No data found")),
+                                )
+                              else
+                                ...requestProvider.requestData!.data.results.map((
+                                  record,
+                                ) {
+                                  return GestureDetector(
+                                    onTap: () {
+                                      context.push(
+                                        '${AppRoutes.detailRequest}/${record['id']}',
+                                      );
+                                    },
+                                    child: _buildRequestCard(
+                                      id: AppLang.translate(
+                                        data: record['request_category'],
+                                        lang: settingProvider.lang ?? 'kh',
+                                      ),
+                                      status: AppLang.translate(
+                                        data: record['request_status'],
+                                        lang: settingProvider.lang ?? 'kh',
+                                      ),
+                                      dates:
+                                          '${formatDate(record['start_datetime'])} ដល់ ${formatDate(record['end_datetime'])}',
+                                      days: calculateDateDifference(
+                                        record['start_datetime'],
+                                        record['end_datetime'],
+                                      ),
+                                      description:
+                                          '${AppLang.translate(data: record['request_type'], lang: settingProvider.lang ?? 'kh')} | ${formatStringValue(record['objective'])}',
+                                    ),
+                                  );
+                                }),
+                            ],
+                          ),
+                        ),
+                      ),
+            ),
+          );
+        },
+      ),
     );
   }
 
-  void _showAddRequestBottomSheet(BuildContext context) {
+  void _showAddRequestBottomSheet(
+    BuildContext context,
+    Map<String, dynamic> dataSetup,
+  ) {
+    final lang = Provider.of<SettingProvider>(context, listen: false).lang;
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -139,26 +161,16 @@ class _RequestScreenState extends State<RequestScreen> {
                 ),
               ),
               const SizedBox(height: 16.0),
-              _buildBottomSheetOption(
-                icon: Icons.account_circle,
-                label: 'សំណើរច្បាប់',
-                onTap: () {
-                  Navigator.pop(context); // Close the bottom sheet
-                  context
-                      .push(AppRoutes.createRequest); // Navigate to new route
-                },
-              ),
-              const SizedBox(height: 12.0),
-              _buildBottomSheetOption(
-                icon: Icons.airplanemode_active_rounded,
-                label: 'សំណើរបេសកកម្ម',
-                onTap: () {
-                  Navigator.pop(
-                      context); // Close the bottom sheet (optional, for consistency)
-                  // Add navigation or logic for mission request if needed
-                },
-              ),
-              const SizedBox(height: 16.0),
+              ...(dataSetup['request_categories'] as List).map((record) {
+                return _buildBottomSheetOption(
+                  icon: Icons.account_circle,
+                  label: AppLang.translate(data: record, lang: lang ?? 'kh'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    context.push('/create-request/${record['id']}');
+                  },
+                );
+              }),
             ],
           ),
         );
@@ -175,6 +187,7 @@ class _RequestScreenState extends State<RequestScreen> {
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(12.0),
+        margin: EdgeInsets.only(bottom: 8),
         decoration: BoxDecoration(
           border: Border.all(color: Colors.grey),
           borderRadius: BorderRadius.circular(12.0),
@@ -183,14 +196,8 @@ class _RequestScreenState extends State<RequestScreen> {
           children: [
             Container(
               padding: const EdgeInsets.all(8.0),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                icon,
-                size: 24.0,
-                color: Colors.grey,
-              ),
+              decoration: BoxDecoration(shape: BoxShape.circle),
+              child: Icon(icon, size: 24.0, color: Colors.grey),
             ),
             const SizedBox(width: 12.0),
             Text(
@@ -219,9 +226,10 @@ class _RequestScreenState extends State<RequestScreen> {
       margin: const EdgeInsets.only(bottom: 12.0),
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16.0),
-          border: Border.all(width: 1, color: Colors.grey)),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16.0),
+        border: Border.all(width: 1, color: Colors.grey),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -237,8 +245,10 @@ class _RequestScreenState extends State<RequestScreen> {
                 ),
               ),
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10.0, vertical: 4.0),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10.0,
+                  vertical: 4.0,
+                ),
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.blue),
                   borderRadius: BorderRadius.circular(20.0),
@@ -258,15 +268,14 @@ class _RequestScreenState extends State<RequestScreen> {
             children: [
               Text(
                 dates,
-                style: TextStyle(
-                  fontSize: 14.0,
-                  color: Colors.grey.shade700,
-                ),
+                style: TextStyle(fontSize: 14.0, color: Colors.grey.shade700),
               ),
               const SizedBox(width: 8.0),
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2.0),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 8.0,
+                  vertical: 2.0,
+                ),
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.blue),
                   borderRadius: BorderRadius.circular(20.0),
@@ -284,10 +293,7 @@ class _RequestScreenState extends State<RequestScreen> {
           ),
           Text(
             description,
-            style: TextStyle(
-              fontSize: 14.0,
-              color: Colors.grey.shade600,
-            ),
+            style: TextStyle(fontSize: 14.0, color: Colors.grey.shade600),
           ),
         ],
       ),

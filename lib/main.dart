@@ -9,6 +9,7 @@ import 'package:mobile_app/screens/evaluate_screen.dart';
 import 'package:mobile_app/screens/holliday_screen.dart';
 import 'package:mobile_app/screens/personal_info_screen.dart';
 import 'package:mobile_app/screens/request/create_request_screen.dart';
+import 'package:mobile_app/screens/request/detail_request_screen.dart';
 import 'package:mobile_app/screens/request_screen.dart';
 import 'package:mobile_app/screens/scan_screen.dart';
 import 'package:mobile_app/screens/select_language_screen.dart';
@@ -97,7 +98,8 @@ final GoRouter _router = GoRouter(
       builder: (context, state, navigationShell) {
         // Wrap the MainLayout with AuthMiddleware
         return AuthMiddleware(
-            child: MainLayout(navigationShell: navigationShell));
+          child: MainLayout(navigationShell: navigationShell),
+        );
       },
       branches: [
         // Home Tab
@@ -144,13 +146,16 @@ final GoRouter _router = GoRouter(
     ),
     GoRoute(
       path: AppRoutes.login,
-      builder: (context, state) =>
-          AuthMiddleware(child: const AuthLayout(child: LoginScreen())),
+      builder:
+          (context, state) =>
+              AuthMiddleware(child: const AuthLayout(child: LoginScreen())),
     ),
     GoRoute(
       path: AppRoutes.selectLanguage,
-      builder: (context, state) => AuthMiddleware(
-          child: const AuthLayout(child: SelectLanguageScreen())),
+      builder:
+          (context, state) => AuthMiddleware(
+            child: const AuthLayout(child: SelectLanguageScreen()),
+          ),
     ),
     GoRoute(
       path: AppRoutes.welcome,
@@ -181,18 +186,29 @@ final GoRouter _router = GoRouter(
       builder: (context, state) => const WorkScreen(),
     ),
     GoRoute(
-      path: AppRoutes.createRequest,
-      builder: (context, state) => const CreateRequestScreen(),
+      path: '${AppRoutes.createRequest}/:id',
+      builder: (context, state) {
+        final id = state.pathParameters['id'];
+        return CreateRequestScreen(id: id);
+      },
+    ),
+    GoRoute(
+      path: '${AppRoutes.detailRequest}/:id',
+      builder: (context, state) {
+        final id = state.pathParameters['id'];
+        return DetailRequestScreen(id: id);
+      },
     ),
   ],
-  errorBuilder: (context, state) => Scaffold(
-    body: Center(
-      child: Text(
-        'Error: ${state.error}',
-        style: const TextStyle(fontSize: 18, color: Colors.red),
+  errorBuilder:
+      (context, state) => Scaffold(
+        body: Center(
+          child: Text(
+            'Error: ${state.error}',
+            style: const TextStyle(fontSize: 18, color: Colors.red),
+          ),
+        ),
       ),
-    ),
-  ),
 );
 
 /// Main Layout with Stateful Navigation
@@ -295,13 +311,18 @@ class _MainLayoutState extends State<MainLayout> {
             BottomNavigationBarItem(
               icon: _buildNavIcon(Icons.calendar_month, 3),
               activeIcon: _buildNavIcon(Icons.calendar_month, 3, active: true),
-              label:
-                  AppLang.translate(key: 'layout_holiday', lang: lang ?? 'kh'),
+              label: AppLang.translate(
+                key: 'layout_holiday',
+                lang: lang ?? 'kh',
+              ),
             ),
             BottomNavigationBarItem(
               icon: _buildNavIcon(Icons.grid_view_rounded, 4),
-              activeIcon:
-                  _buildNavIcon(Icons.grid_view_rounded, 4, active: true),
+              activeIcon: _buildNavIcon(
+                Icons.grid_view_rounded,
+                4,
+                active: true,
+              ),
               label: AppLang.translate(key: 'layout_other', lang: lang ?? 'kh'),
             ),
           ],
@@ -365,11 +386,7 @@ class _MainLayoutState extends State<MainLayout> {
                 color: Colors.grey[200],
                 shape: BoxShape.circle,
               ),
-              child: Icon(
-                icon,
-                size: 24.0,
-                color: Colors.blue[800],
-              ),
+              child: Icon(icon, size: 24.0, color: Colors.blue[800]),
             ),
             const SizedBox(width: 12.0),
             Text(
@@ -395,9 +412,10 @@ class _MainLayoutState extends State<MainLayout> {
       child: Icon(
         icon,
         size: 28.0,
-        color: isSelected || active
-            ? Theme.of(context).colorScheme.secondary
-            : Colors.grey[600],
+        color:
+            isSelected || active
+                ? Theme.of(context).colorScheme.secondary
+                : Colors.grey[600],
       ),
     );
   }
@@ -429,10 +447,7 @@ class AuthLayout extends StatelessWidget {
                   padding: const EdgeInsets.only(bottom: 16.0),
                   child: Text(
                     '© ${DateTime.now().year} ${dotenv.env['APP_NAME']}',
-                    style: TextStyle(
-                      fontSize: 12.0,
-                      color: Colors.grey[600],
-                    ),
+                    style: TextStyle(fontSize: 12.0, color: Colors.grey[600]),
                   ),
                 ),
               ],

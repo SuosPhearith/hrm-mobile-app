@@ -13,5 +13,6 @@ class AppRoutes {
   static const String evaluate = '/evaluate';
   static const String personalInfo = '/personal-info';
   static const String work = '/work';
-  static const String createRequest = '/create-request';
+  static const String createRequest = '/create-request'; // dynamic
+  static const String detailRequest = '/detail-request'; // dynamic
 }

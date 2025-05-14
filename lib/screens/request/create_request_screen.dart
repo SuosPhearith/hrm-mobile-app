@@ -1,6 +1,10 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:mobile_app/app_lang.dart';
 import 'package:mobile_app/providers/global/setting_provider.dart';
@@ -11,7 +15,8 @@ import 'package:mobile_app/widgets/helper.dart';
 import 'package:provider/provider.dart';
 
 class CreateRequestScreen extends StatefulWidget {
-  const CreateRequestScreen({super.key});
+  final String? id;
+  const CreateRequestScreen({super.key, this.id});
 
   @override
   State<CreateRequestScreen> createState() => _CreateRequestScreenState();
@@ -27,11 +32,31 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
   // Variables to store form field values
   int? _selectedTypeId;
   String? _selectedTypeNameKh;
-  int? _selectedCategoryId;
-  String? _selectedCategoryNameKh;
   DateTime? _startDate;
   DateTime? _endDate;
   String? _description;
+
+  File? _image; // Store the selected image
+  final ImagePicker _picker = ImagePicker();
+  String? _imageBase64;
+
+  Future<void> _pickImage(ImageSource source) async {
+    final XFile? pickedFile = await _picker.pickImage(source: source);
+
+    if (pickedFile != null) {
+      // First create the File from the picked image
+      final File imageFile = File(pickedFile.path);
+
+      // Then read the bytes
+      final bytes = await imageFile.readAsBytes();
+      final base64Image = base64Encode(bytes);
+
+      setState(() {
+        _image = imageFile;
+        _imageBase64 = base64Image;
+      });
+    }
+  }
 
   // Controller for description field
   final TextEditingController _descriptionController = TextEditingController();
@@ -53,14 +78,6 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
       }
       return;
     }
-    if (_selectedCategoryId == null) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('សូមជ្រើសរើសប្រភេទប្រភេទ')),
-        );
-      }
-      return;
-    }
     if (_startDate == null) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -71,9 +88,9 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
     }
     if (_description == null) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('សូមបញ្ចូលមូលហេតុ')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('សូមបញ្ចូលមូលហេតុ')));
       }
       return;
     }
@@ -85,6 +102,14 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
       }
       return;
     }
+    if (_imageBase64 == null) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('សូមជ្រើសរើសរូប')));
+      }
+      return;
+    }
 
     try {
       await _createRequestService.createRequest(
@@ -93,7 +118,8 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
         objective:
             _description?.trim().isNotEmpty == true ? _description! : null,
         requestTypeId: _selectedTypeId!,
-        requestCategoryId: _selectedCategoryId!,
+        requestCategoryId: int.parse(widget.id!),
+        attachment: _imageBase64!,
       );
 
       if (mounted) {
@@ -117,22 +143,45 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
       create: (_) => CreateRequestProvider(),
       child: Consumer2<CreateRequestProvider, SettingProvider>(
         builder: (context, createRequestProvider, settingProvider, child) {
-          final dataSetup = createRequestProvider.data?.data;
+          final List<dynamic>? requestCategories =
+              createRequestProvider.data?.data['request_categories']
+                  as List<dynamic>?;
+
+          Map<String, dynamic>? data;
+          if (requestCategories != null) {
+            try {
+              data =
+                  requestCategories.firstWhere(
+                        (item) => item['id'] == int.parse(widget.id!),
+                        orElse: () => <String, dynamic>{},
+                      )
+                      as Map<String, dynamic>;
+
+              // If we got an empty map from orElse, set data to null
+              if (data.isEmpty) {
+                data = null;
+              }
+            } catch (e) {
+              data = null;
+            }
+          }
           return Scaffold(
             backgroundColor: Colors.grey[100],
             appBar: AppBar(
-              title: const Text('ស្នើសុំច្បាប់'),
+              title: Text('ស្នើសុំច្បាប់'),
               centerTitle: true,
               actions: [
                 GestureDetector(
                   onTap: () {
                     showConfirmDialog(
-                        context,
-                        'Confirm Create',
-                        'Are you sure to create request?',
-                        DialogType.primary, () {
-                      _validateAndSubmit();
-                    });
+                      context,
+                      'Confirm Create',
+                      'Are you sure to create request?',
+                      DialogType.primary,
+                      () {
+                        _validateAndSubmit();
+                      },
+                    );
                   },
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -153,9 +202,7 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
               ],
             ),
             body: GestureDetector(
-              onTap: () {
-                FocusScope.of(context).unfocus(); // Dismiss keyboard
-              },
+              onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
               child: Column(
                 children: [
                   Expanded(
@@ -164,111 +211,147 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
                       color: Colors.blue[800],
                       backgroundColor: Colors.white,
                       onRefresh: () => _refreshData(createRequestProvider),
-                      child: createRequestProvider.isLoading
-                          ? const Center(child: Text('Loading...'))
-                          : SingleChildScrollView(
-                              physics: const AlwaysScrollableScrollPhysics(),
-                              child: Padding(
-                                padding: const EdgeInsets.all(16.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Wrap(
-                                      spacing: 10,
-                                      runSpacing: 10,
-                                      children:
-                                          (dataSetup!['request_types'] as List)
-                                              .map((record) {
-                                        return Container(
-                                          margin: EdgeInsets.zero,
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 4, horizontal: 8),
-                                          decoration: BoxDecoration(
-                                            color: const Color.fromRGBO(
-                                                33, 150, 243, 0.1),
-                                            borderRadius:
-                                                const BorderRadius.all(
-                                              Radius.circular(16),
+                      child:
+                          createRequestProvider.isLoading
+                              ? const Center(child: Text('Loading...'))
+                              : SingleChildScrollView(
+                                physics: const AlwaysScrollableScrollPhysics(),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Wrap(
+                                        spacing: 10,
+                                        runSpacing: 10,
+                                        children:
+                                            (data!['request_types'] as List).map((
+                                              record,
+                                            ) {
+                                              return Container(
+                                                margin: EdgeInsets.zero,
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                      vertical: 4,
+                                                      horizontal: 8,
+                                                    ),
+                                                decoration: BoxDecoration(
+                                                  color: const Color.fromRGBO(
+                                                    33,
+                                                    150,
+                                                    243,
+                                                    0.1,
+                                                  ),
+                                                  borderRadius:
+                                                      const BorderRadius.all(
+                                                        Radius.circular(16),
+                                                      ),
+                                                ),
+                                                child: Text(
+                                                  '${getSafeString(value: AppLang.translate(data: record, lang: settingProvider.lang ?? 'kh'))} ${getSafeInteger(value: record['max_per_year'])}',
+                                                  style: TextStyle(
+                                                    color: Colors.blue[800],
+                                                  ),
+                                                ),
+                                              );
+                                            }).toList(),
+                                      ),
+                                      const SizedBox(height: 16),
+                                      MyDropdown(
+                                        items:
+                                            (data['request_types'] as List)
+                                                .map(
+                                                  (item) =>
+                                                      item
+                                                          as Map<
+                                                            String,
+                                                            dynamic
+                                                          >,
+                                                )
+                                                .toList(),
+                                        label: 'ប្រភេទច្បាប់',
+                                        displayKey: 'name_kh',
+                                        onChanged: (item) {
+                                          setState(() {
+                                            _selectedTypeId = item['id'];
+                                            _selectedTypeNameKh =
+                                                item['name_kh'];
+                                          });
+                                        },
+                                        selectedValue: _selectedTypeNameKh,
+                                      ),
+                                      const SizedBox(height: 16),
+                                      DateInputField(
+                                        label: 'កាលបរិច្ឆេទចាប់ផ្តើម',
+                                        initialDate: DateTime.now(),
+                                        selectedDate: _startDate,
+                                        onDateSelected: (date) {
+                                          setState(() {
+                                            _startDate = date;
+                                          });
+                                        },
+                                      ),
+                                      const SizedBox(height: 16),
+                                      DateInputField(
+                                        label: 'កាលបរិច្ឆេទបញ្ចប់',
+                                        initialDate: DateTime.now(),
+                                        selectedDate: _endDate,
+                                        onDateSelected: (date) {
+                                          setState(() {
+                                            _endDate = date;
+                                          });
+                                        },
+                                      ),
+                                      const SizedBox(height: 16),
+                                      DescriptionTextField(
+                                        controller: _descriptionController,
+                                        onChanged: (value) {
+                                          _description = value;
+                                        },
+                                      ),
+                                      const SizedBox(height: 16),
+                                      Center(
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            // Display selected image or placeholder
+                                            _image == null
+                                                ? Text('No image selected.')
+                                                : Image.file(
+                                                  _image!,
+                                                  height: 200,
+                                                ),
+                                            SizedBox(height: 20),
+                                            // Button to pick image from gallery
+                                            ElevatedButton(
+                                              onPressed:
+                                                  () => _pickImage(
+                                                    ImageSource.gallery,
+                                                  ),
+                                              child: Text(
+                                                'Pick Image from Gallery',
+                                              ),
                                             ),
-                                          ),
-                                          child: Text(
-                                            '${getSafeString(value: AppLang.translate(data: record, lang: settingProvider.lang ?? 'kh'))} ${getSafeInteger(value: record['total'])} / ${getSafeInteger(value: record['max_per_year'])}',
-                                            style: TextStyle(
-                                              color: Colors.blue[800],
-                                            ),
-                                          ),
-                                        );
-                                      }).toList(),
-                                    ),
-                                    const SizedBox(height: 16),
-                                    MyDropdown(
-                                      items:
-                                          (dataSetup['request_types'] as List)
-                                              .map((item) =>
-                                                  item as Map<String, dynamic>)
-                                              .toList(),
-                                      label: 'ប្រភេទច្បាប់',
-                                      displayKey: 'name_kh',
-                                      onChanged: (item) {
-                                        setState(() {
-                                          _selectedTypeId = item['id'];
-                                          _selectedTypeNameKh = item['name_kh'];
-                                        });
-                                      },
-                                      selectedValue: _selectedTypeNameKh,
-                                    ),
-                                    const SizedBox(height: 16),
-                                    MyDropdown(
-                                      items: (dataSetup['request_categories']
-                                              as List)
-                                          .map((item) =>
-                                              item as Map<String, dynamic>)
-                                          .toList(),
-                                      label: 'ប្រភេទសំណើ',
-                                      displayKey: 'name_kh',
-                                      onChanged: (item) {
-                                        setState(() {
-                                          _selectedCategoryId = item['id'];
-                                          _selectedCategoryNameKh =
-                                              item['name_kh'];
-                                        });
-                                      },
-                                      selectedValue: _selectedCategoryNameKh,
-                                    ),
-                                    const SizedBox(height: 16),
-                                    DateInputField(
-                                      label: 'កាលបរិច្ឆេទចាប់ផ្តើម',
-                                      initialDate: DateTime.now(),
-                                      selectedDate: _startDate,
-                                      onDateSelected: (date) {
-                                        setState(() {
-                                          _startDate = date;
-                                        });
-                                      },
-                                    ),
-                                    const SizedBox(height: 16),
-                                    DateInputField(
-                                      label: 'កាលបរិច្ឆេទបញ្ចប់',
-                                      initialDate: DateTime.now(),
-                                      selectedDate: _endDate,
-                                      onDateSelected: (date) {
-                                        setState(() {
-                                          _endDate = date;
-                                        });
-                                      },
-                                    ),
-                                    const SizedBox(height: 16),
-                                    DescriptionTextField(
-                                      controller: _descriptionController,
-                                      onChanged: (value) {
-                                        _description = value;
-                                      },
-                                    ),
-                                    const SizedBox(height: 16),
-                                  ],
+                                            // Button to pick image from camera
+                                            // ElevatedButton(
+                                            //   onPressed: () =>
+                                            //       _pickImage(ImageSource.camera),
+                                            //   child: Text('Take Photo'),
+                                            // ),
+                                            // Button to upload image
+                                            // ElevatedButton(
+                                            //   onPressed: _image == null ? null : _uploadImage,
+                                            //   child: Text('Upload Image'),
+                                            // ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ),
                     ),
                   ),
                   Container(
@@ -286,18 +369,22 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
                     child: ElevatedButton(
                       onPressed: () {
                         showConfirmDialog(
-                            context,
-                            'Confirm Create',
-                            'Are you sure to create request?',
-                            DialogType.primary, () {
-                          _validateAndSubmit();
-                        });
+                          context,
+                          'Confirm Create',
+                          'Are you sure to create request?',
+                          DialogType.primary,
+                          () {
+                            _validateAndSubmit();
+                          },
+                        );
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blue[800],
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(
-                            vertical: 16, horizontal: 32),
+                          vertical: 16,
+                          horizontal: 32,
+                        ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
@@ -410,9 +497,10 @@ class MyDropdown extends StatelessWidget {
                 Text(
                   selectedValue ?? 'សូមជ្រើសរើស$label',
                   style: TextStyle(
-                    color: selectedValue != null
-                        ? Colors.black87
-                        : Colors.grey[600],
+                    color:
+                        selectedValue != null
+                            ? Colors.black87
+                            : Colors.grey[600],
                     fontSize: 16,
                   ),
                 ),
@@ -440,7 +528,7 @@ class KhmerDateFormatter {
       9: 'កញ្ញា',
       10: 'តុលា',
       11: 'វិច្ឆិកា',
-      12: 'ធ្នូ'
+      12: 'ធ្នូ',
     };
     final Map<int, String> khmerDigits = {
       0: '០',
@@ -452,21 +540,23 @@ class KhmerDateFormatter {
       6: '៦',
       7: '៧',
       8: '៨',
-      9: '៩'
+      9: '៩',
     };
 
-    String day = date.day
-        .toString()
-        .padLeft(2, '0')
-        .split('')
-        .map((d) => khmerDigits[int.parse(d)]!)
-        .join();
+    String day =
+        date.day
+            .toString()
+            .padLeft(2, '0')
+            .split('')
+            .map((d) => khmerDigits[int.parse(d)]!)
+            .join();
     String month = khmerMonths[date.month]!;
-    String year = date.year
-        .toString()
-        .split('')
-        .map((d) => khmerDigits[int.parse(d)]!)
-        .join();
+    String year =
+        date.year
+            .toString()
+            .split('')
+            .map((d) => khmerDigits[int.parse(d)]!)
+            .join();
 
     return '$day $month $year';
   }
@@ -579,9 +669,10 @@ class DateInputField extends StatelessWidget {
                       : 'សូមជ្រើសរើសកាលបរិច្ឆេទ',
                   style: TextStyle(
                     fontSize: 16,
-                    color: selectedDate != null
-                        ? Colors.black87
-                        : Colors.grey[600],
+                    color:
+                        selectedDate != null
+                            ? Colors.black87
+                            : Colors.grey[600],
                   ),
                 ),
                 Icon(Icons.calendar_today, color: Colors.blue[800]),
