@@ -699,7 +699,7 @@ class MenuGrid extends StatelessWidget {
       {
         'icon': Icons.work_outline,
         'label': AppLang.translate(key: 'home_job', lang: lang ?? 'kh'),
-        'route': null
+        'route': AppRoutes.work
       },
       {
         'icon': Icons.monetization_on_outlined,

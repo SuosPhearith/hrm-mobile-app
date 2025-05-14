@@ -8,10 +8,12 @@ import 'package:mobile_app/screens/daily_screen.dart';
 import 'package:mobile_app/screens/evaluate_screen.dart';
 import 'package:mobile_app/screens/holliday_screen.dart';
 import 'package:mobile_app/screens/personal_info_screen.dart';
+import 'package:mobile_app/screens/request/create_request_screen.dart';
 import 'package:mobile_app/screens/request_screen.dart';
 import 'package:mobile_app/screens/scan_screen.dart';
 import 'package:mobile_app/screens/select_language_screen.dart';
 import 'package:mobile_app/screens/welcome_screen.dart';
+import 'package:mobile_app/screens/work_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:mobile_app/app_routes.dart';
 import 'package:mobile_app/middlewares/auth_middleware.dart';
@@ -173,6 +175,14 @@ final GoRouter _router = GoRouter(
     GoRoute(
       path: AppRoutes.personalInfo,
       builder: (context, state) => const PersonalInfoScreen(),
+    ),
+    GoRoute(
+      path: AppRoutes.work,
+      builder: (context, state) => const WorkScreen(),
+    ),
+    GoRoute(
+      path: AppRoutes.createRequest,
+      builder: (context, state) => const CreateRequestScreen(),
     ),
   ],
   errorBuilder: (context, state) => Scaffold(

@@ -1,26 +1,19 @@
 import 'package:dio/dio.dart';
 import 'package:mobile_app/error_type.dart';
-import 'package:mobile_app/models/pagination_structure_model.dart';
-import 'package:mobile_app/models/response_structure_model.dart';
 import 'package:mobile_app/utils/dio.client.dart';
 import 'package:mobile_app/utils/help_util.dart';
 
-class RequestService {
-  Future<ResponseStructure<PaginationStructure<Map<String, dynamic>>>>
-      request() async {
+class AuthService {
+  Future<String> login({
+    required String username,
+    required String password,
+  }) async {
     try {
-      final response = await DioClient.dio.get(
-        "/user/home/request?limit=30",
+      final response = await DioClient.dio.post(
+        "/api/mini/login",
+        data: {"email": username, "password": password},
       );
-      return ResponseStructure<
-          PaginationStructure<Map<String, dynamic>>>.fromJson(
-        response.data as Map<String, dynamic>,
-        dataFromJson: (json) =>
-            PaginationStructure<Map<String, dynamic>>.fromJson(
-          json,
-          resultFromJson: (item) => item,
-        ),
-      );
+      return response.data;
     } on DioException catch (dioError) {
       if (dioError.response != null) {
         printError(

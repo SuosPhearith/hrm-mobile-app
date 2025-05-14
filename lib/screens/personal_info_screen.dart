@@ -71,7 +71,7 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                             ),
                             buildProfileContainer(
                               name:
-                                  '${AppLang.translate(data: user?['salute'], lang: settingProvider.lang ?? 'kh')} ${getSafeString(value: user['name_kh'])} (${getSafeString(value: user['name_en'])})',
+                                  '${AppLang.translate(data: user?['salute'], lang: settingProvider.lang ?? 'kh')} ${getSafeString(value: user['name_kh'])}\n(${getSafeString(value: user['name_en'])})',
                               description: AppLang.translate(
                                   key: 'user_info_name',
                                   lang: settingProvider.lang ?? 'kh'),
@@ -156,15 +156,20 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                               text: 'ការសិក្សា',
                             ),
                             buildIconTextContainer(
-                              text: 'ប',
+                              text: 'បន្ថែមការសិក្សា',
                               icon: Icons.group,
                             ),
-                            buildProfileContainerAction(
-                              name: 'ឃួច ទីទ្ធ (khouch tith)',
-                              description:
-                                  '01-01-1965 (60 ឆ្នាំ) • នារីជនជាតិខ្មែរ • សញ្ញាតិ ABA\nភេទ: ស្ត្រី',
-                              icon: Icons.person,
-                            ),
+                            ...(user['user_educations'] as List).map((record) {
+                              return buildProfileContainerAction(
+                                name:
+                                    "${AppLang.translate(data: record['education_type'], lang: settingProvider.lang ?? 'kh')} - ${AppLang.translate(data: record['education_level'], lang: settingProvider.lang ?? 'kh')}",
+                                description:
+                                    '• ${AppLang.translate(data: record['school'], lang: settingProvider.lang ?? 'kh')} \n• ${AppLang.translate(data: record['education_place'], lang: settingProvider.lang ?? 'kh')} \n• ${AppLang.translate(data: record['major'], lang: settingProvider.lang ?? 'kh')}\n• ${AppLang.translate(data: record['education_place'], lang: settingProvider.lang ?? 'kh')}\n• ${formatDate(record['study_at'])} | ${formatDate(record['graduate_at'])}',
+                                icon: Icons.person,
+                              );
+                            }),
+                            // do here
+
                             buildContainer(
                               text: 'កម្រិតភាសា',
                             ),

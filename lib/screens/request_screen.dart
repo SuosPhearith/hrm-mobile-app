@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mobile_app/app_lang.dart';
+import 'package:mobile_app/app_routes.dart';
 import 'package:mobile_app/providers/global/setting_provider.dart';
 import 'package:mobile_app/providers/local/request_provider.dart';
 import 'package:mobile_app/utils/help_util.dart';
@@ -24,14 +26,14 @@ class _RequestScreenState extends State<RequestScreen> {
     return ChangeNotifierProvider(
       create: (_) => RequestProvider(),
       child: Consumer2<RequestProvider, SettingProvider>(
-          builder: (context, requestProvider, settingProvider, chold) {
+          builder: (context, requestProvider, settingProvider, child) {
         return Scaffold(
           backgroundColor: Colors.grey[100],
           appBar: AppBar(
             title: Text(
               AppLang.translate(
                   key: 'request', lang: settingProvider.lang ?? 'kh'),
-              style: TextStyle(
+              style: const TextStyle(
                 fontWeight: FontWeight.bold,
                 color: Colors.black,
               ),
@@ -65,49 +67,47 @@ class _RequestScreenState extends State<RequestScreen> {
               ),
             ],
           ),
-          // Wrap SingleChildScrollView with RefreshIndicator
           body: RefreshIndicator(
             key: _refreshIndicatorKey,
             color: Colors.blue[800],
             backgroundColor: Colors.white,
             onRefresh: () => _refreshData(requestProvider),
             child: requestProvider.isLoading
-                ? Center(child: Text('Loading...'))
+                ? const Center(child: Text('Loading...'))
                 : SingleChildScrollView(
                     physics: const AlwaysScrollableScrollPhysics(),
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),
-                      child: (requestProvider.requestData?.data.results !=
-                                  null &&
+                      child: Column(
+                        children: [
+                          if (requestProvider.requestData?.data.results ==
+                                  null ||
                               requestProvider.requestData!.data.results.isEmpty)
-                          ? Text("No data found")
-                          : Column(
-                              children: [
-                                ...requestProvider.requestData?.data.results
-                                        .map((record) {
-                                      return _buildRequestCard(
-                                        id: AppLang.translate(
-                                            data: record['request_category'],
-                                            lang: settingProvider.lang ?? 'kh'),
-                                        status: AppLang.translate(
-                                            data: record['request_status'],
-                                            lang: settingProvider.lang ?? 'kh'),
-                                        dates:
-                                            '${formatDate(record['start_datetime'])} ដល់ ${formatDate(record['end_datetime'])}',
-                                        days: calculateDateDifference(
-                                            record['start_datetime'],
-                                            record['end_datetime']),
-                                        description:
-                                            '${AppLang.translate(data: record['request_type'], lang: settingProvider.lang ?? 'kh')} | ${formatStringValue(record['objective'])}',
-                                      );
-                                    }).toList() ??
-                                    [],
-                                // Add empty container with minimum height to ensure scrollability when empty
-                                SizedBox(
-                                    height: MediaQuery.of(context).size.height *
-                                        0.7),
-                              ],
-                            ),
+                            const SizedBox(
+                              height: 200, // Minimal height for empty state
+                              child: Center(child: Text("No data found")),
+                            )
+                          else
+                            ...requestProvider.requestData!.data.results
+                                .map((record) {
+                              return _buildRequestCard(
+                                id: AppLang.translate(
+                                    data: record['request_category'],
+                                    lang: settingProvider.lang ?? 'kh'),
+                                status: AppLang.translate(
+                                    data: record['request_status'],
+                                    lang: settingProvider.lang ?? 'kh'),
+                                dates:
+                                    '${formatDate(record['start_datetime'])} ដល់ ${formatDate(record['end_datetime'])}',
+                                days: calculateDateDifference(
+                                    record['start_datetime'],
+                                    record['end_datetime']),
+                                description:
+                                    '${AppLang.translate(data: record['request_type'], lang: settingProvider.lang ?? 'kh')} | ${formatStringValue(record['objective'])}',
+                              );
+                            }),
+                        ],
+                      ),
                     ),
                   ),
           ),
@@ -142,13 +142,21 @@ class _RequestScreenState extends State<RequestScreen> {
               _buildBottomSheetOption(
                 icon: Icons.account_circle,
                 label: 'សំណើរច្បាប់',
-                onTap: () {},
+                onTap: () {
+                  Navigator.pop(context); // Close the bottom sheet
+                  context
+                      .push(AppRoutes.createRequest); // Navigate to new route
+                },
               ),
               const SizedBox(height: 12.0),
               _buildBottomSheetOption(
                 icon: Icons.airplanemode_active_rounded,
                 label: 'សំណើរបេសកកម្ម',
-                onTap: () {},
+                onTap: () {
+                  Navigator.pop(
+                      context); // Close the bottom sheet (optional, for consistency)
+                  // Add navigation or logic for mission request if needed
+                },
               ),
               const SizedBox(height: 16.0),
             ],
@@ -168,34 +176,20 @@ class _RequestScreenState extends State<RequestScreen> {
       child: Container(
         padding: const EdgeInsets.all(12.0),
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.grey[50]!, Colors.white],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
+          border: Border.all(color: Colors.grey),
           borderRadius: BorderRadius.circular(12.0),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black12,
-              blurRadius: 6,
-              offset: const Offset(0, 2),
-            ),
-          ],
         ),
         child: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(8.0),
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Colors.blue[100]!, Colors.blue[200]!],
-                ),
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 icon,
                 size: 24.0,
-                color: Colors.blue[800],
+                color: Colors.grey,
               ),
             ),
             const SizedBox(width: 12.0),
@@ -246,7 +240,7 @@ class _RequestScreenState extends State<RequestScreen> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 10.0, vertical: 4.0),
                 decoration: BoxDecoration(
-                  color: const Color.fromARGB(255, 255, 225, 135),
+                  border: Border.all(color: Colors.blue),
                   borderRadius: BorderRadius.circular(20.0),
                 ),
                 child: Text(
@@ -272,9 +266,9 @@ class _RequestScreenState extends State<RequestScreen> {
               const SizedBox(width: 8.0),
               Container(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
+                    const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2.0),
                 decoration: BoxDecoration(
-                  color: const Color.fromARGB(255, 135, 195, 244),
+                  border: Border.all(color: Colors.blue),
                   borderRadius: BorderRadius.circular(20.0),
                 ),
                 child: Text(

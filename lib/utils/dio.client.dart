@@ -54,16 +54,8 @@ class DioClient {
           print(
               "\x1B[36m🟢 onResponse Triggered! ${response.requestOptions.path}\x1B[0m");
 
-          if (response.statusCode == 200) {
-            try {
-              print(
-                  "\x1B[32m✅ SUCCESS: ${response.requestOptions.path}\x1B[0m");
-            } catch (e) {
-              print(
-                  "\x1B[32m✅ SUCCESS: ${response.requestOptions.path}\x1B[0m");
-              print(
-                  "\x1B[32m📡 Response Data: ${response.data.toString()}\x1B[0m");
-            }
+          if (response.statusCode == 200 || response.statusCode == 201) {
+            print("\x1B[32m✅ SUCCESS: ${response.requestOptions.path}\x1B[0m");
           } else {
             print(
                 "\x1B[33m⚠️ RESPONSE WARNING: ${response.statusCode} - ${response.statusMessage}\x1B[0m");
