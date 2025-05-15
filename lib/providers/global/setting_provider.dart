@@ -29,7 +29,7 @@ class SettingProvider extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
     try {
-      // Do anything
+      handleSelectLanguage();
     } catch (e) {
       _error = "Invalid Credential.";
     } finally {

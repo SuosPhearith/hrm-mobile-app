@@ -48,7 +48,7 @@ class _RequestScreenState extends State<RequestScreen> {
               actions: [
                 GestureDetector(
                   onTap: () {
-                    _showAddRequestBottomSheet(context, dataSetup!);
+                    _showAddRequestBottomSheet(context, dataSetup ?? {});
                   },
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -73,28 +73,18 @@ class _RequestScreenState extends State<RequestScreen> {
               color: Colors.blue[800],
               backgroundColor: Colors.white,
               onRefresh: () => _refreshData(requestProvider),
-              child:
-                  requestProvider.isLoading
-                      ? const Center(child: Text('Loading...'))
+              child: requestProvider.isLoading
+                  ? const Center(child: Text('Loading...'))
+                  : requestProvider.requestData == null
+                      ? Center(child: Text('Something when wrong'))
                       : SingleChildScrollView(
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Column(
-                            children: [
-                              if (requestProvider.requestData?.data.results ==
-                                      null ||
-                                  requestProvider
-                                      .requestData!
-                                      .data
-                                      .results
-                                      .isEmpty)
-                                const SizedBox(
-                                  height: 200, // Minimal height for empty state
-                                  child: Center(child: Text("No data found")),
-                                )
-                              else
-                                ...requestProvider.requestData!.data.results.map((
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Column(
+                              children: [
+                                ...requestProvider.requestData!.data.results
+                                    .map((
                                   record,
                                 ) {
                                   return GestureDetector(
@@ -123,10 +113,10 @@ class _RequestScreenState extends State<RequestScreen> {
                                     ),
                                   );
                                 }),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
-                      ),
             ),
           );
         },
@@ -161,7 +151,10 @@ class _RequestScreenState extends State<RequestScreen> {
                 ),
               ),
               const SizedBox(height: 16.0),
-              ...(dataSetup['request_categories'] as List).map((record) {
+              ...(dataSetup['request_categories'] != null
+                      ? dataSetup['request_categories'] as List
+                      : [])
+                  .map((record) {
                 return _buildBottomSheetOption(
                   icon: Icons.account_circle,
                   label: AppLang.translate(data: record, lang: lang ?? 'kh'),

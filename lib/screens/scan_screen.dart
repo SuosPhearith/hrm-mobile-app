@@ -95,47 +95,52 @@ class ScanScreenState extends State<ScanScreen> {
             onRefresh: () => _refreshData(scanProvider),
             child: scanProvider.isLoading
                 ? Center(child: Text('Loading...'))
-                : SingleChildScrollView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        children: [
-                          // Display selected date range
-                          DateRangeSelector(
-                            startDate: _startDate,
-                            endDate: _endDate,
-                            onTap: () {
-                              _showMonthPicker(context, scanProvider);
-                            },
+                : scanProvider.data == null
+                    ? Center(child: Text('Something went wrong'))
+                    : SingleChildScrollView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            children: [
+                              // Display selected date range
+                              DateRangeSelector(
+                                startDate: _startDate,
+                                endDate: _endDate,
+                                onTap: () {
+                                  _showMonthPicker(context, scanProvider);
+                                },
+                              ),
+                              scanProvider.data!.data.results.isEmpty
+                                  ? Text("No Data Found")
+                                  : SizedBox(),
+                              ...scanProvider.data?.data.results.map((record) {
+                                    final result = parseDateTime(getSafeString(
+                                        value: record['datetime']));
+                                    return _buildScanCard(
+                                      type: getSafeString(
+                                        value: AppLang.translate(
+                                            data: record['terminal_device']
+                                                ['direction'],
+                                            lang: settingProvider.lang ?? 'kh'),
+                                      ),
+                                      location:
+                                          '${getSafeString(value: record['terminal_device']['name'])} | ${getSafeString(value: record['terminal_device']['group'])}',
+                                      time:
+                                          getSafeString(value: result['time']),
+                                      date:
+                                          getSafeString(value: result['date']),
+                                      icon: Icons.logout,
+                                    );
+                                  }).toList() ??
+                                  [],
+                              SizedBox(
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.1),
+                            ],
                           ),
-                          scanProvider.data!.data.results.isEmpty
-                              ? Text("No Data Found")
-                              : SizedBox(),
-                          ...scanProvider.data?.data.results.map((record) {
-                                final result = parseDateTime(
-                                    getSafeString(value: record['datetime']));
-                                return _buildScanCard(
-                                  type: getSafeString(
-                                    value: AppLang.translate(
-                                        data: record['terminal_device']
-                                            ['direction'],
-                                        lang: settingProvider.lang ?? 'kh'),
-                                  ),
-                                  location:
-                                      '${getSafeString(value: record['terminal_device']['name'])} | ${getSafeString(value: record['terminal_device']['group'])}',
-                                  time: getSafeString(value: result['time']),
-                                  date: getSafeString(value: result['date']),
-                                  icon: Icons.logout,
-                                );
-                              }).toList() ??
-                              [],
-                          SizedBox(
-                              height: MediaQuery.of(context).size.height * 0.1),
-                        ],
+                        ),
                       ),
-                    ),
-                  ),
           ),
         );
       }),

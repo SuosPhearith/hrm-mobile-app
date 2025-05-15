@@ -71,7 +71,7 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                             ),
                             buildProfileContainer(
                               name:
-                                  '${AppLang.translate(data: user?['salute'], lang: settingProvider.lang ?? 'kh')} ${getSafeString(value: user['name_kh'])}\n(${getSafeString(value: user['name_en'])})',
+                                  '${AppLang.translate(data: user?['salute'], lang: settingProvider.lang ?? 'kh')} ${getSafeString(value: user?['name_kh'])}\n(${getSafeString(value: user?['name_en'])})',
                               description: AppLang.translate(
                                   key: 'user_info_name',
                                   lang: settingProvider.lang ?? 'kh'),
@@ -87,14 +87,14 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                               icon: Icons.transgender,
                             ),
                             buildProfileContainer(
-                              name: getSafeString(value: user['phone_number']),
+                              name: getSafeString(value: user?['phone_number']),
                               description: AppLang.translate(
                                   key: 'user_info_phone',
                                   lang: settingProvider.lang ?? 'kh'),
                               icon: Icons.phone_iphone,
                             ),
                             buildProfileContainer(
-                              name: getSafeString(value: user['email']),
+                              name: getSafeString(value: user?['email']),
                               description: AppLang.translate(
                                   key: 'user_info_email',
                                   lang: settingProvider.lang ?? 'kh'),
@@ -102,15 +102,15 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                             ),
                             buildProfileContainer(
                               name: getSafeString(
-                                  value: user['identity_card_number']),
+                                  value: user?['identity_card_number']),
                               description: AppLang.translate(
                                   key: 'user_info_card_id',
                                   lang: settingProvider.lang ?? 'kh'),
                               icon: Icons.fingerprint,
                             ),
                             buildProfileContainer(
-                              name:
-                                  getSafeString(value: formatDate(user['dob'])),
+                              name: getSafeString(
+                                  value: formatDate(user?['dob'])),
                               description: AppLang.translate(
                                   key: 'user_info_date_of_birth',
                                   lang: settingProvider.lang ?? 'kh'),
@@ -143,12 +143,16 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                                   lang: settingProvider.lang ?? 'kh'),
                               icon: Icons.group,
                             ),
-                            ...(user['relatives'] as List).map((record) {
+
+                            ...(user?['relatives'] != null
+                                    ? user['relatives'] as List
+                                    : [])
+                                .map((record) {
                               return buildProfileContainerAction(
                                 name:
-                                    '${getSafeString(value: record['name_kh'])} (${getSafeString(value: record['name_en'])})',
+                                    '${getSafeString(value: record?['name_kh'])} (${getSafeString(value: record?['name_en'])})',
                                 description:
-                                    '${formatDate(record['dob'])} • ${getSafeString(value: record['job'])} • ${getSafeString(value: record['work_place'])}',
+                                    '${formatDate(record['dob'])} • ${getSafeString(value: record?['job'])} • ${getSafeString(value: record?['work_place'])}',
                                 icon: Icons.person,
                               );
                             }),
@@ -159,7 +163,10 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                               text: 'បន្ថែមការសិក្សា',
                               icon: Icons.group,
                             ),
-                            ...(user['user_educations'] as List).map((record) {
+                            ...(user?['user_educations'] != null
+                                    ? user['user_educations'] as List
+                                    : [])
+                                .map((record) {
                               return buildProfileContainerAction(
                                 name:
                                     "${AppLang.translate(data: record['education_type'], lang: settingProvider.lang ?? 'kh')} - ${AppLang.translate(data: record['education_level'], lang: settingProvider.lang ?? 'kh')}",

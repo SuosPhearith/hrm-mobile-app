@@ -1,0 +1,2 @@
+D:/development/HRM/hrm-mobile-app/android/app/.cxx/RelWithDebInfo/422m1cu2/arm64-v8a/CMakeFiles/edit_cache.dir
+D:/development/HRM/hrm-mobile-app/android/app/.cxx/RelWithDebInfo/422m1cu2/arm64-v8a/CMakeFiles/rebuild_cache.dir
