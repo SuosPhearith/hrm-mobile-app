@@ -46,7 +46,8 @@ class CreateRequestService {
           "objective": objective ?? '', // opt
           "request_type_id": requestTypeId,
           "request_category_id": requestCategoryId,
-          "attachment": 'data:application/image;base64,$attachment',
+          "attachment": '',
+          // "attachment": 'data:application/image;base64,$attachment',
         },
       );
       return response.data;

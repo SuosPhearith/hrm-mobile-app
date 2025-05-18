@@ -76,7 +76,16 @@ class _RequestScreenState extends State<RequestScreen> {
               child: requestProvider.isLoading
                   ? const Center(child: Text('Loading...'))
                   : requestProvider.requestData == null
-                      ? Center(child: Text('Something when wrong'))
+                      ? Center(
+                          child: GestureDetector(
+                            onTap: () {
+                              context.push(
+                                '${AppRoutes.detailRequest}/1}',
+                              );
+                            },
+                            child: Text('Something when wrong'),
+                          ),
+                        )
                       : SingleChildScrollView(
                           physics: const AlwaysScrollableScrollPhysics(),
                           child: Padding(

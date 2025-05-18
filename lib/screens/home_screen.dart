@@ -566,8 +566,8 @@ class MonthlyView extends StatelessWidget {
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                percent: clampToZeroOne(
-                    homeProvider.scanByMonthData?.data['percentage'] ?? 0),
+                percent: clampToZeroOne(getSafeDouble(
+                    value: homeProvider.scanByMonthData?.data['percentage'])),
                 backgroundColor: Colors.grey[300],
                 progressColor: Colors.blue[400],
                 barRadius: const Radius.circular(4.0),

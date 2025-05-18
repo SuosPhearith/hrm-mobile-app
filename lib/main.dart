@@ -146,16 +146,14 @@ final GoRouter _router = GoRouter(
     ),
     GoRoute(
       path: AppRoutes.login,
-      builder:
-          (context, state) =>
-              AuthMiddleware(child: const AuthLayout(child: LoginScreen())),
+      builder: (context, state) =>
+          AuthMiddleware(child: const AuthLayout(child: LoginScreen())),
     ),
     GoRoute(
       path: AppRoutes.selectLanguage,
-      builder:
-          (context, state) => AuthMiddleware(
-            child: const AuthLayout(child: SelectLanguageScreen()),
-          ),
+      builder: (context, state) => AuthMiddleware(
+        child: const AuthLayout(child: SelectLanguageScreen()),
+      ),
     ),
     GoRoute(
       path: AppRoutes.welcome,
@@ -200,15 +198,14 @@ final GoRouter _router = GoRouter(
       },
     ),
   ],
-  errorBuilder:
-      (context, state) => Scaffold(
-        body: Center(
-          child: Text(
-            'Error: ${state.error}',
-            style: const TextStyle(fontSize: 18, color: Colors.red),
-          ),
-        ),
+  errorBuilder: (context, state) => Scaffold(
+    body: Center(
+      child: Text(
+        'Error: ${state.error}',
+        style: const TextStyle(fontSize: 18, color: Colors.red),
       ),
+    ),
+  ),
 );
 
 /// Main Layout with Stateful Navigation
@@ -412,10 +409,9 @@ class _MainLayoutState extends State<MainLayout> {
       child: Icon(
         icon,
         size: 28.0,
-        color:
-            isSelected || active
-                ? Theme.of(context).colorScheme.secondary
-                : Colors.grey[600],
+        color: isSelected || active
+            ? Theme.of(context).colorScheme.secondary
+            : Colors.grey[600],
       ),
     );
   }
