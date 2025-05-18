@@ -41,7 +41,7 @@ class _PersonalInfoDetailScreenState extends State<PersonalInfoDetailScreen> {
                       physics: const AlwaysScrollableScrollPhysics(),
                       child: Padding(
                         padding: const EdgeInsets.all(16.0),
-                        child: Text('Sample'),
+                        child: Text('Personal info'),
                       ),
                     ),
             ),
