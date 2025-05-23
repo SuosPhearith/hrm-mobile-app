@@ -7,6 +7,10 @@ import 'package:mobile_app/screens/about_screen.dart';
 import 'package:mobile_app/screens/daily_screen.dart';
 import 'package:mobile_app/screens/evaluate_screen.dart';
 import 'package:mobile_app/screens/holliday_screen.dart';
+import 'package:mobile_app/screens/personal_info/create_education_screen.dart';
+import 'package:mobile_app/screens/personal_info/create_language_level.dart';
+import 'package:mobile_app/screens/personal_info/create_relative_screen.dart';
+import 'package:mobile_app/screens/personal_info/update_screen.dart';
 import 'package:mobile_app/screens/personal_info_screen.dart';
 import 'package:mobile_app/screens/request/create_request_screen.dart';
 import 'package:mobile_app/screens/request/detail_request_screen.dart';
@@ -195,6 +199,34 @@ final GoRouter _router = GoRouter(
       builder: (context, state) {
         final id = state.pathParameters['id'];
         return DetailRequestScreen(id: id);
+      },
+    ),
+    GoRoute(
+      path: '${AppRoutes.updatePersonalInfo}/:id',
+      builder: (context, state) {
+        final id = state.pathParameters['id'];
+        return UpdatePersonalInfoScreen(id: id);
+      },
+    ),
+    GoRoute(
+      path: '${AppRoutes.createUserRelative}/:id',
+      builder: (context, state) {
+        final id = state.pathParameters['id'];
+        return CreateRelativeScreen(id: id);
+      },
+    ),
+    GoRoute(
+      path: '${AppRoutes.createEducation}/:id',
+      builder: (context, state) {
+        final id = state.pathParameters['id'];
+        return CreateEducationScreen(id: id);
+      },
+    ),
+    GoRoute(
+      path: '${AppRoutes.createLanguageLevel}/:id',
+      builder: (context, state) {
+        final id = state.pathParameters['id'];
+        return CreateLanguageLevel(id: id);
       },
     ),
   ],

@@ -1,19 +1,19 @@
 import 'package:dio/dio.dart';
 import 'package:mobile_app/error_type.dart';
+import 'package:mobile_app/models/response_structure_model.dart';
 import 'package:mobile_app/utils/dio.client.dart';
 import 'package:mobile_app/utils/help_util.dart';
 
-class AuthService {
-  Future<String> login({
-    required String username,
-    required String password,
-  }) async {
+class WorkService {
+  Future<ResponseStructure<Map<String, dynamic>>> userWork() async {
     try {
-      final response = await DioClient.dio.post(
-        "/api/mini/login",
-        data: {"email": username, "password": password},
+      final response = await DioClient.dio.get(
+        "/user/personal_information",
       );
-      return response.data;
+      return ResponseStructure<Map<String, dynamic>>.fromJson(
+        response.data as Map<String, dynamic>,
+        dataFromJson: (json) => json,
+      );
     } on DioException catch (dioError) {
       if (dioError.response != null) {
         printError(
