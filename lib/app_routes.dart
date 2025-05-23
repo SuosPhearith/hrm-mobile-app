@@ -15,4 +15,8 @@ class AppRoutes {
   static const String work = '/work';
   static const String createRequest = '/create-request'; // dynamic
   static const String detailRequest = '/detail-request'; // dynamic
+  static const String updatePersonalInfo = '/update-personal-info'; // dynamic
+  static const String createUserRelative = '/create-user-relative'; // dynamic
+  static const String createEducation = '/create-education';
+  static const String createLanguageLevel = '/create-langauge-level';
 }

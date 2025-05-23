@@ -1,24 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_app/models/response_structure_model.dart';
-import 'package:mobile_app/services/work_service.dart';
+import 'package:mobile_app/services/request/create_request_service.dart';
 
-class WorkProvider extends ChangeNotifier {
+class CreateEducationProvider extends ChangeNotifier {
   // Feilds
   bool _isLoading = false;
   String? _error;
   ResponseStructure<Map<String, dynamic>>? _data;
 
   // Services
-  final WorkService _service = WorkService();
+  final CreateRequestService _createRequestService = CreateRequestService();
 
   // Getters
   bool get isLoading => _isLoading;
   String? get error => _error;
   ResponseStructure<Map<String, dynamic>>? get data => _data;
+
   // Setters
 
   // Initialize
-  WorkProvider() {
+  CreateEducationProvider() {
     getHome();
   }
 
@@ -27,8 +28,8 @@ class WorkProvider extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
     try {
-      final response = await _service.userWork();
-      _data = response;
+      final res = await _createRequestService.dataSetup();
+      _data = res;
     } catch (e) {
       _error = "Invalid Credential.";
     } finally {

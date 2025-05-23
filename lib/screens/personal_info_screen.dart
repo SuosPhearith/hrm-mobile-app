@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mobile_app/app_lang.dart';
 import 'package:mobile_app/providers/global/setting_provider.dart';
 import 'package:mobile_app/providers/local/personal_info_provider.dart';
@@ -67,7 +68,10 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                               text: AppLang.translate(
                                   key: 'user_info_personal_info',
                                   lang: settingProvider.lang ?? 'kh'),
-                              onEditTap: () => {},
+                              onEditTap: () => {
+                                context.push(
+                                    '/update-personal-info/${user['id']}'),
+                              },
                             ),
                             buildProfileContainer(
                               name:
@@ -142,6 +146,10 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                                   key: 'user_info_family_add',
                                   lang: settingProvider.lang ?? 'kh'),
                               icon: Icons.group,
+                              onEditTap: () {
+                                context.push(
+                                    '/create-user-relative/${user['id']}');
+                              },
                             ),
 
                             ...(user?['relatives'] != null
@@ -160,8 +168,13 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                               text: 'ការសិក្សា',
                             ),
                             buildIconTextContainer(
-                              text: 'បន្ថែមការសិក្សា',
+                              text: AppLang.translate(
+                                  lang: settingProvider.lang ?? 'kh',
+                                  key: 'user_info_education_add'),
                               icon: Icons.group,
+                              onEditTap: () {
+                                context.push('/create-education/${user['id']}');
+                              },
                             ),
                             ...(user?['user_educations'] != null
                                     ? user['user_educations'] as List
@@ -175,23 +188,41 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                                 icon: Icons.person,
                               );
                             }),
-                            // do here
 
+                            //Language
                             buildContainer(
-                              text: 'កម្រិតភាសា',
+                              text: AppLang.translate(
+                                  lang: settingProvider.lang ?? 'kh',
+                                  key: 'user_info_language'),
                             ),
-                            buildProfileContainerAction(
-                              name: 'ឃួច ទីទ្ធ (khouch tith)',
-                              description:
-                                  '01-01-1965 (60 ឆ្នាំ) • នារីជនជាតិខ្មែរ • សញ្ញាតិ ABA\nភេទ: ស្ត្រី',
-                              icon: Icons.person,
+                            buildIconTextContainer(
+                              text: AppLang.translate(
+                                  key: 'user_info_language_add',
+                                  lang: settingProvider.lang ?? 'kh'),
+                              icon: Icons.translate,
+                              onEditTap: () {
+                                context.push(
+                                    '/create-langauge-level/${user['id']}');
+                              },
                             ),
-                            buildProfileContainerAction(
-                              name: 'ឃួច ទីទ្ធ (khouch tith)',
-                              description:
-                                  '01-01-1965 (60 ឆ្នាំ) • នារីជនជាតិខ្មែរ • សញ្ញាតិ ABA\nភេទ: ស្ត្រី',
-                              icon: Icons.person,
-                            ),
+                            ...(user?['user_languages'] != null
+                                    ? user['user_languages'] as List
+                                    : [])
+                                .map((record) {
+                              return buildProfileContainerAction(
+                                name:
+                                    "${AppLang.translate(data: record['language'], lang: settingProvider.lang ?? 'kh')} ",
+                                description:
+                                    '🗣️${AppLang.translate(data: record['speaking_level'], lang: settingProvider.lang ?? 'kh')} ✍️${AppLang.translate(data: record['writing_level'], lang: settingProvider.lang ?? 'kh')} 📖${AppLang.translate(data: record['reading_level'], lang: settingProvider.lang ?? 'kh')} 🦻${AppLang.translate(data: record['listening_level'], lang: settingProvider.lang ?? 'kh')}',
+                                icon: Icons.flag,
+                              );
+                            }),
+                            // buildProfileContainerAction(
+                            //   name: 'ឃួច ទីទ្ធ (khouch tith)',
+                            //   description:
+                            //       '01-01-1965 (60 ឆ្នាំ) • នារីជនជាតិខ្មែរ • សញ្ញាតិ ABA\nភេទ: ស្ត្រី',
+                            //   icon: Icons.person,
+                            // ),
                             SizedBox(
                                 height:
                                     MediaQuery.of(context).size.height * 0.1),
@@ -211,25 +242,29 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
     Color textColor = Colors.blueGrey,
     Color iconColor = Colors.grey,
     Color? avatarColor,
+    VoidCallback? onEditTap, // Made optional with nullable type
   }) {
-    return Container(
-      padding: EdgeInsets.only(bottom: 16.0),
-      child: Row(
-        children: [
-          CircleAvatar(
-            radius: 25.0,
-            backgroundColor: avatarColor ?? Colors.grey[300],
-            child: Icon(icon, size: 25.0, color: iconColor),
-          ),
-          SizedBox(width: 8.0),
-          Expanded(
-            child: Text(
-              text,
-              style: TextStyle(fontSize: 16.0, color: textColor),
-              softWrap: true,
+    return GestureDetector(
+      onTap: onEditTap,
+      child: Container(
+        padding: EdgeInsets.only(bottom: 16.0),
+        child: Row(
+          children: [
+            CircleAvatar(
+              radius: 25.0,
+              backgroundColor: avatarColor ?? Colors.grey[300],
+              child: Icon(icon, size: 25.0, color: iconColor),
             ),
-          ),
-        ],
+            SizedBox(width: 8.0),
+            Expanded(
+              child: Text(
+                text,
+                style: TextStyle(fontSize: 16.0, color: textColor),
+                softWrap: true,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
