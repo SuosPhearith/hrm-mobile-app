@@ -43,68 +43,70 @@ class _CreateRelativeScreenState extends State<CreateRelativeScreen> {
   String? selectedProvince;
   String? selectedDistrict;
 
- void _handleSubmit() async {
-  if (!_formKey.currentState!.validate()) return;
+  void _handleSubmit() async {
+    if (!_formKey.currentState!.validate()) return;
 
-  // Validate required fields
-  if (_firstNameController.text.isEmpty ||
-      _lastNameController.text.isEmpty ||
-      selectedGender == null) {
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('សូមបំពេញព័ត៌មានចាំបាច់')),
-    );
-    return;
-  }
-
-  try {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => const Center(child: CircularProgressIndicator()),
-    );
-
-    final result = await _service.createUserFamily(
-      userId: widget.id ?? '',
-      nameKh: _firstNameController.text.trim(),
-      nameEn: _lastNameController.text.trim(),
-      sexId: selectedGender ?? '',
-      dob: _dobController.text.isNotEmpty ? _dobController.text.trim() : null,
-      familyRoleId: selectedRelativeTypeId,
-      job: selectedJobId,
-      workPlace: selectedWorkPlaceId,
-      note: _noteController.text.isNotEmpty ? _noteController.text.trim() : null,
-    );
-
-    if (!mounted) return;
-    Navigator.of(context).pop(); // Close loading dialog
-    
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('បង្កើតបានជោគជ័យ')),
-    );
-
-    Navigator.of(context).pop(result); // Return to previous screen
-  } on DioException catch (dioError) {
-    if (!mounted) return;
-    Navigator.of(context).pop(); // Close loading dialog
-    
-    String errorMessage = 'បញ្ហាក្នុងការបង្កើត';
-    if (dioError.response?.data != null) {
-      errorMessage += ': ${dioError.response?.data['message'] ?? ''}';
+    // Validate required fields
+    if (_firstNameController.text.isEmpty ||
+        _lastNameController.text.isEmpty ||
+        selectedGender == null) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('សូមបំពេញព័ត៌មានចាំបាច់')),
+      );
+      return;
     }
-    
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(errorMessage)),
-    );
-  } catch (e) {
-    if (!mounted) return;
-    Navigator.of(context).pop(); // Close loading dialog
-    
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('បញ្ហាមិនដឹងមូលហេតុ: ${e.toString()}')),
-    );
+
+    try {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const Center(child: CircularProgressIndicator()),
+      );
+
+      final result = await _service.createUserFamily(
+        userId: widget.id ?? '',
+        nameKh: _firstNameController.text.trim(),
+        nameEn: _lastNameController.text.trim(),
+        sexId: selectedGender ?? '',
+        dob: _dobController.text.isNotEmpty ? _dobController.text.trim() : null,
+        familyRoleId: selectedRelativeTypeId,
+        job: selectedJobId,
+        workPlace: selectedWorkPlaceId,
+        note: _noteController.text.isNotEmpty
+            ? _noteController.text.trim()
+            : null,
+      );
+
+      if (!mounted) return;
+      Navigator.of(context).pop(); // Close loading dialog
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('បង្កើតបានជោគជ័យ')),
+      );
+
+      Navigator.of(context).pop(result); // Return to previous screen
+    } on DioException catch (dioError) {
+      if (!mounted) return;
+      Navigator.of(context).pop(); // Close loading dialog
+
+      String errorMessage = 'បញ្ហាក្នុងការបង្កើត';
+      if (dioError.response?.data != null) {
+        errorMessage += ': ${dioError.response?.data['message'] ?? ''}';
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(errorMessage)),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      Navigator.of(context).pop(); // Close loading dialog
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('បញ្ហាមិនដឹងមូលហេតុ: ${e.toString()}')),
+      );
+    }
   }
-}
 
   @override
   void dispose() {
@@ -145,162 +147,152 @@ class _CreateRelativeScreenState extends State<CreateRelativeScreen> {
             ),
             body: RefreshIndicator(
               key: _refreshIndicatorKey,
-              color: Colors.blue[800],
-              backgroundColor: Colors.white,
+              color: Theme.of(context).colorScheme.primary,
+              backgroundColor: Theme.of(context).colorScheme.surface,
               onRefresh: () => _refreshData(evaluateProvider),
               child: evaluateProvider.isLoading
-                  ? Center(child: Text('Loading...'))
+                  ? const Center(child: CircularProgressIndicator())
                   : SingleChildScrollView(
                       physics: const AlwaysScrollableScrollPhysics(),
-                      child: Padding(
-                        padding: const EdgeInsets.all(15),
-                        child: Form(
-                          key: _formKey,
-                          child: Column(
-                            children: [
-                              SizedBox(
-                                height: 15,
-                              ),
-                              // ត្រូវជា (Relative Type)
-                              TextFormField(
-                                controller: _relativeTypeController,
-                                readOnly: true,
-                                onTap: () async {
-                                  await _showSelectionBottomSheet(
-                                    context: context,
-                                    title: 'Select Relative Type',
-                                    items: relativeTypes,
-                                    onSelected: (id, value) {
-                                      setState(() {
-                                        selectedRelativeTypeId = id;
-                                        _relativeTypeController.text = value;
-                                      });
-                                    },
-                                  );
-                                },
-                                decoration: const InputDecoration(
-                                  labelText: 'ត្រូវជា',
-                                  border: OutlineInputBorder(),
-                                  suffixIcon: Icon(Icons.arrow_drop_down),
-                                ),
-                              ),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: RadioListTile<String>(
-                                      title: const Text('ប្រុស'),
-                                      value: '1',
-                                      groupValue: selectedGender,
-                                      onChanged: (value) {
-                                        setState(() => selectedGender = value);
-                                      },
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: RadioListTile<String>(
-                                      title: const Text('ស្រី'),
-                                      value: '2',
-                                      groupValue: selectedGender,
-                                      onChanged: (value) {
-                                        setState(() => selectedGender = value);
-                                      },
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(
-                                height: 25,
-                              ),
-                              // ឈ្មោះជាភាសាខ្មែរ *
-                              TextFormField(
-                                controller: _firstNameController,
-                                decoration: const InputDecoration(
-                                  labelText: 'ឈ្មោះជាភាសាខ្មែរ *',
-                                  border: OutlineInputBorder(),
-                                ),
-                              ),
-                              SizedBox(
-                                height: 25,
-                              ),
-                              // ឈ្មោះជាអក្សរឡាតាំង *
-                              TextFormField(
-                                controller: _lastNameController,
-                                decoration: const InputDecoration(
-                                  labelText: 'ឈ្មោះជាអក្សរឡាតាំង *',
-                                  border: OutlineInputBorder(),
-                                ),
-                              ),
-                              SizedBox(
-                                height: 25,
-                              ),
-                              // ថ្ងៃខែឆ្នាំកំណើត
-                              TextFormField(
-                                controller: _dobController,
-                                readOnly: true,
-                                decoration: InputDecoration(
-                                  labelText: 'ថ្ងៃខែឆ្នាំកំណើត',
-                                  border: const OutlineInputBorder(),
-                                  suffixIcon: IconButton(
-                                    icon: const Icon(Icons.calendar_today),
-                                    onPressed: _selectDate,
+                      padding: const EdgeInsets.all(16.0),
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const SizedBox(height: 16.0),
+                            // Relative Type
+                            _buildSelectionField(
+                              controller: _relativeTypeController,
+                              label: AppLang.translate(
+                                  lang: settingProvider.lang ?? 'kh',
+                                  key: 'relative_type'),
+                              items: relativeTypes,
+                              onSelected: (id, value) {
+                                setState(() {
+                                  selectedRelativeTypeId = id;
+                                  _relativeTypeController.text = value;
+                                });
+                              },
+                            ),
+                            const SizedBox(height: 24.0),
+                            // Gender Selection
+                            Text(
+                              AppLang.translate(
+                                  lang: settingProvider.lang ?? 'kh',
+                                  key: 'gender'),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyLarge
+                                  ?.copyWith(fontWeight: FontWeight.w600),
+                            ),
+                            const SizedBox(height: 8.0),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: RadioListTile<String>(
+                                    title: Text(AppLang.translate(
+                                        lang: settingProvider.lang ?? 'kh',
+                                        key: 'male')),
+                                    value: '1',
+                                    groupValue: selectedGender,
+                                    onChanged: (value) =>
+                                        setState(() => selectedGender = value),
+                                    activeColor:
+                                        Theme.of(context).colorScheme.primary,
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        horizontal: 8.0),
                                   ),
                                 ),
-                              ),
-                              SizedBox(
-                                height: 25,
-                              ),
-                              // មុខរបរ (Job)
-                              TextFormField(
-                                controller: _jobController,
-                                readOnly: true,
-                                onTap: () async {
-                                  await _showSelectionBottomSheet(
-                                    context: context,
-                                    title: 'Select Job',
-                                    items: jobTypes,
-                                    onSelected: (id, value) {
-                                      setState(() {
-                                        selectedJobId = id;
-                                        _jobController.text = value;
-                                      });
-                                    },
-                                  );
-                                },
-                                decoration: const InputDecoration(
-                                  labelText: 'មុខរបរ',
-                                  suffixIcon: Icon(Icons.arrow_drop_down),
-                                  border: OutlineInputBorder(),
+                                Expanded(
+                                  child: RadioListTile<String>(
+                                    title: Text(AppLang.translate(
+                                        lang: settingProvider.lang ?? 'kh',
+                                        key: 'female')),
+                                    value: '2',
+                                    groupValue: selectedGender,
+                                    onChanged: (value) =>
+                                        setState(() => selectedGender = value),
+                                    activeColor:
+                                        Theme.of(context).colorScheme.primary,
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        horizontal: 8.0),
+                                  ),
                                 ),
+                              ],
+                            ),
+                            const SizedBox(height: 24.0),
+                            // Name (Khmer)
+                            _buildTextField(
+                              controller: _firstNameController,
+                              label: AppLang.translate(
+                                  lang: settingProvider.lang ?? 'kh',
+                                  key: 'name_kh'),
+                              validator: (value) => value!.isEmpty
+                                  ? AppLang.translate(
+                                      lang: settingProvider.lang ?? 'kh',
+                                      key: 'required_field')
+                                  : null,
+                            ),
+                            const SizedBox(height: 24.0),
+                            // Name (Latin)
+                            _buildTextField(
+                              controller: _lastNameController,
+                              label: AppLang.translate(
+                                  lang: settingProvider.lang ?? 'kh',
+                                  key: 'name_en'),
+                              validator: (value) => value!.isEmpty
+                                  ? AppLang.translate(
+                                      lang: settingProvider.lang ?? 'kh',
+                                      key: 'required_field')
+                                  : null,
+                            ),
+                            const SizedBox(height: 24.0),
+                            // Date of Birth
+                            _buildTextField(
+                              controller: _dobController,
+                              label: AppLang.translate(
+                                  lang: settingProvider.lang ?? 'kh',
+                                  key: 'dob'),
+                              readOnly: true,
+                              onTap: _selectDate,
+                              suffixIcon: IconButton(
+                                icon: const Icon(Icons.calendar_today_rounded),
+                                onPressed: _selectDate,
                               ),
-                              SizedBox( 
-                                height: 25,
-                              ),
-
-                              // ស្ថាប័ន (Work Place)
-                              TextFormField(
-                                controller: _workPlaceController,
-                                readOnly: true,
-                                onTap: () async {
-                                  await _showSelectionBottomSheet(
-                                    context: context,
-                                    title: 'Select Work Place',
-                                    items: workPlaces,
-                                    onSelected: (id, value) {
-                                      setState(() {
-                                        selectedWorkPlaceId = id;
-                                        _workPlaceController.text = value;
-                                      });
-                                    },
-                                  );
-                                },
-                                decoration: const InputDecoration(
-                                  labelText: 'ស្ថាប័ន',
-                                  suffixIcon: Icon(Icons.arrow_drop_down),
-                                  border: OutlineInputBorder(),
-                                ),
-                              ),
-                            ],
-                          ),
+                            ),
+                            const SizedBox(height: 24.0),
+                            // Job
+                            _buildSelectionField(
+                              controller: _jobController,
+                              label: AppLang.translate(
+                                  lang: settingProvider.lang ?? 'kh',
+                                  key: 'job'),
+                              items: jobTypes,
+                              onSelected: (id, value) {
+                                setState(() {
+                                  selectedJobId = id;
+                                  _jobController.text = value;
+                                });
+                              },
+                            ),
+                            const SizedBox(height: 24.0),
+                            // Work Place
+                            _buildSelectionField(
+                              controller: _workPlaceController,
+                              label: AppLang.translate(
+                                  lang: settingProvider.lang ?? 'kh',
+                                  key: 'work_place'),
+                              items: workPlaces,
+                              onSelected: (id, value) {
+                                setState(() {
+                                  selectedWorkPlaceId = id;
+                                  _workPlaceController.text = value;
+                                });
+                              },
+                            ),
+                            const SizedBox(height: 24.0),
+                          ],
                         ),
                       ),
                     ),
@@ -315,7 +307,7 @@ class _CreateRelativeScreenState extends State<CreateRelativeScreen> {
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     backgroundColor: Colors.blue[900],
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
+                      borderRadius: BorderRadius.circular(12),
                     ),
                   ),
                   onPressed: () {
@@ -360,6 +352,89 @@ class _CreateRelativeScreenState extends State<CreateRelativeScreen> {
     '3': 'ក្រុមហ៊ុនឯកជន',
     '4': 'អង្គការអន្តរជាតិ',
   };
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    String? Function(String?)? validator,
+    bool readOnly = false,
+    VoidCallback? onTap,
+    Widget? suffixIcon,
+    int maxLines = 1,
+  }) {
+    return TextFormField(
+      controller: controller,
+      readOnly: readOnly,
+      onTap: onTap,
+      validator: validator,
+      maxLines: maxLines,
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: TextStyle(color: Colors.blueGrey),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12.0),
+          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12.0),
+          borderSide: BorderSide(color: Colors.blueGrey),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12.0),
+          borderSide: BorderSide(
+              color: Theme.of(context).colorScheme.primary, width: 2.0),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12.0),
+          borderSide: BorderSide(color: Theme.of(context).colorScheme.error),
+        ),
+        suffixIcon: suffixIcon,
+        filled: true,
+      ),
+    );
+  }
+
+  // Reusable Selection Field widget
+  Widget _buildSelectionField({
+    required TextEditingController controller,
+    required String label,
+    required Map<String, String> items,
+    required void Function(String id, String value) onSelected,
+  }) {
+    return TextFormField(
+      controller: controller,
+      readOnly: true,
+      onTap: () async {
+        await _showSelectionBottomSheet(
+          context: context,
+          title: label,
+          items: items,
+          onSelected: onSelected,
+        );
+      },
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: TextStyle(color: Colors.blueGrey),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12.0),
+          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12.0),
+          borderSide: BorderSide(color: Colors.blueGrey),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12.0),
+          borderSide: BorderSide(
+              color: Theme.of(context).colorScheme.primary, width: 1.0),
+        ),
+        suffixIcon: Icon(Icons.arrow_drop_down,
+            color: Theme.of(context).colorScheme.primary),
+        filled: true,
+      ),
+    );
+  }
+
   //bottom sheet selector
   Future<void> _showSelectionBottomSheet({
     required BuildContext context,
@@ -381,18 +456,68 @@ class _CreateRelativeScreenState extends State<CreateRelativeScreen> {
               ),
             ),
             Expanded(
-              child: ListView(
-                children: items.entries
-                    .map((entry) => ListTile(
-                          title: Text(entry.value),
-                          onTap: () {
-                            onSelected(entry.key, entry.value);
-                            Navigator.pop(context);
-                          },
-                        ))
-                    .toList(),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 16.0, vertical: 12.0),
+                child: ListView.separated(
+                  itemCount: items.length,
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(height: 8.0),
+                  itemBuilder: (context, index) {
+                    final entry = items.entries.elementAt(index);
+                    return Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: () {
+                          onSelected(entry.key, entry.value);
+                          Navigator.pop(context);
+                        },
+                        borderRadius: BorderRadius.circular(16.0),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.surface,
+                            borderRadius: BorderRadius.circular(16.0),
+                            border: Border.all(
+                              color: Colors.grey,
+                              width: 1.0,
+                            ),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20.0,
+                              vertical: 16.0,
+                            ),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    entry.value,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyLarge
+                                        ?.copyWith(
+                                          fontWeight: FontWeight.w500,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface,
+                                        ),
+                                  ),
+                                ),
+                                Icon(
+                                  Icons.arrow_forward_ios_rounded,
+                                  size: 16.0,
+                                  color: Colors.grey,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
               ),
-            ),
+            )
           ],
         );
       },

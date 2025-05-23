@@ -108,7 +108,10 @@ class _UpdatePersonalInfoScreenState extends State<UpdatePersonalInfoScreen> {
                                 labelText: AppLang.translate(
                                     key: "user_info_salute",
                                     lang: settingProvider.lang ?? 'kh'),
-                                border: OutlineInputBorder(),
+                                border: OutlineInputBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(12.0)),
+                                ),
                               ),
                             ),
                             // AppLang.translate(
@@ -130,7 +133,10 @@ class _UpdatePersonalInfoScreenState extends State<UpdatePersonalInfoScreen> {
                                     decoration: InputDecoration(
                                       labelText: AppLang.translate(
                                           key: "user_info_kh_name", lang: 'kh'),
-                                      border: const OutlineInputBorder(),
+                                      border: const OutlineInputBorder(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(12.0)),
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -146,7 +152,10 @@ class _UpdatePersonalInfoScreenState extends State<UpdatePersonalInfoScreen> {
                                     decoration: InputDecoration(
                                       labelText: AppLang.translate(
                                           key: "user_info_en_name", lang: 'kh'),
-                                      border: const OutlineInputBorder(),
+                                      border: const OutlineInputBorder(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(12.0)),
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -180,7 +189,10 @@ class _UpdatePersonalInfoScreenState extends State<UpdatePersonalInfoScreen> {
                               decoration: InputDecoration(
                                 labelText: AppLang.translate(
                                     key: "user_info_phone", lang: 'kh'),
-                                border: const OutlineInputBorder(),
+                                border: const OutlineInputBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(12.0)),
+                                ),
                               ),
                               keyboardType: TextInputType.phone,
                             ),
@@ -194,7 +206,10 @@ class _UpdatePersonalInfoScreenState extends State<UpdatePersonalInfoScreen> {
                               decoration: InputDecoration(
                                 labelText: AppLang.translate(
                                     key: "user_info_email", lang: 'kh'),
-                                border: const OutlineInputBorder(),
+                                border: const OutlineInputBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(12.0)),
+                                ),
                               ),
                               keyboardType: TextInputType.emailAddress,
                             ),
@@ -208,7 +223,10 @@ class _UpdatePersonalInfoScreenState extends State<UpdatePersonalInfoScreen> {
                               decoration: InputDecoration(
                                 labelText: AppLang.translate(
                                     key: "user_info_card_id", lang: 'kh'),
-                                border: const OutlineInputBorder(),
+                                border: const OutlineInputBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(12.0)),
+                                ),
                               ),
                             ),
                             const SizedBox(height: 16),
@@ -227,7 +245,10 @@ class _UpdatePersonalInfoScreenState extends State<UpdatePersonalInfoScreen> {
                                     // Show date picker logic here
                                   },
                                 ),
-                                border: const OutlineInputBorder(),
+                                border: const OutlineInputBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(12.0)),
+                                ),
                               ),
                             ),
                             const SizedBox(height: 16),
@@ -241,7 +262,10 @@ class _UpdatePersonalInfoScreenState extends State<UpdatePersonalInfoScreen> {
                               decoration: InputDecoration(
                                 labelText: AppLang.translate(
                                     key: "user_info_note", lang: 'kh'),
-                                border: const OutlineInputBorder(),
+                                border: const OutlineInputBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(12.0)),
+                                ),
                               ),
                             ),
                             const SizedBox(height: 16),
@@ -285,7 +309,10 @@ class _UpdatePersonalInfoScreenState extends State<UpdatePersonalInfoScreen> {
                                       labelText: AppLang.translate(
                                           key: "user_info_province",
                                           lang: 'kh'),
-                                      border: const OutlineInputBorder(),
+                                      border: const OutlineInputBorder(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(12.0)),
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -308,7 +335,10 @@ class _UpdatePersonalInfoScreenState extends State<UpdatePersonalInfoScreen> {
                                       labelText: AppLang.translate(
                                           key: "user_info_district",
                                           lang: 'kh'),
-                                      border: const OutlineInputBorder(),
+                                      border: const OutlineInputBorder(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(12.0)),
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -333,7 +363,10 @@ class _UpdatePersonalInfoScreenState extends State<UpdatePersonalInfoScreen> {
                                     decoration: InputDecoration(
                                       labelText: AppLang.translate(
                                           key: "user_info_commune", lang: 'kh'),
-                                      border: const OutlineInputBorder(),
+                                      border: const OutlineInputBorder(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(12.0)),
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -354,7 +387,10 @@ class _UpdatePersonalInfoScreenState extends State<UpdatePersonalInfoScreen> {
                                     decoration: InputDecoration(
                                       labelText: AppLang.translate(
                                           key: "user_info_village", lang: 'kh'),
-                                      border: const OutlineInputBorder(),
+                                      border: const OutlineInputBorder(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(12.0)),
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -380,7 +416,10 @@ class _UpdatePersonalInfoScreenState extends State<UpdatePersonalInfoScreen> {
                                     decoration: InputDecoration(
                                       labelText: AppLang.translate(
                                           key: "user_info_street", lang: 'kh'),
-                                      border: const OutlineInputBorder(),
+                                      border: const OutlineInputBorder(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(12.0)),
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -402,7 +441,10 @@ class _UpdatePersonalInfoScreenState extends State<UpdatePersonalInfoScreen> {
                                     decoration: InputDecoration(
                                       labelText: AppLang.translate(
                                           key: "user_info_number", lang: 'kh'),
-                                      border: const OutlineInputBorder(),
+                                      border: const OutlineInputBorder(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(12.0)),
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -447,7 +489,10 @@ class _UpdatePersonalInfoScreenState extends State<UpdatePersonalInfoScreen> {
                                       labelText: AppLang.translate(
                                           key: "user_info_province",
                                           lang: 'kh'),
-                                      border: const OutlineInputBorder(),
+                                      border: const OutlineInputBorder(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(12.0)),
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -468,7 +513,10 @@ class _UpdatePersonalInfoScreenState extends State<UpdatePersonalInfoScreen> {
                                       labelText: AppLang.translate(
                                           key: "user_info_district",
                                           lang: 'kh'),
-                                      border: const OutlineInputBorder(),
+                                      border: const OutlineInputBorder(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(12.0)),
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -494,7 +542,10 @@ class _UpdatePersonalInfoScreenState extends State<UpdatePersonalInfoScreen> {
                                     decoration: InputDecoration(
                                       labelText: AppLang.translate(
                                           key: "user_info_commune", lang: 'kh'),
-                                      border: const OutlineInputBorder(),
+                                      border: const OutlineInputBorder(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(12.0)),
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -514,7 +565,10 @@ class _UpdatePersonalInfoScreenState extends State<UpdatePersonalInfoScreen> {
                                     decoration: InputDecoration(
                                       labelText: AppLang.translate(
                                           key: "user_info_village", lang: 'kh'),
-                                      border: const OutlineInputBorder(),
+                                      border: const OutlineInputBorder(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(12.0)),
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -542,7 +596,10 @@ class _UpdatePersonalInfoScreenState extends State<UpdatePersonalInfoScreen> {
                                     decoration: InputDecoration(
                                       labelText: AppLang.translate(
                                           key: "user_info_street", lang: 'kh'),
-                                      border: const OutlineInputBorder(),
+                                      border: const OutlineInputBorder(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(12.0)),
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -563,7 +620,10 @@ class _UpdatePersonalInfoScreenState extends State<UpdatePersonalInfoScreen> {
                                     decoration: InputDecoration(
                                       labelText: AppLang.translate(
                                           key: "user_info_number", lang: 'kh'),
-                                      border: const OutlineInputBorder(),
+                                      border: const OutlineInputBorder(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(12.0)),
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -592,8 +652,9 @@ class _UpdatePersonalInfoScreenState extends State<UpdatePersonalInfoScreen> {
                     //   // Submit logic
                     // }
                   },
-                  child:  Text(
-                    AppLang.translate(lang: settingProvider.lang??'kh',key: 'update'),
+                  child: Text(
+                    AppLang.translate(
+                        lang: settingProvider.lang ?? 'kh', key: 'update'),
                     style: TextStyle(fontSize: 16, color: Colors.white),
                   ),
                 ),

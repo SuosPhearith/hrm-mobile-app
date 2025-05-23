@@ -148,7 +148,10 @@ class _CreateEducationScreenState extends State<CreateEducationScreen> {
                               },
                               decoration: const InputDecoration(
                                 labelText: 'ប្រភេទ *',
-                                border: OutlineInputBorder(),
+                                border: OutlineInputBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(12.0)),
+                                ),
                                 suffixIcon: Icon(Icons.arrow_drop_down),
                               ),
                               validator: (value) {
@@ -181,12 +184,14 @@ class _CreateEducationScreenState extends State<CreateEducationScreen> {
                               },
                               decoration: const InputDecoration(
                                 labelText: 'កម្រិតភាសា *',
-                                border: OutlineInputBorder(),
+                                border: OutlineInputBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(12.0)),
+                                ),
                                 suffixIcon: Icon(Icons.arrow_drop_down),
                               ),
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
-                        
                                   return AppLang.translate(
                                       lang: settingProvider.lang ?? 'kh',
                                       key: 'Please select education level');
@@ -214,7 +219,10 @@ class _CreateEducationScreenState extends State<CreateEducationScreen> {
                               },
                               decoration: const InputDecoration(
                                 labelText: 'សញ្ញាបត្រ *',
-                                border: OutlineInputBorder(),
+                                border: OutlineInputBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(12.0)),
+                                ),
                                 suffixIcon: Icon(Icons.arrow_drop_down),
                               ),
                               validator: (value) {
@@ -246,7 +254,10 @@ class _CreateEducationScreenState extends State<CreateEducationScreen> {
                               },
                               decoration: const InputDecoration(
                                 labelText: 'ជំនាញ',
-                                border: OutlineInputBorder(),
+                                border: OutlineInputBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(12.0)),
+                                ),
                                 suffixIcon: Icon(Icons.arrow_drop_down),
                               ),
                             ),
@@ -270,7 +281,10 @@ class _CreateEducationScreenState extends State<CreateEducationScreen> {
                               },
                               decoration: const InputDecoration(
                                 labelText: 'គ្រឹះស្ថានសិក្សា',
-                                border: OutlineInputBorder(),
+                                border: OutlineInputBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(12.0)),
+                                ),
                                 suffixIcon: Icon(Icons.arrow_drop_down),
                               ),
                             ),
@@ -295,7 +309,10 @@ class _CreateEducationScreenState extends State<CreateEducationScreen> {
                               },
                               decoration: const InputDecoration(
                                 labelText: 'ទីកន្លែងសិក្សា',
-                                border: OutlineInputBorder(),
+                                border: OutlineInputBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(12.0)),
+                                ),
                                 suffixIcon: Icon(Icons.arrow_drop_down),
                               ),
                             ),
@@ -310,7 +327,10 @@ class _CreateEducationScreenState extends State<CreateEducationScreen> {
                                     readOnly: true,
                                     decoration: InputDecoration(
                                       labelText: 'ថ្ងៃចូលសិក្សា',
-                                      border: const OutlineInputBorder(),
+                                      border: const OutlineInputBorder(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(12.0)),
+                                      ),
                                       suffixIcon: IconButton(
                                         icon: const Icon(Icons.calendar_today),
                                         onPressed: () => _selectDate(_dateIn),
@@ -325,7 +345,10 @@ class _CreateEducationScreenState extends State<CreateEducationScreen> {
                                     readOnly: true,
                                     decoration: InputDecoration(
                                       labelText: 'ថ្ងៃបញ្ចប់',
-                                      border: const OutlineInputBorder(),
+                                      border: const OutlineInputBorder(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(12.0)),
+                                      ),
                                       suffixIcon: IconButton(
                                         icon: const Icon(Icons.calendar_today),
                                         onPressed: () => _selectDate(_dateOut),
@@ -359,7 +382,8 @@ class _CreateEducationScreenState extends State<CreateEducationScreen> {
                     _handleSubmit();
                   },
                   child: Text(
-                    AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'create'),
+                    AppLang.translate(
+                        lang: settingProvider.lang ?? 'kh', key: 'create'),
                     style: TextStyle(fontSize: 16, color: Colors.white),
                   ),
                 ),

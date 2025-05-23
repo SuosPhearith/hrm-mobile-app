@@ -161,7 +161,10 @@ class _CreateLanguageLevelState extends State<CreateLanguageLevel> {
                                 decoration: InputDecoration(
                                   labelText:
                                       "${AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'user_info_language')} *",
-                                  border: OutlineInputBorder(),
+                                  border: OutlineInputBorder(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(12.0)),
+                                  ),
                                   suffixIcon: Icon(Icons.arrow_drop_down),
                                 ),
                                 validator: (value) {
@@ -201,7 +204,10 @@ class _CreateLanguageLevelState extends State<CreateLanguageLevel> {
                                       decoration: InputDecoration(
                                         labelText:
                                             '${AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'speaking level')} *',
-                                        border: OutlineInputBorder(),
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(12.0)),
+                                        ),
                                         suffixIcon: Icon(Icons.arrow_drop_down),
                                       ),
                                       validator: (value) {
@@ -239,7 +245,10 @@ class _CreateLanguageLevelState extends State<CreateLanguageLevel> {
                                       decoration: InputDecoration(
                                         labelText:
                                             '${AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'reading level')} *',
-                                        border: OutlineInputBorder(),
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(12.0)),
+                                        ),
                                         suffixIcon: Icon(Icons.arrow_drop_down),
                                       ),
                                       validator: (value) {
@@ -283,7 +292,10 @@ class _CreateLanguageLevelState extends State<CreateLanguageLevel> {
                                       decoration: InputDecoration(
                                         labelText:
                                             '${AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'writting level')} *',
-                                        border: OutlineInputBorder(),
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(12.0)),
+                                        ),
                                         suffixIcon: Icon(Icons.arrow_drop_down),
                                       ),
                                       validator: (value) {
@@ -321,7 +333,10 @@ class _CreateLanguageLevelState extends State<CreateLanguageLevel> {
                                       decoration: InputDecoration(
                                         labelText:
                                             '${AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'listenning level')} *',
-                                        border: OutlineInputBorder(),
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(12.0)),
+                                        ),
                                         suffixIcon: Icon(Icons.arrow_drop_down),
                                       ),
                                       validator: (value) {
