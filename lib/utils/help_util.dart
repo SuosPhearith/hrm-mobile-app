@@ -290,20 +290,48 @@ String formatDateTime(String isoString) {
   }
 }
 
-List<dynamic> mapToList(Map<String, dynamic>? map) {
-  // Return empty list if map is null
-  if (map == null) return [];
+List<dynamic> mapToList(dynamic input) {
+  // Handle null input
+  if (input == null) return [];
 
   try {
-    // Check if the map is empty
-    if (map.isEmpty) return [];
-
-    // Convert map values to list
-    return map.values.toList();
+    if (input is List<dynamic>) {
+      // If input is already a List<dynamic>, return it
+      return input;
+    } else if (input is Map<String, dynamic>) {
+      // If input is a Map<String, dynamic>, convert values to list
+      if (input.isEmpty) return [];
+      return input.values.toList();
+    } else {
+      // Return empty list for unsupported types
+      return [];
+    }
   } catch (e) {
     // Return empty list if conversion fails
     return [];
   }
+}
+
+List<Map<String, int>> convertSelectedUsersToReviewers(
+  Map<int, List<Map<String, String>>> selectedUsersByReviewerType,
+) {
+  List<Map<String, int>> reviewers = [];
+
+  // Iterate through each reviewer type and its list of users
+  selectedUsersByReviewerType.forEach((flowReviewerTypeId, users) {
+    for (var user in users) {
+      // Extract user_id from the 'id' field and convert to int
+      int? userId = int.tryParse(user['id'] ?? '');
+      if (userId != null) {
+        reviewers.add({
+          'user_id': userId,
+          'flow_reviewer_type_id': flowReviewerTypeId,
+        });
+      }
+    }
+  });
+
+  return reviewers;
 }
 
 

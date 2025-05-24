@@ -514,7 +514,7 @@ class MonthlyView extends StatelessWidget {
                     value:
                         '${getHoursFromSumHour(homeProvider.scanByMonthData?.data['sum_hour'])} ${AppLang.translate(key: 'hour', lang: lang ?? 'kh')}',
                     label:
-                        '${AppLang.translate(key: 'home_daily', lang: lang ?? 'kh')} ${convertToHoursAndMinutes(homeProvider.scanByMonthData?.data['avg_per_day'] ?? 0)['hours']} ${AppLang.translate(key: 'hour', lang: lang ?? 'kh')} ${convertToHoursAndMinutes(homeProvider.scanByMonthData?.data['avg_per_day'] ?? 0)['minutes']} ${AppLang.translate(key: 'minute', lang: lang ?? 'kh')}',
+                        '${AppLang.translate(key: 'home_daily', lang: lang ?? 'kh')} ${convertToHoursAndMinutes(getSafeDouble(value: homeProvider.scanByMonthData?.data['avg_per_day'], safeValue: 0))['hours']} ${AppLang.translate(key: 'hour', lang: lang ?? 'kh')} ${convertToHoursAndMinutes(getSafeDouble(value: homeProvider.scanByMonthData?.data['avg_per_day'], safeValue: 0))['minutes']} ${AppLang.translate(key: 'minute', lang: lang ?? 'kh')}',
                   ),
                   StatIcon(
                     icon: Icons.person_off,
