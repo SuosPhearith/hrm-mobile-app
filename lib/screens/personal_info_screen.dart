@@ -3,7 +3,9 @@ import 'package:go_router/go_router.dart';
 import 'package:mobile_app/app_lang.dart';
 import 'package:mobile_app/providers/global/setting_provider.dart';
 import 'package:mobile_app/providers/local/personal_info_provider.dart';
+import 'package:mobile_app/services/personal_info_service.dart';
 import 'package:mobile_app/utils/help_util.dart';
+import 'package:mobile_app/widgets/helper.dart';
 import 'package:provider/provider.dart';
 
 class PersonalInfoScreen extends StatefulWidget {
@@ -18,6 +20,70 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
       GlobalKey<RefreshIndicatorState>();
   Future<void> _refreshData(PersonalInfoProvider provider) async {
     return await provider.getHome();
+  }
+
+  final PersonalInfoService _service = PersonalInfoService();
+  // delete relative
+  void _deleteRelative(int id) async {
+    try {
+      await _service.delete(id: id);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content:
+                  Text(AppLang.translate(lang: 'kh', key: 'deleted success'))),
+        );
+        
+        // context.pop();
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('មានបញ្ហាក្នុងការលុប: $e')),
+        );
+      }
+    }
+  }
+  //delete  education
+  void _deleteEducation(int id,int userID) async {
+    try {
+      await _service.deleteEducation(id: id,userId: userID);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content:
+                  Text(AppLang.translate(lang: 'kh', key: 'deleted success'))),
+        );
+        // context.pop();
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('មានបញ្ហាក្នុងការលុប: $e')),
+        );
+      }
+    }
+  }
+
+  //delete  language level
+  void _deleteLanuageLevel(int id,int userID) async {
+    try {
+      await _service.deleteLanguageLevel(id: id,userId: userID);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content:
+                  Text(AppLang.translate(lang: 'kh', key: 'deleted success'))),
+        );
+        // context.pop();
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('មានបញ្ហាក្នុងការលុប: $e')),
+        );
+      }
+    }
   }
 
   @override
@@ -162,6 +228,7 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                                 description:
                                     '${formatDate(record['dob'])} • ${getSafeString(value: record?['job'])} • ${getSafeString(value: record?['work_place'])}',
                                 icon: Icons.person,
+                                onDelete: () => _deleteRelative(record['id']),
                               );
                             }),
                             buildContainer(
@@ -186,6 +253,7 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                                 description:
                                     '• ${AppLang.translate(data: record['school'], lang: settingProvider.lang ?? 'kh')} \n• ${AppLang.translate(data: record['education_place'], lang: settingProvider.lang ?? 'kh')} \n• ${AppLang.translate(data: record['major'], lang: settingProvider.lang ?? 'kh')}\n• ${AppLang.translate(data: record['education_place'], lang: settingProvider.lang ?? 'kh')}\n• ${formatDate(record['study_at'])} | ${formatDate(record['graduate_at'])}',
                                 icon: Icons.person,
+                                onDelete: () =>_deleteEducation(record['id'],user['id']),
                               );
                             }),
 
@@ -215,6 +283,7 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                                 description:
                                     '🗣️${AppLang.translate(data: record['speaking_level'], lang: settingProvider.lang ?? 'kh')} ✍️${AppLang.translate(data: record['writing_level'], lang: settingProvider.lang ?? 'kh')} 📖${AppLang.translate(data: record['reading_level'], lang: settingProvider.lang ?? 'kh')} 🦻${AppLang.translate(data: record['listening_level'], lang: settingProvider.lang ?? 'kh')}',
                                 icon: Icons.flag,
+                                onDelete: () =>_deleteLanuageLevel(record['id'], user['id']),
                               );
                             }),
                             // buildProfileContainerAction(
@@ -338,10 +407,56 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
     );
   }
 
+  // Widget buildProfileContainerAction({
+  //   required String name,
+  //   required String description,
+  //   IconData icon = Icons.person, // Default icon is person
+  //   int? iD,
+  // }) {
+  //   return Container(
+  //     padding: EdgeInsets.only(bottom: 16.0),
+  //     child: Row(
+  //       crossAxisAlignment: CrossAxisAlignment.start,
+  //       children: [
+  //         CircleAvatar(
+  //           radius: 25.0,
+  //           backgroundColor: Colors.grey[300],
+  //           child: Icon(icon, size: 25.0, color: Colors.grey),
+  //         ),
+  //         SizedBox(width: 8.0),
+  //         Expanded(
+  //           child: Column(
+  //             crossAxisAlignment: CrossAxisAlignment.start,
+  //             children: [
+  //               Text(
+  //                 name,
+  //                 style: TextStyle(fontSize: 16.0, color: Colors.black87),
+  //                 softWrap: true,
+  //               ),
+  //               SizedBox(height: 2.0),
+  //               Text(
+  //                 description,
+  //                 style: TextStyle(fontSize: 14.0, color: Colors.grey),
+  //                 softWrap: true,
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //         IconButton(
+  //           icon: Icon(Icons.edit, size: 20.0, color: Colors.grey),
+  //           onPressed: () {
+  //             _showAddRequestBottomSheet(context, iD!);
+  //           },
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
   Widget buildProfileContainerAction({
     required String name,
     required String description,
-    IconData icon = Icons.person, // Default icon is person
+    required VoidCallback? onDelete,
+    IconData icon = Icons.person,
   }) {
     return Container(
       padding: EdgeInsets.only(bottom: 16.0),
@@ -358,25 +473,163 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  name,
-                  style: TextStyle(fontSize: 16.0, color: Colors.black87),
-                  softWrap: true,
-                ),
+                Text(name,
+                    style: TextStyle(fontSize: 16.0, color: Colors.black87),
+                    softWrap: true),
                 SizedBox(height: 2.0),
-                Text(
-                  description,
-                  style: TextStyle(fontSize: 14.0, color: Colors.grey),
-                  softWrap: true,
-                ),
+                Text(description,
+                    style: TextStyle(fontSize: 14.0, color: Colors.grey),
+                    softWrap: true),
               ],
             ),
           ),
           IconButton(
             icon: Icon(Icons.edit, size: 20.0, color: Colors.grey),
-            onPressed: () {},
+            onPressed: () {
+              _showBottomSheet(context, onDelete!);
+            },
           ),
         ],
+      ),
+    );
+  }
+
+  // void _showAddRequestBottomSheet(
+  //   BuildContext context,
+  //   int id,
+  // ) {
+  //   final lang = Provider.of<SettingProvider>(context, listen: false).lang;
+  //   showModalBottomSheet(
+  //     context: context,
+  //     isScrollControlled: true,
+  //     shape: const RoundedRectangleBorder(
+  //       borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
+  //     ),
+  //     backgroundColor: Colors.white,
+  //     builder: (BuildContext context) {
+  //       return Padding(
+  //         padding: const EdgeInsets.all(16.0),
+  //         child: Column(
+  //           mainAxisSize: MainAxisSize.min,
+  //           children: [
+  //             // Text(
+  //             //   'បន្ថែមសំណើថ្មី',
+  //             //   style: TextStyle(
+  //             //     fontSize: 20.0,
+  //             //     fontWeight: FontWeight.bold,
+  //             //     color: Colors.blue[900],
+  //             //   ),
+  //             // ),
+  //             // const SizedBox(height: 16.0),
+  //             _buildBottomSheetOption(
+  //               icon: Icons.edit,
+  //               label: AppLang.translate(key: 'update', lang: lang ?? 'kh'),
+  //               onTap: () {
+  //                 Navigator.pop(context);
+  //               },
+  //             ),
+  //             _buildBottomSheetOption(
+  //               icon: Icons.delete,
+  //               label: AppLang.translate(key: 'delete', lang: lang ?? 'kh'),
+  //               colors: Colors.red,
+  //               onTap: () {
+  //                 showConfirmDialog(
+  //                   context,
+  //                   AppLang.translate(
+  //                       lang: lang ?? 'kh', key: 'Confirm Delete'),
+  //                   '${AppLang.translate(lang: lang ?? 'kh', key: 'Are you sure to delete')}?',
+  //                   DialogType.primary,
+  //                   () {
+  //                     _validateAndSubmit(id);
+  //                   },
+  //                 );
+  //               },
+  //             ),
+  //           ],
+  //         ),
+  //       );
+  //     },
+  //   );
+  // }
+  void _showBottomSheet(BuildContext context, VoidCallback onDelete) {
+    final lang = Provider.of<SettingProvider>(context, listen: false).lang;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
+      ),
+      backgroundColor: Colors.white,
+      builder: (BuildContext context) {
+        return Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildBottomSheetOption(
+                icon: Icons.edit,
+                label: AppLang.translate(key: 'update', lang: lang ?? 'kh'),
+                onTap: () {
+                  Navigator.pop(context);
+                },
+              ),
+              _buildBottomSheetOption(
+                icon: Icons.delete,
+                label: AppLang.translate(key: 'delete', lang: lang ?? 'kh'),
+                colors: Colors.red,
+                onTap: () {
+                  Navigator.pop(context);
+                  showConfirmDialog(
+                    context,
+                    AppLang.translate(
+                        lang: lang ?? 'kh', key: 'Confirm Delete'),
+                    '${AppLang.translate(lang: lang ?? 'kh', key: 'Are you sure to delete')}?',
+                    DialogType.primary,
+                    onDelete,
+                  );
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildBottomSheetOption({
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+    Color? colors,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(12.0),
+        margin: EdgeInsets.only(bottom: 8),
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey),
+          borderRadius: BorderRadius.circular(12.0),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8.0),
+              decoration: BoxDecoration(shape: BoxShape.circle),
+              child: Icon(icon, size: 24.0, color: colors ?? Colors.grey),
+            ),
+            const SizedBox(width: 12.0),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 16.0,
+                fontWeight: FontWeight.w600,
+                color: Colors.grey.shade800,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

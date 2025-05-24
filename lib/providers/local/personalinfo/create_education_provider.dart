@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_app/models/response_structure_model.dart';
-import 'package:mobile_app/services/request/create_request_service.dart';
+import 'package:mobile_app/services/personal_info/create_service.dart';
+
 
 class CreateEducationProvider extends ChangeNotifier {
   // Feilds
@@ -9,7 +10,7 @@ class CreateEducationProvider extends ChangeNotifier {
   ResponseStructure<Map<String, dynamic>>? _data;
 
   // Services
-  final CreateRequestService _createRequestService = CreateRequestService();
+    final CreatePersonalService _createPersonalService = CreatePersonalService();
 
   // Getters
   bool get isLoading => _isLoading;
@@ -28,7 +29,7 @@ class CreateEducationProvider extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
     try {
-      final res = await _createRequestService.dataSetup();
+      final res = await _createPersonalService.dataSetup();
       _data = res;
     } catch (e) {
       _error = "Invalid Credential.";

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:dio/dio.dart';
 import 'package:mobile_app/error_type.dart';
 import 'package:mobile_app/models/response_structure_model.dart';
@@ -8,7 +10,7 @@ class CreatePersonalService {
 
   Future<ResponseStructure<Map<String, dynamic>>> dataSetup() async {
     try {
-      final response = await DioClient.dio.get("/shared/setup?models=family_role");
+      final response = await DioClient.dio.get("/shared/setup?models=family_role,education_type,certificate_type,language_level,major,school,province,education_level");
       return ResponseStructure<Map<String, dynamic>>.fromJson(
         response.data as Map<String, dynamic>,
         dataFromJson: (json) => json,
@@ -39,7 +41,7 @@ class CreatePersonalService {
     required String? familyRoleId,
     required String? job,
     required String? workPlace,
-    required String? note,
+    String? note,
   }) async {
     try {
       final response = await DioClient.dio.post(
@@ -52,10 +54,12 @@ class CreatePersonalService {
           "family_role_id":familyRoleId,
           "job":job,
           "work_place":workPlace,
-          "note":note,
+          "note_":note,
         },
       );
-      return response.data;
+      log(response.data);
+      
+     return response.data;
     } on DioException catch (dioError) {
       if (dioError.response != null) {
         printError(
@@ -64,14 +68,11 @@ class CreatePersonalService {
         );
         throw Exception(ErrorType.requestError);
       } else {
-        printError(
-          errorMessage: ErrorType.networkError,
-          statusCode: null,
-        );
+        printError(errorMessage: ErrorType.networkError, statusCode: null);
         throw Exception(ErrorType.networkError);
       }
     } catch (e) {
-      printError(errorMessage: 'Something went wrong.', statusCode: 500);
+      printError(errorMessage: 'Something went wrong. $e', statusCode: 500);
       throw Exception(ErrorType.unexpectedError);
     }
   }
@@ -102,7 +103,7 @@ class CreatePersonalService {
           "study_at":studyAt,
           "graduate_at":graduateAt,
           "note":note,
-          "attachment_id":attachmentId,
+          // "attachment_id":attachmentId,
         },
       );
       return response.data;
