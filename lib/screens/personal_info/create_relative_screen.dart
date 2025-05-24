@@ -1,4 +1,4 @@
-import 'package:dio/dio.dart';
+
 import 'package:flutter/material.dart';
 import 'package:mobile_app/app_lang.dart';
 import 'package:mobile_app/providers/global/setting_provider.dart';
@@ -33,7 +33,7 @@ class _CreateRelativeScreenState extends State<CreateRelativeScreen> {
       TextEditingController(); // ស្ថាប័ន
   final TextEditingController _noteController =
       TextEditingController(); // ចំណាំ
-
+//រឿន​ សុផាត់
   // Variables to store selected IDs
   String? selectedRelativeTypeId;
   String? selectedJobId;
@@ -71,8 +71,12 @@ class _CreateRelativeScreenState extends State<CreateRelativeScreen> {
         sexId: selectedGender ?? '',
         dob: _dobController.text.isNotEmpty ? _dobController.text.trim() : null,
         familyRoleId: selectedRelativeTypeId,
-        job: _jobController.text.trim().isNotEmpty?_jobController.text.trim():null,
-        workPlace: _workPlaceController.text.trim().isNotEmpty?_workPlaceController.text.trim():null,
+        job: _jobController.text.trim().isNotEmpty
+            ? _jobController.text.trim()
+            : null,
+        workPlace: _workPlaceController.text.trim().isNotEmpty
+            ? _workPlaceController.text.trim()
+            : null,
         note: _noteController.text.isNotEmpty
             ? _noteController.text.trim()
             : null,
@@ -84,20 +88,8 @@ class _CreateRelativeScreenState extends State<CreateRelativeScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('បង្កើតបានជោគជ័យ')),
       );
-
+      _clearAllFields();
       Navigator.of(context).pop(result); // Return to previous screen
-    } on DioException catch (dioError) {
-      if (!mounted) return;
-      Navigator.of(context).pop(); // Close loading dialog
-
-      String errorMessage = 'បញ្ហាក្នុងការបង្កើត';
-      if (dioError.response?.data != null) {
-        errorMessage += ': ${dioError.response?.data['message'] ?? ''}';
-      }
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(errorMessage)),
-      );
     } catch (e) {
       if (!mounted) return;
       Navigator.of(context).pop(); // Close loading dialog
@@ -120,6 +112,26 @@ class _CreateRelativeScreenState extends State<CreateRelativeScreen> {
     super.dispose();
   }
 
+  // Method to clear all form fields
+  void _clearAllFields() {
+    _dobController.clear();
+    _firstNameController.clear();
+    _lastNameController.clear();
+    _relativeTypeController.clear();
+    _jobController.clear();
+    _workPlaceController.clear();
+    _noteController.clear();
+
+    // Reset dropdown selections
+    setState(() {
+      selectedGender = null;
+      selectedRelativeTypeId = null;
+      // Reset any other state variables you might have
+    });
+
+    // print("🧹 All form fields cleared");
+  }
+
   Future<void> _selectDate() async {
     DateTime? picked = await showDatePicker(
       context: context,
@@ -138,7 +150,8 @@ class _CreateRelativeScreenState extends State<CreateRelativeScreen> {
         create: (_) => CreateRelativeProvider(),
         child: Consumer2<CreateRelativeProvider, SettingProvider>(
             builder: (context, createRelativeProvider, settingProvider, child) {
-                final relativeTypes = _buildRelativeTypes(createRelativeProvider, settingProvider);
+          final relativeTypes =
+              _buildRelativeTypes(createRelativeProvider, settingProvider);
           return Scaffold(
             backgroundColor: Colors.grey[100],
             appBar: AppBar(
@@ -175,7 +188,6 @@ class _CreateRelativeScreenState extends State<CreateRelativeScreen> {
                                   _relativeTypeController.text = value;
                                 });
                               },
-                              
                             ),
                             const SizedBox(height: 24.0),
                             // Gender Selection
@@ -227,9 +239,8 @@ class _CreateRelativeScreenState extends State<CreateRelativeScreen> {
                             // Name (Khmer)
                             _buildTextField(
                               controller: _firstNameController,
-                              label: '${AppLang.translate(
-                                  lang: settingProvider.lang ?? 'kh',
-                                  key: 'user_info_kh_name')} *',
+                              label:
+                                  '${AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'user_info_kh_name')} *',
                               validator: (value) => value!.isEmpty
                                   ? AppLang.translate(
                                       lang: settingProvider.lang ?? 'kh',
@@ -240,9 +251,8 @@ class _CreateRelativeScreenState extends State<CreateRelativeScreen> {
                             // Name (Latin)
                             _buildTextField(
                               controller: _lastNameController,
-                              label: '${AppLang.translate(
-                                  lang: settingProvider.lang ?? 'kh',
-                                  key: 'user_info_en_name')} *',
+                              label:
+                                  '${AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'user_info_en_name')} *',
                               validator: (value) => value!.isEmpty
                                   ? AppLang.translate(
                                       lang: settingProvider.lang ?? 'kh',
@@ -365,31 +375,35 @@ class _CreateRelativeScreenState extends State<CreateRelativeScreen> {
   //   '8': 'ឪពុក',
   //   '9': 'ម្តាយ',
   // };
-   // Helper method to build relative types map
-  Map<String, String> _buildRelativeTypes(CreateRelativeProvider createRelativeProvider, SettingProvider settingProvider) {
+  // Helper method to build relative types map
+  Map<String, String> _buildRelativeTypes(
+      CreateRelativeProvider createRelativeProvider,
+      SettingProvider settingProvider) {
     final dataSetUp = createRelativeProvider.dataSetup?.data['family_role'];
-    
+
     if (dataSetUp == null || dataSetUp is! List) {
       return {}; // Return empty map if data is not available or not a list
     }
-    
+
     Map<String, String> types = {};
-    
+
     for (var item in dataSetUp) {
       if (item is Map<String, dynamic>) {
         final id = item['id']?.toString();
         // Use Khmer name based on current language, fallback to English
         final currentLang = settingProvider.lang ?? 'kh';
-        final name = currentLang == 'kh' 
+        final name = currentLang == 'kh'
             ? (item['name_kh']?.toString() ?? item['name_en']?.toString() ?? '')
-            : (item['name_en']?.toString() ?? item['name_kh']?.toString() ?? '');
-        
+            : (item['name_en']?.toString() ??
+                item['name_kh']?.toString() ??
+                '');
+
         if (id != null && name.isNotEmpty) {
           types[id] = name;
         }
       }
     }
-    
+
     return types;
   }
 

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_app/app_lang.dart';
 import 'package:mobile_app/providers/global/setting_provider.dart';
-import 'package:mobile_app/providers/sample_provider.dart';
+import 'package:mobile_app/providers/local/personalinfo/create_education_provider.dart';
 import 'package:mobile_app/services/personal_info/create_service.dart';
+import 'package:mobile_app/widgets/helper.dart';
 import 'package:provider/provider.dart';
 
 class CreateEducationScreen extends StatefulWidget {
@@ -16,7 +17,7 @@ class CreateEducationScreen extends StatefulWidget {
 class _CreateEducationScreenState extends State<CreateEducationScreen> {
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
       GlobalKey<RefreshIndicatorState>();
-  Future<void> _refreshData(SampleProvider provider) async {
+  Future<void> _refreshData(CreateEducationProvider provider) async {
     return await provider.getHome();
   }
 
@@ -25,7 +26,7 @@ class _CreateEducationScreenState extends State<CreateEducationScreen> {
   final TextEditingController _dateOut = TextEditingController();
   final TextEditingController _type = TextEditingController();
   final TextEditingController _certificate = TextEditingController();
-  final TextEditingController _languageLevel = TextEditingController();
+  final TextEditingController _educationLevel = TextEditingController();
   final TextEditingController _skill = TextEditingController();
   final TextEditingController _school = TextEditingController();
   final TextEditingController _place = TextEditingController();
@@ -45,7 +46,7 @@ class _CreateEducationScreenState extends State<CreateEducationScreen> {
   void dispose() {
     _dateIn.dispose();
     _type.dispose();
-    _languageLevel.dispose();
+    _educationLevel.dispose();
     _dateOut.dispose();
     _certificate.dispose();
     _skill.dispose();
@@ -68,45 +69,117 @@ class _CreateEducationScreenState extends State<CreateEducationScreen> {
     }
   }
 
-  // Handle form submission
+  // Handle form submission with step-by-step validation
   Future<void> _handleSubmit() async {
-    if (_formKey.currentState!.validate()) {
-      try {
-        final result = await _service.createUserEducation(
-          userId: widget.id ?? '', //  widget.id is the user ID
-          educationTypeId: selectedEducationTypeId ?? '',
-          educationLevelId: selectedEducationLevelId ?? '',
-          certificateTypeId: selectedCertificateTypeId ?? '',
-          majorId: selectedMajorId,
-          schoolId: selectedSchoolId,
-          educationPlaceId: selectedEducationPlaceId,
-          studyAt: _dateIn.text,
-          graduateAt: _dateOut.text,
-          note: null,
-          attachmentId: null,
-        );
+    // First validate the form fields
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
 
-        // Handle successful submission
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Education created successfully')),
-        );
-        Navigator.pop(context, result); // Return to previous screen
-      } catch (e) {
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${e.toString()}')),
-        );
+    // Validate each field one by one and show first error encountered
+    String? getFirstValidationError() {
+      if (selectedEducationTypeId == null || selectedEducationTypeId!.isEmpty) {
+        return 'Please select education type';
       }
+      if (selectedEducationLevelId == null ||
+          selectedEducationLevelId!.isEmpty) {
+        return 'Please select education level';
+      }
+      if (_dateIn.text.isEmpty) {
+        return 'Start Date is required';
+      }
+      if (_dateOut.text.isEmpty) {
+        return 'End Date is required';
+      }
+      return null;
+    }
+
+    final errorMessage = getFirstValidationError();
+    if (errorMessage != null) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            AppLang.translate(lang: 'kh', key: errorMessage),
+            style: const TextStyle(color: Colors.white),
+          ),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 3),
+        ),
+      );
+      return;
+    }
+
+    // All validations passed - proceed with submission
+    try {
+      final result = await _service.createUserEducation(
+        userId: widget.id ?? '',
+        educationTypeId: selectedEducationTypeId!,
+        educationLevelId: selectedEducationLevelId!,
+        certificateTypeId: selectedCertificateTypeId ?? '',
+        majorId: selectedMajorId ?? '',
+        schoolId: selectedSchoolId ?? '',
+        educationPlaceId: selectedEducationPlaceId ?? '',
+        studyAt: _dateIn.text,
+        graduateAt: _dateOut.text,
+        note: null,
+        attachmentId: null,
+      );
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Education created successfully'),
+          backgroundColor: Colors.green,
+        ),
+      );
+      Navigator.pop(context, result);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-        create: (_) => SampleProvider(),
-        child: Consumer2<SampleProvider, SettingProvider>(
-            builder: (context, evaluateProvider, settingProvider, child) {
+        create: (_) => CreateEducationProvider(),
+        child: Consumer2<CreateEducationProvider, SettingProvider>(builder:
+            (context, createEducationProvider, settingProvider, child) {
+          final educationTypes = _buildEducationSelectionMap(
+            apiData: createEducationProvider.data,
+            dataKey: 'education_types',
+            settingProvider: settingProvider,
+          );
+
+          final educationLevels = _buildEducationSelectionMap(
+            apiData: createEducationProvider.data,
+            dataKey: 'education_levels',
+            settingProvider: settingProvider,
+          );
+
+          final certificateTypes = _buildEducationSelectionMap(
+              apiData: createEducationProvider.data,
+              dataKey: 'certificate_types',
+              settingProvider: settingProvider);
+          final majors = _buildEducationSelectionMap(
+              apiData: createEducationProvider.data,
+              dataKey: 'majors',
+              settingProvider: settingProvider);
+          final schools = _buildEducationSelectionMap(
+              apiData: createEducationProvider.data,
+              dataKey: 'schools',
+              settingProvider: settingProvider);
+          final educationPlaces = _buildEducationSelectionMap(
+              apiData: createEducationProvider.data,
+              dataKey: 'education_places',
+              settingProvider: settingProvider);
+
           return Scaffold(
             backgroundColor: Colors.grey[100],
             appBar: AppBar(
@@ -118,8 +191,8 @@ class _CreateEducationScreenState extends State<CreateEducationScreen> {
               key: _refreshIndicatorKey,
               color: Colors.blue[800],
               backgroundColor: Colors.white,
-              onRefresh: () => _refreshData(evaluateProvider),
-              child: evaluateProvider.isLoading
+              onRefresh: () => _refreshData(createEducationProvider),
+              child: createEducationProvider.isLoading
                   ? const Center(child: Text('Loading...'))
                   : SingleChildScrollView(
                       physics: const AlwaysScrollableScrollPhysics(),
@@ -129,192 +202,103 @@ class _CreateEducationScreenState extends State<CreateEducationScreen> {
                         child: Column(
                           children: [
                             const SizedBox(height: 10),
-                            // Type
-                            TextFormField(
+                            // Education Type
+                            _buildSelectionField(
                               controller: _type,
-                              readOnly: true,
-                              onTap: () async {
-                                await _showSelectionBottomSheet(
-                                  context: context,
-                                  title: 'Select Education Type',
-                                  items: educationTypes,
-                                  onSelected: (id, value) {
-                                    setState(() {
-                                      selectedEducationTypeId = id;
-                                      _type.text = value;
-                                    });
-                                  },
-                                );
-                              },
-                              decoration: const InputDecoration(
-                                labelText: 'ប្រភេទ *',
-                                border: OutlineInputBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(12.0)),
-                                ),
-                                suffixIcon: Icon(Icons.arrow_drop_down),
-                              ),
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  // return 'Please select education type';
-                                  return AppLang.translate(
-                                      lang: settingProvider.lang ?? 'kh',
-                                      key: 'Please select education type');
-                                }
-                                return null;
+                              label:
+                                  '${AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'user_education_type')} *',
+                              items: educationTypes,
+                              selectedId:
+                                  selectedEducationTypeId, // Pass current selection
+                              onSelected: (id, value) {
+                                setState(() {
+                                  selectedEducationTypeId = id;
+                                  _type.text = value;
+                                });
                               },
                             ),
                             const SizedBox(height: 16),
-                            // Language Level
-                            TextFormField(
-                              controller: _languageLevel,
-                              readOnly: true,
-                              onTap: () async {
-                                await _showSelectionBottomSheet(
-                                  context: context,
-                                  title: 'Select Education Level',
-                                  items: educationLevels,
-                                  onSelected: (id, value) {
-                                    setState(() {
-                                      selectedEducationLevelId = id;
-                                      _languageLevel.text = value;
-                                    });
-                                  },
-                                );
-                              },
-                              decoration: const InputDecoration(
-                                labelText: 'កម្រិតភាសា *',
-                                border: OutlineInputBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(12.0)),
-                                ),
-                                suffixIcon: Icon(Icons.arrow_drop_down),
-                              ),
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return AppLang.translate(
-                                      lang: settingProvider.lang ?? 'kh',
-                                      key: 'Please select education level');
-                                }
-                                return null;
+                            // Education Level
+                            _buildSelectionField(
+                              controller: _educationLevel,
+                              label:
+                                  '${AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'user_educationLevel')} *',
+                              items: educationLevels,
+                              selectedId:
+                                  selectedEducationLevelId, // Pass current selection
+                              onSelected: (id, value) {
+                                setState(() {
+                                  selectedEducationLevelId = id;
+                                  _educationLevel.text = value;
+                                });
                               },
                             ),
                             const SizedBox(height: 16),
                             // Certificate
-                            TextFormField(
+                            _buildSelectionField(
                               controller: _certificate,
-                              readOnly: true,
-                              onTap: () async {
-                                await _showSelectionBottomSheet(
-                                  context: context,
-                                  title: 'ជ្រើសរើសប្រភេទសញ្ញាបត្រ',
-                                  items: certificateTypes,
-                                  onSelected: (id, value) {
-                                    setState(() {
-                                      selectedCertificateTypeId = id;
-                                      _certificate.text = value;
-                                    });
-                                  },
-                                );
-                              },
-                              decoration: const InputDecoration(
-                                labelText: 'សញ្ញាបត្រ *',
-                                border: OutlineInputBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(12.0)),
-                                ),
-                                suffixIcon: Icon(Icons.arrow_drop_down),
-                              ),
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return AppLang.translate(
-                                      lang: settingProvider.lang ?? 'kh',
-                                      key: 'Please select certificate type');
-                                }
-                                return null;
+                              label:
+                                  '${AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'certificate')} *',
+                              items: certificateTypes,
+                              selectedId:
+                                  selectedCertificateTypeId, // Pass current selection
+                              onSelected: (id, value) {
+                                setState(() {
+                                  selectedCertificateTypeId = id;
+                                  _certificate.text = value;
+                                });
                               },
                             ),
                             const SizedBox(height: 16),
-                            // Skill Level
-                            TextFormField(
+                            // Majors
+                            _buildSelectionField(
                               controller: _skill,
-                              readOnly: true,
-                              onTap: () async {
-                                await _showSelectionBottomSheet(
-                                  context: context,
-                                  title: 'Select Major',
-                                  items: majors,
-                                  onSelected: (id, value) {
-                                    setState(() {
-                                      selectedMajorId = id;
-                                      _skill.text = value;
-                                    });
-                                  },
-                                );
+                              label: AppLang.translate(
+                                  lang: settingProvider.lang ?? 'kh',
+                                  key: 'majors'),
+                              items: majors,
+                              selectedId:
+                                  selectedMajorId, // Pass current selection
+                              onSelected: (id, value) {
+                                setState(() {
+                                  selectedMajorId = id;
+                                  _skill.text = value;
+                                });
                               },
-                              decoration: const InputDecoration(
-                                labelText: 'ជំនាញ',
-                                border: OutlineInputBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(12.0)),
-                                ),
-                                suffixIcon: Icon(Icons.arrow_drop_down),
-                              ),
                             ),
                             const SizedBox(height: 16),
                             // School
-                            TextFormField(
+                            _buildSelectionField(
                               controller: _school,
-                              readOnly: true,
-                              onTap: () async {
-                                await _showSelectionBottomSheet(
-                                  context: context,
-                                  title: 'Select School',
-                                  items: schools,
-                                  onSelected: (id, value) {
-                                    setState(() {
-                                      selectedSchoolId = id;
-                                      _school.text = value;
-                                    });
-                                  },
-                                );
+                              label: AppLang.translate(
+                                  lang: settingProvider.lang ?? 'kh',
+                                  key: 'school'),
+                              items: schools,
+                              selectedId:
+                                  selectedSchoolId, // Pass current selection
+                              onSelected: (id, value) {
+                                setState(() {
+                                  selectedSchoolId = id;
+                                  _school.text = value;
+                                });
                               },
-                              decoration: const InputDecoration(
-                                labelText: 'គ្រឹះស្ថានសិក្សា',
-                                border: OutlineInputBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(12.0)),
-                                ),
-                                suffixIcon: Icon(Icons.arrow_drop_down),
-                              ),
                             ),
-
-                            // Place Study
                             const SizedBox(height: 16),
-                            TextFormField(
+                            // Place Study
+                            _buildSelectionField(
                               controller: _place,
-                              readOnly: true,
-                              onTap: () async {
-                                await _showSelectionBottomSheet(
-                                  context: context,
-                                  title: 'Select Education Place',
-                                  items: educationPlaces,
-                                  onSelected: (id, value) {
-                                    setState(() {
-                                      selectedEducationPlaceId = id;
-                                      _place.text = value;
-                                    });
-                                  },
-                                );
+                              label: AppLang.translate(
+                                  lang: settingProvider.lang ?? 'kh',
+                                  key: 'school place'),
+                              items: educationPlaces,
+                              selectedId:
+                                  selectedEducationPlaceId, // Pass current selection
+                              onSelected: (id, value) {
+                                setState(() {
+                                  selectedEducationPlaceId = id;
+                                  _place.text = value;
+                                });
                               },
-                              decoration: const InputDecoration(
-                                labelText: 'ទីកន្លែងសិក្សា',
-                                border: OutlineInputBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(12.0)),
-                                ),
-                                suffixIcon: Icon(Icons.arrow_drop_down),
-                              ),
                             ),
                             const SizedBox(height: 16),
 
@@ -326,10 +310,47 @@ class _CreateEducationScreenState extends State<CreateEducationScreen> {
                                     controller: _dateIn,
                                     readOnly: true,
                                     decoration: InputDecoration(
-                                      labelText: 'ថ្ងៃចូលសិក្សា',
-                                      border: const OutlineInputBorder(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(12.0)),
+                                      labelText: AppLang.translate(
+                                          lang: settingProvider.lang ?? 'kh',
+                                          key: 'enroll date'),
+                                      border: OutlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(12.0),
+                                        borderSide: BorderSide(
+                                            color: Colors
+                                                .blueGrey), // Normal border color
+                                      ),
+                                      enabledBorder: OutlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(12.0),
+                                        borderSide: BorderSide(
+                                            color: Colors
+                                                .blueGrey), // Enabled but not focused
+                                      ),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(12.0),
+                                        borderSide: BorderSide(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .primary, // Focused border color
+                                          width: 2.0,
+                                        ),
+                                      ),
+                                      errorBorder: OutlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(12.0),
+                                        borderSide: BorderSide(
+                                            color: Colors.red), // Error state
+                                      ),
+                                      focusedErrorBorder: OutlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(12.0),
+                                        borderSide: BorderSide(
+                                          color:
+                                              Colors.red, // Focused error state
+                                          width: 2.0,
+                                        ),
                                       ),
                                       suffixIcon: IconButton(
                                         icon: const Icon(Icons.calendar_today),
@@ -344,10 +365,48 @@ class _CreateEducationScreenState extends State<CreateEducationScreen> {
                                     controller: _dateOut,
                                     readOnly: true,
                                     decoration: InputDecoration(
-                                      labelText: 'ថ្ងៃបញ្ចប់',
-                                      border: const OutlineInputBorder(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(12.0)),
+                                      labelText: AppLang.translate(
+                                        lang: settingProvider.lang ?? 'kh',
+                                        key: 'graduated date',
+                                      ),
+                                      border: OutlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(12.0),
+                                        borderSide: BorderSide(
+                                            color: Colors
+                                                .blueGrey), // Normal border color
+                                      ),
+                                      enabledBorder: OutlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(12.0),
+                                        borderSide: BorderSide(
+                                            color: Colors
+                                                .blueGrey), // Enabled but not focused
+                                      ),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(12.0),
+                                        borderSide: BorderSide(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .primary, // Focused border color
+                                          width: 2.0,
+                                        ),
+                                      ),
+                                      errorBorder: OutlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(12.0),
+                                        borderSide: BorderSide(
+                                            color: Colors.red), // Error state
+                                      ),
+                                      focusedErrorBorder: OutlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(12.0),
+                                        borderSide: BorderSide(
+                                          color:
+                                              Colors.red, // Focused error state
+                                          width: 2.0,
+                                        ),
                                       ),
                                       suffixIcon: IconButton(
                                         icon: const Icon(Icons.calendar_today),
@@ -379,7 +438,18 @@ class _CreateEducationScreenState extends State<CreateEducationScreen> {
                     ),
                   ),
                   onPressed: () {
-                    _handleSubmit();
+                    showConfirmDialog(
+                      context,
+                      AppLang.translate(
+                          lang: settingProvider.lang ?? 'kh', key: 'create'),
+                      AppLang.translate(
+                          lang: settingProvider.lang ?? 'kh',
+                          key: 'Are you sure to create'),
+                      DialogType.primary,
+                      () {
+                        _handleSubmit();
+                      },
+                    );
                   },
                   child: Text(
                     AppLang.translate(
@@ -393,76 +463,184 @@ class _CreateEducationScreenState extends State<CreateEducationScreen> {
         }));
   }
 
-  //static data
-  final Map<String, String> educationTypes = {
-    '1': 'Formal Education',
-    '2': 'Vocational Training',
-    '3': 'Online Course',
-  };
+  Map<String, String> _buildEducationSelectionMap({
+    required dynamic apiData,
+    required String dataKey,
+    required SettingProvider settingProvider,
+  }) {
+    final dataSetUp = apiData?.data[dataKey];
 
-  final Map<String, String> educationLevels = {
-    '1': 'Primary',
-    '2': 'Secondary',
-    '3': 'Bachelor',
-    '4': 'Master',
-    '5': 'PhD',
-  };
+    if (dataSetUp == null || dataSetUp is! List) {
+      return {};
+    }
 
-  final Map<String, String> certificateTypes = {
-    '1': 'Diploma',
-    '2': 'Degree',
-    '3': 'Certificate',
-  };
+    Map<String, String> result = {};
 
-  final Map<String, String> majors = {
-    '1': 'Computer Science',
-    '2': 'Business Administration',
-    '3': 'Engineering',
-  };
+    for (var item in dataSetUp) {
+      if (item is Map<String, dynamic>) {
+        final id = item['id']?.toString();
+        final currentLang = settingProvider.lang ?? 'kh';
+        final name = currentLang == 'kh'
+            ? (item['name_kh']?.toString() ?? item['name_en']?.toString() ?? '')
+            : (item['name_en']?.toString() ??
+                item['name_kh']?.toString() ??
+                '');
 
-  final Map<String, String> schools = {
-    '1': 'University A',
-    '2': 'University B',
-    '3': 'College C',
-  };
+        if (id != null && name.isNotEmpty) {
+          result[id] = name;
+        }
+      }
+    }
 
-  final Map<String, String> educationPlaces = {
-    '1': 'Phnom Penh',
-    '2': 'Siem Reap',
-    '3': 'Battambang',
-  };
+    return result;
+  }
 
-  // Function to show bottom sheet for selection
+  // Reusable Selection Field widget
+  Widget _buildSelectionField({
+    required TextEditingController controller,
+    required String label,
+    required Map<String, String> items,
+    required void Function(String id, String value) onSelected,
+    String? selectedId, // Add selectedId parameter
+  }) {
+    return TextFormField(
+      controller: controller,
+      readOnly: true,
+      onTap: () async {
+        await _showSelectionBottomSheet(
+          context: context,
+          title: label,
+          items: items,
+          onSelected: onSelected,
+          //  selectedId: selectedEducationTypeId, // Pass current selection
+          selectedId: selectedId, // Pass current selection
+        );
+      },
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: TextStyle(color: Colors.blueGrey),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12.0),
+          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12.0),
+          borderSide: BorderSide(color: Colors.blueGrey),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12.0),
+          borderSide: BorderSide(
+              color: Theme.of(context).colorScheme.primary, width: 1.0),
+        ),
+        suffixIcon: Icon(Icons.arrow_drop_down,
+            color: Theme.of(context).colorScheme.primary),
+        filled: true,
+      ),
+    );
+  }
+
   Future<void> _showSelectionBottomSheet({
     required BuildContext context,
     required String title,
     required Map<String, String> items,
     required Function(String id, String value) onSelected,
+    String? selectedId, // Add selectedId parameter
   }) async {
     await showModalBottomSheet(
       context: context,
       builder: (context) {
         return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
               padding: const EdgeInsets.all(16.0),
-              child: Text(
-                title,
-                style:
-                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  // IconButton(
+                  //   icon: const Icon(Icons.close),
+                  //   onPressed: () => Navigator.pop(context),
+                  // ),
+                ],
               ),
             ),
             Expanded(
-              child: ListView(
-                children: items.entries
-                    .map((entry) => ListTile(
-                          title: Text(entry.value),
-                          onTap: () {
-                            onSelected(entry.key, entry.value);
-                            Navigator.pop(context);
-                          },
-                        ))
-                    .toList(),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16.0,
+                  vertical: 12.0,
+                ),
+                child: ListView.separated(
+                  itemCount: items.length,
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(height: 8.0),
+                  itemBuilder: (context, index) {
+                    final entry = items.entries.elementAt(index);
+                    final isSelected = selectedId == entry.key;
+
+                    return Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: () {
+                          onSelected(entry.key, entry.value);
+                          Navigator.pop(context);
+                        },
+                        borderRadius: BorderRadius.circular(16.0),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.surface,
+                            borderRadius: BorderRadius.circular(16.0),
+                            border: Border.all(
+                              color: isSelected
+                                  ? Theme.of(context).colorScheme.primary
+                                  : Colors.grey,
+                              width: isSelected ? 1.5 : 1.0,
+                            ),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20.0,
+                              vertical: 16.0,
+                            ),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    entry.value,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyLarge
+                                        ?.copyWith(
+                                          fontWeight: FontWeight.w500,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface,
+                                        ),
+                                  ),
+                                ),
+                                if (isSelected)
+                                  Icon(
+                                    Icons.check_circle,
+                                    color: Colors.green,
+                                    size: 24.0,
+                                  )
+                                
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
               ),
             ),
           ],
