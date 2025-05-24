@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_app/app_lang.dart';
 import 'package:mobile_app/providers/global/setting_provider.dart';
-import 'package:mobile_app/providers/sample_provider.dart';
+import 'package:mobile_app/providers/local/personalinfo/create_relative_provider.dart';
 import 'package:mobile_app/services/personal_info/create_service.dart';
 import 'package:provider/provider.dart';
 
@@ -16,7 +16,7 @@ class CreateRelativeScreen extends StatefulWidget {
 class _CreateRelativeScreenState extends State<CreateRelativeScreen> {
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
       GlobalKey<RefreshIndicatorState>();
-  Future<void> _refreshData(SampleProvider provider) async {
+  Future<void> _refreshData(CreateRelativeProvider provider) async {
     return await provider.getHome();
   }
 
@@ -71,8 +71,8 @@ class _CreateRelativeScreenState extends State<CreateRelativeScreen> {
         sexId: selectedGender ?? '',
         dob: _dobController.text.isNotEmpty ? _dobController.text.trim() : null,
         familyRoleId: selectedRelativeTypeId,
-        job: selectedJobId,
-        workPlace: selectedWorkPlaceId,
+        job: _jobController.text.trim().isNotEmpty?_jobController.text.trim():null,
+        workPlace: _workPlaceController.text.trim().isNotEmpty?_workPlaceController.text.trim():null,
         note: _noteController.text.isNotEmpty
             ? _noteController.text.trim()
             : null,
@@ -135,9 +135,10 @@ class _CreateRelativeScreenState extends State<CreateRelativeScreen> {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-        create: (_) => SampleProvider(),
-        child: Consumer2<SampleProvider, SettingProvider>(
-            builder: (context, evaluateProvider, settingProvider, child) {
+        create: (_) => CreateRelativeProvider(),
+        child: Consumer2<CreateRelativeProvider, SettingProvider>(
+            builder: (context, createRelativeProvider, settingProvider, child) {
+                final relativeTypes = _buildRelativeTypes(createRelativeProvider, settingProvider);
           return Scaffold(
             backgroundColor: Colors.grey[100],
             appBar: AppBar(
@@ -149,8 +150,8 @@ class _CreateRelativeScreenState extends State<CreateRelativeScreen> {
               key: _refreshIndicatorKey,
               color: Theme.of(context).colorScheme.primary,
               backgroundColor: Theme.of(context).colorScheme.surface,
-              onRefresh: () => _refreshData(evaluateProvider),
-              child: evaluateProvider.isLoading
+              onRefresh: () => _refreshData(createRelativeProvider),
+              child: createRelativeProvider.isLoading
                   ? const Center(child: CircularProgressIndicator())
                   : SingleChildScrollView(
                       physics: const AlwaysScrollableScrollPhysics(),
@@ -174,13 +175,14 @@ class _CreateRelativeScreenState extends State<CreateRelativeScreen> {
                                   _relativeTypeController.text = value;
                                 });
                               },
+                              
                             ),
                             const SizedBox(height: 24.0),
                             // Gender Selection
                             Text(
                               AppLang.translate(
                                   lang: settingProvider.lang ?? 'kh',
-                                  key: 'gender'),
+                                  key: 'user_info_sex'),
                               style: Theme.of(context)
                                   .textTheme
                                   .bodyLarge
@@ -225,26 +227,26 @@ class _CreateRelativeScreenState extends State<CreateRelativeScreen> {
                             // Name (Khmer)
                             _buildTextField(
                               controller: _firstNameController,
-                              label: AppLang.translate(
+                              label: '${AppLang.translate(
                                   lang: settingProvider.lang ?? 'kh',
-                                  key: 'name_kh'),
+                                  key: 'user_info_kh_name')} *',
                               validator: (value) => value!.isEmpty
                                   ? AppLang.translate(
                                       lang: settingProvider.lang ?? 'kh',
-                                      key: 'required_field')
+                                      key: 'please enter name_kh')
                                   : null,
                             ),
                             const SizedBox(height: 24.0),
                             // Name (Latin)
                             _buildTextField(
                               controller: _lastNameController,
-                              label: AppLang.translate(
+                              label: '${AppLang.translate(
                                   lang: settingProvider.lang ?? 'kh',
-                                  key: 'name_en'),
+                                  key: 'user_info_en_name')} *',
                               validator: (value) => value!.isEmpty
                                   ? AppLang.translate(
                                       lang: settingProvider.lang ?? 'kh',
-                                      key: 'required_field')
+                                      key: 'please enter name_en')
                                   : null,
                             ),
                             const SizedBox(height: 24.0),
@@ -262,34 +264,60 @@ class _CreateRelativeScreenState extends State<CreateRelativeScreen> {
                               ),
                             ),
                             const SizedBox(height: 24.0),
-                            // Job
-                            _buildSelectionField(
+                            // // Job
+                            // _buildSelectionField(
+                            //   controller: _jobController,
+                            //   label: AppLang.translate(
+                            //       lang: settingProvider.lang ?? 'kh',
+                            //       key: 'job'),
+                            //   items: jobTypes,
+                            //   onSelected: (id, value) {
+                            //     setState(() {
+                            //       selectedJobId = id;
+                            //       _jobController.text = value;
+                            //     });
+                            //   },
+                            // ),
+                            // const SizedBox(height: 24.0),
+                            // // Work Place
+                            // _buildSelectionField(
+                            //   controller: _workPlaceController,
+                            //   label: AppLang.translate(
+                            //       lang: settingProvider.lang ?? 'kh',
+                            //       key: 'work_place'),
+                            //   items: workPlaces,
+                            //   onSelected: (id, value) {
+                            //     setState(() {
+                            //       selectedWorkPlaceId = id;
+                            //       _workPlaceController.text = value;
+                            //     });
+                            //   },
+                            // ),
+
+                            // Name (Khmer)
+                            _buildTextField(
                               controller: _jobController,
                               label: AppLang.translate(
                                   lang: settingProvider.lang ?? 'kh',
                                   key: 'job'),
-                              items: jobTypes,
-                              onSelected: (id, value) {
-                                setState(() {
-                                  selectedJobId = id;
-                                  _jobController.text = value;
-                                });
-                              },
+                              // validator: (value) => value!.isEmpty
+                              //     ? AppLang.translate(
+                              //         lang: settingProvider.lang ?? 'kh',
+                              //         key: 'please enter name_kh')
+                              //     : null,
                             ),
                             const SizedBox(height: 24.0),
-                            // Work Place
-                            _buildSelectionField(
+                            // Name (Latin)
+                            _buildTextField(
                               controller: _workPlaceController,
                               label: AppLang.translate(
                                   lang: settingProvider.lang ?? 'kh',
                                   key: 'work_place'),
-                              items: workPlaces,
-                              onSelected: (id, value) {
-                                setState(() {
-                                  selectedWorkPlaceId = id;
-                                  _workPlaceController.text = value;
-                                });
-                              },
+                              // validator: (value) => value!.isEmpty
+                              //     ? AppLang.translate(
+                              //         lang: settingProvider.lang ?? 'kh',
+                              //         key: 'please enter name_en')
+                              //     : null,
                             ),
                             const SizedBox(height: 24.0),
                           ],
@@ -325,33 +353,60 @@ class _CreateRelativeScreenState extends State<CreateRelativeScreen> {
         }));
   }
 
-  //static data
-  final Map<String, String> relativeTypes = {
-    '1': 'ប្តី',
-    '2': 'ប្រពន្ធ',
-    '3': 'កូន',
-    '4': 'បងប្រុស',
-    '5': 'បងស្រី',
-    '6': 'ប្អូនប្រុស',
-    '7': 'ប្អូនស្រី',
-    '8': 'ឪពុក',
-    '9': 'ម្តាយ',
-  };
+  // //static data
+  // final Map<String, String> relativeTypes = {
+  //   '1': 'ប្តី',
+  //   '2': 'ប្រពន្ធ',
+  //   '3': 'កូន',
+  //   '4': 'បងប្រុស',
+  //   '5': 'បងស្រី',
+  //   '6': 'ប្អូនប្រុស',
+  //   '7': 'ប្អូនស្រី',
+  //   '8': 'ឪពុក',
+  //   '9': 'ម្តាយ',
+  // };
+   // Helper method to build relative types map
+  Map<String, String> _buildRelativeTypes(CreateRelativeProvider createRelativeProvider, SettingProvider settingProvider) {
+    final dataSetUp = createRelativeProvider.dataSetup?.data['family_role'];
+    
+    if (dataSetUp == null || dataSetUp is! List) {
+      return {}; // Return empty map if data is not available or not a list
+    }
+    
+    Map<String, String> types = {};
+    
+    for (var item in dataSetUp) {
+      if (item is Map<String, dynamic>) {
+        final id = item['id']?.toString();
+        // Use Khmer name based on current language, fallback to English
+        final currentLang = settingProvider.lang ?? 'kh';
+        final name = currentLang == 'kh' 
+            ? (item['name_kh']?.toString() ?? item['name_en']?.toString() ?? '')
+            : (item['name_en']?.toString() ?? item['name_kh']?.toString() ?? '');
+        
+        if (id != null && name.isNotEmpty) {
+          types[id] = name;
+        }
+      }
+    }
+    
+    return types;
+  }
 
-  final Map<String, String> jobTypes = {
-    '1': 'គ្រូបង្រៀន',
-    '2': 'វេជ្ជបណ្ឌិត',
-    '3': 'វិស្វករ',
-    '4': 'អ្នកគ្រប់គ្រង',
-    '5': 'អ្នកវិភាគ',
-  };
+  // final Map<String, String> jobTypes = {
+  //   '1': 'គ្រូបង្រៀន',
+  //   '2': 'វេជ្ជបណ្ឌិត',
+  //   '3': 'វិស្វករ',
+  //   '4': 'អ្នកគ្រប់គ្រង',
+  //   '5': 'អ្នកវិភាគ',
+  // };
 
-  final Map<String, String> workPlaces = {
-    '1': 'ក្រសួងអប់រំ',
-    '2': 'ក្រសួងសុខាភិបាល',
-    '3': 'ក្រុមហ៊ុនឯកជន',
-    '4': 'អង្គការអន្តរជាតិ',
-  };
+  // final Map<String, String> workPlaces = {
+  //   '1': 'ក្រសួងអប់រំ',
+  //   '2': 'ក្រសួងសុខាភិបាល',
+  //   '3': 'ក្រុមហ៊ុនឯកជន',
+  //   '4': 'អង្គការអន្តរជាតិ',
+  // };
 
   Widget _buildTextField({
     required TextEditingController controller,
