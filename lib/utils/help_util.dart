@@ -278,3 +278,34 @@ String convertToHoursMinutes({dynamic value}) {
     return 'N/A';
   }
 }
+
+// 19-05-2025 23:08
+String formatDateTime(String isoString) {
+  try {
+    DateTime parsedDate =
+        DateTime.parse(isoString).toLocal(); // Convert to local time
+    return DateFormat('dd-MM-yyyy HH:mm').format(parsedDate);
+  } catch (e) {
+    return ''; // or handle the error
+  }
+}
+
+List<dynamic> mapToList(Map<String, dynamic>? map) {
+  // Return empty list if map is null
+  if (map == null) return [];
+
+  try {
+    // Check if the map is empty
+    if (map.isEmpty) return [];
+
+    // Convert map values to list
+    return map.values.toList();
+  } catch (e) {
+    // Return empty list if conversion fails
+    return [];
+  }
+}
+
+
+// AppLang.translate(lang: settingProvider.lang ?? 'kh', data: data?['request']['request_category'])
+// getSafeString(value: formatDate(data?['request']['end_datetime']))

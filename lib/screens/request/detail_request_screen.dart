@@ -50,7 +50,7 @@ class _DetailRequestScreenState extends State<DetailRequestScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             // User Profile Card
-                            ...(data?['requesters'] as List).map(
+                            ...mapToList(data?['requesters']).map(
                               (record) {
                                 return Card(
                                   elevation: 0,
@@ -142,33 +142,48 @@ class _DetailRequestScreenState extends State<DetailRequestScreen> {
                             const SizedBox(height: 12),
 
                             // Leave Info
-                            _infoRow(Icons.calendar_today,
-                                '20-01-2025 ដល់ 23-01-2025', 'កាលបរិច្ឆេទ',
-                                trailing: '4 ថ្ងៃ'),
-                            _infoRow(Icons.category, 'ឈប់បញចក្រ (រយៈពេលខ្លី)',
+                            _infoRow(
+                                Icons.calendar_today,
+                                '${getSafeString(value: formatDate(data?['request']['start_datetime']))} ដល់ ${getSafeString(value: formatDate(data?['request']['end_datetime']))}',
+                                'កាលបរិច្ឆេទ',
+                                trailing:
+                                    '${getSafeInteger(value: data?['request']['num_day'])} ថ្ងៃ'),
+                            _infoRow(
+                                Icons.category,
+                                '${AppLang.translate(lang: settingProvider.lang ?? 'kh', data: data?['request']['request_category'])} (${AppLang.translate(lang: settingProvider.lang ?? 'kh', data: data?['request']['request_type'])})',
                                 'ប្រភេទ'),
-                            _infoRow(Icons.chat_bubble_outline, 'បញ្ចូលហេតុផល',
+                            _infoRow(
+                                Icons.chat_bubble_outline,
+                                getSafeString(
+                                    value: data?['request']['objective']),
                                 'មូលហេតុ'),
                             _infoRow(Icons.picture_as_pdf,
                                 'ឯកសារភ្ជាប់ស្នើសុំ.pdf', 'ឯកសារភ្ជាប់'),
-                            _infoRow(Icons.person, 'សុខា ប៉ាងថុល',
-                                'បុគ្គលដាក់ស្នើ | 1 ថ្ងៃមុន'),
+                            _infoRowWithAvatar(
+                              '${getSafeString(value: data?['request']?['creator']?['avatar']?['file_domain'])}${getSafeString(value: data?['request']?['creator']['avatar']['uri'])}',
+                              '${getSafeString(value: data?['request']?['creator']?['name_kh'])} (${getSafeString(value: data?['request']?['creator']?['name_en'])})',
+                              'អ្នកបង្កើត',
+                            ),
 
-                            _timelineEntry(
-                              title: 'ឯកភាព',
-                              date: '03-01-2025 19:20',
-                              userName: 'ប៉ាង សុភាពគុណ',
-                              role: 'អនុប្រធានផ្នែក (អនុ.គ)',
-                              content: 'អនុញ្ញាត ដើម្បីបន្តដំណើរស្នើសុំ',
-                            ),
-                            _timelineEntry(
-                              title: 'ត្រួតពិនិត្យ',
-                              date: '03-01-2025 19:05',
-                              userName: '...អ្នកដាក់ស្នើ...',
-                              role: '',
-                              content: 'បញ្ជូនសំណើ',
-                              icon: Icons.upload_file,
-                            ),
+                            ...mapToList(data?['request']?['request_reviewers'])
+                                .map((record) {
+                              return _timelineEntry(
+                                profileUrl:
+                                    '${getSafeString(value: record?['user']?['avatar']?['file_domain'])}${getSafeString(value: record?['user']?['avatar']['uri'])}',
+                                title: AppLang.translate(
+                                    lang: settingProvider.lang ?? 'kh',
+                                    data: record?['reviewer_type']),
+                                date: formatDateTime(record?['updated_at']),
+                                userName:
+                                    '${getSafeString(value: record?['user']?['salute']?['name_kh'])} ${getSafeString(value: record?['user']?['name_kh'])} (${getSafeString(value: record?['user']?['name_en'])})',
+                                role: AppLang.translate(
+                                    lang: settingProvider.lang ?? 'kh',
+                                    data: record?['user']?['user_work']
+                                        ?['position']),
+                                content:
+                                    getSafeString(value: record?['comment']),
+                              );
+                            }),
 
                             const SizedBox(height: 24),
 
@@ -315,6 +330,56 @@ class _DetailRequestScreenState extends State<DetailRequestScreen> {
     );
   }
 
+  Widget _infoRowWithAvatar(String avatarUrl, String title, String subtitle,
+      {String? trailing}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          CircleAvatar(
+            radius: 12,
+            backgroundImage: NetworkImage(avatarUrl),
+            backgroundColor: Colors.grey[300],
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        title,
+                        style: TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                    if (trailing != null)
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: Colors.indigo[100],
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          trailing,
+                          style: TextStyle(fontSize: 12, color: Colors.indigo),
+                        ),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(subtitle, style: TextStyle(color: Colors.grey[600])),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _infoRow(IconData icon, String title, String subtitle,
       {String? trailing}) {
     return Padding(
@@ -358,6 +423,7 @@ class _DetailRequestScreenState extends State<DetailRequestScreen> {
   }
 
   Widget _timelineEntry({
+    required String profileUrl,
     String? title,
     required String date,
     required String userName,
@@ -389,7 +455,7 @@ class _DetailRequestScreenState extends State<DetailRequestScreen> {
                   children: [
                     CircleAvatar(
                       radius: 14,
-                      backgroundImage: AssetImage('lib/assets/images/pp.png'),
+                      backgroundImage: NetworkImage(profileUrl),
                     ),
                     const SizedBox(width: 8),
                     Column(
