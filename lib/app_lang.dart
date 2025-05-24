@@ -72,6 +72,15 @@ class AppLang {
     'user_info_number': 'Home Number',
     'user_info_note': 'Note',
 
+    // Add Relative
+    'relative_type':'Relative Type',
+    'female':'Female',
+    'dob':'Date Of Birth',
+    'job':'Job',
+    'work_place':'Work Place',
+    'please enter name_en':'Please Enter English Name',
+    'please enter name_kh':'Please Enter Khmer Name',
+    'please select relative type':'Please Select Relative Type',
     // Add User Education
     'Please select certificate type': 'Please select certificate type',
     'Please select education level': 'Please select education level',
@@ -190,6 +199,16 @@ class AppLang {
     'user_info_number': 'ផ្ទះលេខ',
     'user_info_note': 'កំណត់សម្គាល់',
 
+    //Add Relative 
+    'relative_type':'ត្រូវជា',
+    'male':'ប្រុស',
+    'female':'ស្រី',
+    'dob':'ថ្ងៃខែឆ្នាំកំណើត',
+    'work_place':'ស្ថាប័ន',
+    'please enter name_en':'សូមបញ្ចូលឈ្មោះជាអក្សរឡាតាំង',
+    'please enter name_kh':'សូមបញ្ចូលឈ្មោះជាភាសារខ្មែរ',
+    'please select relative type':'សូមជ្រើសរើសប្រភេទសាច់ញ្ញាតិ',
+    'job':'មុខរបរ',
     // Add User Education
     'Please select education level': 'សូមជ្រើសរើសកម្រិតភាសា',
     'Please select certificate type': 'សូមជ្រើសរើសប្រភេទសញ្ញាបត្រ',
