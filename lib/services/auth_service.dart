@@ -1,10 +1,10 @@
 import 'package:dio/dio.dart';
-import 'package:mobile_app/error_type.dart';
+import 'package:mobile_app/models/response_structure_model.dart';
 import 'package:mobile_app/utils/dio.client.dart';
 import 'package:mobile_app/utils/help_util.dart';
 
 class AuthService {
-  Future<Map<String, dynamic>> login({
+  Future<ResponseStructure<Map<String, dynamic>>> login({
     required String username,
     required String password,
   }) async {
@@ -13,53 +13,15 @@ class AuthService {
         "/account/auth/login-password",
         data: {"credential": username, "password": password},
       );
-      return response.data;
-    } on DioException catch (dioError) {
-      if (dioError.response != null) {
-        printError(
-          errorMessage: ErrorType.requestError,
-          statusCode: dioError.response!.statusCode,
-        );
-        throw Exception(ErrorType.requestError);
-      } else {
-        printError(
-          errorMessage: ErrorType.networkError,
-          statusCode: null,
-        );
-        throw Exception(ErrorType.networkError);
-      }
-    } catch (e) {
-      printError(errorMessage: 'Something went wrong.', statusCode: 500);
-      throw Exception(ErrorType.unexpectedError);
-    }
-  }
-
-  Future<bool> checkAuth() async {
-    try {
-      final response = await DioClient.dio.get(
-        "/account/profile",
+      return ResponseStructure<Map<String, dynamic>>.fromJson(
+        response.data as Map<String, dynamic>,
+        dataFromJson: (json) => json,
       );
-      if (response.data['status_code'] == 200) {
-        return true;
-      }
-      return false;
-    } on DioException catch (dioError) {
-      if (dioError.response != null) {
-        printError(
-          errorMessage: ErrorType.requestError,
-          statusCode: dioError.response!.statusCode,
-        );
-        throw Exception(ErrorType.requestError);
-      } else {
-        printError(
-          errorMessage: ErrorType.networkError,
-          statusCode: null,
-        );
-        throw Exception(ErrorType.networkError);
-      }
+    } on DioException catch (_) {
+      rethrow;
     } catch (e) {
       printError(errorMessage: 'Something went wrong.', statusCode: 500);
-      throw Exception(ErrorType.unexpectedError);
+      rethrow;
     }
   }
 }

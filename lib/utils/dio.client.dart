@@ -26,7 +26,7 @@ class DioClient {
           // ✅ Inject token into requests
           String token = '';
           try {
-            token = await _storage.read(key: 'token') ?? '';
+            token = await _storage.read(key: 'access_token') ?? '';
           } catch (e) {
             print('Failed to read token: $e');
           }
@@ -53,13 +53,7 @@ class DioClient {
         onResponse: (response, handler) {
           print(
               "\x1B[36m🟢 onResponse Triggered! ${response.requestOptions.path}\x1B[0m");
-
-          if (response.statusCode == 200 || response.statusCode == 201) {
-            print("\x1B[32m✅ SUCCESS: ${response.requestOptions.path}\x1B[0m");
-          } else {
-            print(
-                "\x1B[33m⚠️ RESPONSE WARNING: ${response.statusCode} - ${response.statusMessage}\x1B[0m");
-          }
+          print("\x1B[32m✅ SUCCESS: ${response.requestOptions.path}\x1B[0m");
 
           return handler.next(response);
         },

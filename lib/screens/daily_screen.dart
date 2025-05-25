@@ -49,7 +49,7 @@ class DailyScreenState extends State<DailyScreen> {
       child: Consumer2<DailyProvider, SettingProvider>(
           builder: (context, scanProvider, settingProvider, child) {
         return Scaffold(
-          backgroundColor: Colors.grey[100],
+          backgroundColor: Color(0xFFF1F5F9),
           appBar: AppBar(
             title: GestureDetector(
               onTap: () {
@@ -171,17 +171,23 @@ class DailyScreenState extends State<DailyScreen> {
     required double percent,
   }) {
     return Container(
-      padding: const EdgeInsets.all(16.0),
-      margin: EdgeInsets.only(bottom: 8),
-      decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12.0),
-          border: Border.all(color: Colors.grey, width: 1)),
+      margin: const EdgeInsets.symmetric(vertical: 6),
+      clipBehavior: Clip.antiAlias,
+      decoration: ShapeDecoration(
+        color: Colors.white,
+        shape: RoundedRectangleBorder(
+          side: const BorderSide(
+            width: 1,
+            color: Color(0xFFCBD5E1),
+          ),
+          borderRadius: BorderRadius.circular(12),
+        ),
+      ),
       child: Row(
         children: [
           Container(
             width: 8.0,
-            height: 60.0,
+            height: 80.0,
             decoration: BoxDecoration(
               color: Colors.blue[700],
               borderRadius: const BorderRadius.horizontal(

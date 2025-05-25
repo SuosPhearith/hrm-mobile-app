@@ -49,7 +49,7 @@ class ScanScreenState extends State<ScanScreen> {
       child: Consumer2<ScanProvider, SettingProvider>(
           builder: (context, scanProvider, settingProvider, child) {
         return Scaffold(
-          backgroundColor: Colors.grey[100],
+          backgroundColor: Color(0xFFF1F5F9),
           appBar: AppBar(
             title: GestureDetector(
               onTap: () {
@@ -174,11 +174,18 @@ class ScanScreenState extends State<ScanScreen> {
   }) {
     return Container(
       padding: const EdgeInsets.all(16.0),
-      margin: EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12.0),
-          border: Border.all(color: Colors.grey, width: 1)),
+      margin: const EdgeInsets.symmetric(vertical: 6),
+      clipBehavior: Clip.antiAlias,
+      decoration: ShapeDecoration(
+        color: Colors.white,
+        shape: RoundedRectangleBorder(
+          side: const BorderSide(
+            width: 1,
+            color: Color(0xFFCBD5E1),
+          ),
+          borderRadius: BorderRadius.circular(12),
+        ),
+      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [

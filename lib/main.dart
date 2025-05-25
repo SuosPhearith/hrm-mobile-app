@@ -15,6 +15,7 @@ import 'package:mobile_app/screens/personal_info_screen.dart';
 import 'package:mobile_app/screens/request/create_request_screen.dart';
 import 'package:mobile_app/screens/request/detail_request_screen.dart';
 import 'package:mobile_app/screens/request_screen.dart';
+import 'package:mobile_app/screens/salary_screen.dart';
 import 'package:mobile_app/screens/scan_screen.dart';
 import 'package:mobile_app/screens/select_language_screen.dart';
 import 'package:mobile_app/screens/welcome_screen.dart';
@@ -66,7 +67,7 @@ class MyApp extends StatelessWidget {
         primaryColor: const Color(0xFF002458),
         colorScheme: const ColorScheme.light(
           primary: Color(0xFF002458),
-          secondary: Color(0xFFD4AD38),
+          secondary: Color(0xFF002458),
           surface: Colors.white,
         ),
         textTheme: const TextTheme(
@@ -81,7 +82,7 @@ class MyApp extends StatelessWidget {
         ),
         bottomNavigationBarTheme: BottomNavigationBarThemeData(
           backgroundColor: Colors.white,
-          selectedItemColor: const Color(0xFFD4AD38),
+          selectedItemColor: const Color(0xFF002458),
           unselectedItemColor: Colors.grey[600],
           selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600),
           unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500),
@@ -186,6 +187,10 @@ final GoRouter _router = GoRouter(
     GoRoute(
       path: AppRoutes.work,
       builder: (context, state) => const WorkScreen(),
+    ),
+    GoRoute(
+      path: AppRoutes.salary,
+      builder: (context, state) => const SalaryScreen(),
     ),
     GoRoute(
       path: '${AppRoutes.createRequest}/:id',

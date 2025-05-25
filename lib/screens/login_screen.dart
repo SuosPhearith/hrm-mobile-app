@@ -1,6 +1,9 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:mobile_app/app_routes.dart';
+import 'package:mobile_app/app_lang.dart';
+import 'package:mobile_app/providers/global/setting_provider.dart';
+import 'package:mobile_app/services/auth_service.dart';
+import 'package:mobile_app/utils/help_util.dart';
 import 'package:provider/provider.dart';
 import 'package:mobile_app/providers/global/auth_provider.dart';
 
@@ -15,6 +18,9 @@ class _LoginScreenState extends State<LoginScreen> {
   // Controllers for email and password
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+
+  bool isLoading = false;
+  Map<String, dynamic>? error;
 
   // For password visibility toggle
   bool _obscureText = true;
@@ -37,8 +43,8 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
-      child: Consumer<AuthProvider>(
-        builder: (context, authProvider, child) {
+      child: Consumer2<AuthProvider, SettingProvider>(
+        builder: (context, authProvider, setting, child) {
           return Scaffold(
             backgroundColor: Colors.white,
             body: Padding(
@@ -139,6 +145,11 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                         const SizedBox(height: 24),
+                        Text(
+                          AppLang.translate(
+                              lang: setting.lang ?? 'kh', data: error),
+                          style: TextStyle(color: Colors.red),
+                        ),
                         // Add bottom padding to ensure content isn't too close to the button
                         SizedBox(height: 20),
                       ],
@@ -153,16 +164,34 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: ElevatedButton(
                         onPressed: () async {
                           if (_emailController.text.isEmpty ||
-                              _passwordController.text.isEmpty ||
-                              authProvider.isLoading) {
+                              _passwordController.text.isEmpty) {
                             return;
                           }
-                          await authProvider.handleLogin(
-                            username: _emailController.text,
-                            password: _passwordController.text,
-                          );
-                          if (context.mounted) {
-                            context.push(AppRoutes.home);
+                          try {
+                            setState(() {
+                              isLoading = true;
+                            });
+                            final AuthService authService = AuthService();
+                            final res = await authService.login(
+                                username: _emailController.text,
+                                password: _passwordController.text);
+                            if (context.mounted) {
+                              Provider.of<AuthProvider>(context, listen: false)
+                                  .setSaveToken(true, res);
+                            }
+                          } catch (e) {
+                            if (e is DioException) {
+                              if (context.mounted) {
+                                setState(() {
+                                  error = parseErrorResponse(
+                                      e.response?.data)['message'];
+                                });
+                              }
+                            }
+                          } finally {
+                            setState(() {
+                              isLoading = false;
+                            });
                           }
                         },
                         style: ElevatedButton.styleFrom(
@@ -171,7 +200,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),
-                        child: !authProvider.isLoading
+                        child: !isLoading
                             ? Text(
                                 'ចូលប្រព័ន្ធ',
                                 style: TextStyle(
