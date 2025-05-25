@@ -65,7 +65,7 @@ class CreatePersonalService {
   }
 
   //create education for personal info
-  Future<String> createUserEducation({
+  Future<Map<String, dynamic>> createUserEducation({
     required String userId,
     required String educationTypeId,
     required String educationLevelId,
@@ -95,28 +95,15 @@ class CreatePersonalService {
         },
       );
       return response.data;
-    } on DioException catch (dioError) {
-      if (dioError.response != null) {
-        printError(
-          errorMessage: ErrorType.requestError,
-          statusCode: dioError.response!.statusCode,
-        );
-        throw Exception(ErrorType.requestError);
-      } else {
-        printError(
-          errorMessage: ErrorType.networkError,
-          statusCode: null,
-        );
-        throw Exception(ErrorType.networkError);
-      }
+    } on DioException catch (_) {
+      rethrow;
     } catch (e) {
-      printError(errorMessage: 'Something went wrong.', statusCode: 500);
-      throw Exception(ErrorType.unexpectedError);
+      rethrow;
     }
   }
 
   //create langauge for personal info
-  Future<String> createUserLanguage({
+  Future<Map<String, dynamic>> createUserLanguage({
     required String userId,
     required String languageId,
     required String speakingLevelId,
@@ -136,23 +123,10 @@ class CreatePersonalService {
         },
       );
       return response.data;
-    } on DioException catch (dioError) {
-      if (dioError.response != null) {
-        printError(
-          errorMessage: ErrorType.requestError,
-          statusCode: dioError.response!.statusCode,
-        );
-        throw Exception(ErrorType.requestError);
-      } else {
-        printError(
-          errorMessage: ErrorType.networkError,
-          statusCode: null,
-        );
-        throw Exception(ErrorType.networkError);
-      }
+    } on DioException catch (_) {
+      rethrow;
     } catch (e) {
-      printError(errorMessage: 'Something went wrong.', statusCode: 500);
-      throw Exception(ErrorType.unexpectedError);
+      rethrow;
     }
   }
 }

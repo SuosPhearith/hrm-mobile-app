@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:mobile_app/app_lang.dart';
 import 'package:mobile_app/providers/global/setting_provider.dart';
 import 'package:mobile_app/providers/local/personalinfo/create_relative_provider.dart';
-import 'package:mobile_app/services/personal_info/create_service.dart';
+import 'package:mobile_app/services/personal_info/create_personalinfo_service.dart';
 import 'package:mobile_app/utils/help_util.dart';
 import 'package:mobile_app/widgets/helper.dart';
 import 'package:provider/provider.dart';
@@ -60,8 +60,17 @@ class _CreateRelativeScreenState extends State<CreateRelativeScreen> {
       return;
     }
 
-    showConfirmDialogWithNavigation(context, 'confirm', 'c', DialogType.primary,
-        () async {
+    showConfirmDialogWithNavigation(
+        context,
+        AppLang.translate(
+            lang: Provider.of<SettingProvider>(context, listen: false).lang ??
+                'kh',
+            key: 'create'),
+        AppLang.translate(
+            lang: Provider.of<SettingProvider>(context, listen: false).lang ??
+                'kh',
+            key: 'Are you sure to create'),
+        DialogType.primary, () async {
       try {
         await _service.createUserFamily(
           userId: widget.id ?? '',
@@ -86,6 +95,8 @@ class _CreateRelativeScreenState extends State<CreateRelativeScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('ការស្នើសុំត្រូវបានបញ្ជូនដោយជោគជ័យ')),
           );
+          _clearAllFields();
+          
           context.pop();
         }
       } catch (e) {

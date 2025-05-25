@@ -1,9 +1,11 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mobile_app/app_lang.dart';
 import 'package:mobile_app/providers/global/setting_provider.dart';
 import 'package:mobile_app/providers/local/personalinfo/create_education_provider.dart';
-import 'package:mobile_app/services/personal_info/create_service.dart';
+import 'package:mobile_app/services/personal_info/create_personalinfo_service.dart';
+import 'package:mobile_app/utils/help_util.dart';
 import 'package:mobile_app/widgets/helper.dart';
 import 'package:provider/provider.dart';
 
@@ -62,9 +64,7 @@ class _CreateLanguageLevelState extends State<CreateLanguageLevel> {
       selectedListeningLevelId = null;
     });
   }
-
-  // Handle form submission
-  Future<void> _handleSubmit() async {
+  void _handleSubmit() async {
     if (!_formKey.currentState!.validate()) return;
 
     // Validate required fields
@@ -79,51 +79,45 @@ class _CreateLanguageLevelState extends State<CreateLanguageLevel> {
       return;
     }
 
-    try {
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => const Center(child: CircularProgressIndicator()),
-      );
-
-      final result = await _service.createUserLanguage(
-        userId: widget.id ?? '',
-        languageId: selectedLanguageId!,
-        speakingLevelId: selectedSpeakingLevelId!,
-        writingLevelId: selectedWritingLevelId!,
-        listeningLevelId: selectedListeningLevelId!,
-        readingLevelId: selectedReadingLevelId!,
-      );
-
-      if (!mounted) return;
-      Navigator.of(context).pop(); // Close loading dialog
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('បង្កើតបានជោគជ័យ')),
-      );
-      _clearAllControllers();
-
-      Navigator.of(context).pop(result); // Return to previous screen
-    } on DioException catch (dioError) {
-      if (!mounted) return;
-      Navigator.of(context).pop(); // Close loading dialog
-
-      String errorMessage = 'បញ្ហាក្នុងការបង្កើត';
-      if (dioError.response?.data != null) {
-        errorMessage += ': ${dioError.response?.data['message'] ?? ''}';
+    showConfirmDialogWithNavigation(
+        context,
+        AppLang.translate(
+            lang: Provider.of<SettingProvider>(context, listen: false).lang ??
+                'kh',
+            key: 'create'),
+        AppLang.translate(
+            lang: Provider.of<SettingProvider>(context, listen: false).lang ??
+                'kh',
+            key: 'Are you sure to create'),
+        DialogType.primary, () async {
+      try {
+        await _service.createUserLanguage(
+          userId: widget.id ?? '',
+          languageId: selectedLanguageId!,
+          speakingLevelId: selectedSpeakingLevelId!,
+          writingLevelId: selectedWritingLevelId!,
+          listeningLevelId: selectedListeningLevelId!,
+          readingLevelId: selectedReadingLevelId!,
+        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('ការស្នើសុំត្រូវបានបញ្ជូនដោយជោគជ័យ')),
+          );
+          _clearAllControllers();
+          context.pop();
+        }
+      } catch (e) {
+        if (e is DioException) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                  content: Text(parseErrorResponse(e.response?.data)['message']
+                      ?['name_kh'])),
+            );
+          }
+        }
       }
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(errorMessage)),
-      );
-    } catch (e) {
-      if (!mounted) return;
-      Navigator.of(context).pop(); // Close loading dialog
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('បញ្ហាមិនដឹងមូលហេតុ: ${e.toString()}')),
-      );
-    }
+    });
   }
 
   @override
@@ -278,18 +272,7 @@ class _CreateLanguageLevelState extends State<CreateLanguageLevel> {
                     ),
                   ),
                   onPressed: () {
-                    showConfirmDialog(
-                      context,
-                      AppLang.translate(
-                          lang: settingProvider.lang ?? 'kh', key: 'create'),
-                      AppLang.translate(
-                          lang: settingProvider.lang ?? 'kh',
-                          key: 'Are you sure to create'),
-                      DialogType.primary,
-                      () {
-                        _handleSubmit();
-                      },
-                    );
+                    _handleSubmit();
                   },
                   child: Text(
                     AppLang.translate(

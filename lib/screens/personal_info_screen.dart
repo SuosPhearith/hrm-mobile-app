@@ -24,9 +24,11 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
 
   final PersonalInfoService _service = PersonalInfoService();
   // delete relative
-  void _deleteRelative(int id) async {
+  void _deleteRelative(int id, PersonalInfoProvider provider) async {
     try {
       await _service.delete(id: id);
+      provider.getHome();
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -229,7 +231,8 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                                 description:
                                     '${formatDate(record['dob'])} • ${getSafeString(value: record?['job'])} • ${getSafeString(value: record?['work_place'])}',
                                 icon: Icons.person,
-                                onDelete: () => _deleteRelative(record['id']),
+                                onDelete: () =>
+                                    _deleteRelative(record['id'], provider),
                                 onUpdated: () {
                                   // Navigator.pop(context);
                                   context

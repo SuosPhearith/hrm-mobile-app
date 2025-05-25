@@ -1,8 +1,11 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mobile_app/app_lang.dart';
 import 'package:mobile_app/providers/global/setting_provider.dart';
 import 'package:mobile_app/providers/local/personalinfo/create_education_provider.dart';
-import 'package:mobile_app/services/personal_info/create_service.dart';
+import 'package:mobile_app/services/personal_info/create_personalinfo_service.dart';
+import 'package:mobile_app/utils/help_util.dart';
 import 'package:mobile_app/widgets/helper.dart';
 import 'package:provider/provider.dart';
 
@@ -69,8 +72,82 @@ class _CreateEducationScreenState extends State<CreateEducationScreen> {
     }
   }
 
-  // Handle form submission with step-by-step validation
-  Future<void> _handleSubmit() async {
+  // // Handle form submission with step-by-step validation
+  // Future<void> _handleSubmit() async {
+  // // First validate the form fields
+  // if (!_formKey.currentState!.validate()) {
+  //   return;
+  // }
+
+  // // Validate each field one by one and show first error encountered
+  // String? getFirstValidationError() {
+  //   if (selectedEducationTypeId == null || selectedEducationTypeId!.isEmpty) {
+  //     return 'Please select education type';
+  //   }
+  //   if (selectedEducationLevelId == null ||
+  //       selectedEducationLevelId!.isEmpty) {
+  //     return 'Please select education level';
+  //   }
+  //   if (_dateIn.text.isEmpty) {
+  //     return 'Start Date is required';
+  //   }
+  //   if (_dateOut.text.isEmpty) {
+  //     return 'End Date is required';
+  //   }
+  //   return null;
+  // }
+
+  // final errorMessage = getFirstValidationError();
+  // if (errorMessage != null) {
+  //   if (!mounted) return;
+  //   ScaffoldMessenger.of(context).showSnackBar(
+  //     SnackBar(
+  //       content: Text(
+  //         AppLang.translate(lang: 'kh', key: errorMessage),
+  //         style: const TextStyle(color: Colors.white),
+  //       ),
+  //       backgroundColor: Colors.red,
+  //       duration: const Duration(seconds: 3),
+  //     ),
+  //   );
+  //   return;
+  // }
+
+  //   // All validations passed - proceed with submission
+  //   try {
+  // final result = await _service.createUserEducation(
+  //   userId: widget.id ?? '',
+  //   educationTypeId: selectedEducationTypeId!,
+  //   educationLevelId: selectedEducationLevelId!,
+  //   certificateTypeId: selectedCertificateTypeId ?? '',
+  //   majorId: selectedMajorId ?? '',
+  //   schoolId: selectedSchoolId ?? '',
+  //   educationPlaceId: selectedEducationPlaceId ?? '',
+  //   studyAt: _dateIn.text,
+  //   graduateAt: _dateOut.text,
+  //   note: null,
+  //   attachmentId: null,
+  // );
+
+  //     if (!mounted) return;
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       const SnackBar(
+  //         content: Text('Education created successfully'),
+  //         backgroundColor: Colors.green,
+  //       ),
+  //     );
+  //     Navigator.pop(context, result);
+  //   } catch (e) {
+  //     if (!mounted) return;
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(
+  //         content: Text('Error: ${e.toString()}'),
+  //         backgroundColor: Colors.red,
+  //       ),
+  //     );
+  //   }
+  // }
+  void _handleSubmit() async {
     // First validate the form fields
     if (!_formKey.currentState!.validate()) {
       return;
@@ -110,39 +187,52 @@ class _CreateEducationScreenState extends State<CreateEducationScreen> {
       return;
     }
 
-    // All validations passed - proceed with submission
-    try {
-      final result = await _service.createUserEducation(
-        userId: widget.id ?? '',
-        educationTypeId: selectedEducationTypeId!,
-        educationLevelId: selectedEducationLevelId!,
-        certificateTypeId: selectedCertificateTypeId ?? '',
-        majorId: selectedMajorId ?? '',
-        schoolId: selectedSchoolId ?? '',
-        educationPlaceId: selectedEducationPlaceId ?? '',
-        studyAt: _dateIn.text,
-        graduateAt: _dateOut.text,
-        note: null,
-        attachmentId: null,
-      );
+    showConfirmDialogWithNavigation(
+        context,
+        AppLang.translate(
+            lang: Provider.of<SettingProvider>(context, listen: false).lang ??
+                'kh',
+            key: 'create'),
+        AppLang.translate(
+            lang: Provider.of<SettingProvider>(context, listen: false).lang ??
+                'kh',
+            key: 'Are you sure to create'),
+        DialogType.primary, () async {
+      try {
+        await _service.createUserEducation(
+          userId: widget.id ?? '',
+          educationTypeId: selectedEducationTypeId!,
+          educationLevelId: selectedEducationLevelId!,
+          certificateTypeId: selectedCertificateTypeId ?? '',
+          majorId: selectedMajorId ?? '',
+          schoolId: selectedSchoolId ?? '',
+          educationPlaceId: selectedEducationPlaceId ?? '',
+          studyAt: _dateIn.text,
+          graduateAt: _dateOut.text,
+          note: null,
+          attachmentId: null,
+        );
 
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Education created successfully'),
-          backgroundColor: Colors.green,
-        ),
-      );
-      Navigator.pop(context, result);
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error: ${e.toString()}'),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('ការស្នើសុំត្រូវបានបញ្ជូនដោយជោគជ័យ')),
+          );
+          // _clearAllFields();
+
+          context.pop();
+        }
+      } catch (e) {
+        if (e is DioException) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                  content: Text(parseErrorResponse(e.response?.data)['message']
+                      ?['name_kh'])),
+            );
+          }
+        }
+      }
+    });
   }
 
   @override
@@ -438,18 +528,7 @@ class _CreateEducationScreenState extends State<CreateEducationScreen> {
                     ),
                   ),
                   onPressed: () {
-                    showConfirmDialog(
-                      context,
-                      AppLang.translate(
-                          lang: settingProvider.lang ?? 'kh', key: 'create'),
-                      AppLang.translate(
-                          lang: settingProvider.lang ?? 'kh',
-                          key: 'Are you sure to create'),
-                      DialogType.primary,
-                      () {
-                        _handleSubmit();
-                      },
-                    );
+                    _handleSubmit();
                   },
                   child: Text(
                     AppLang.translate(
@@ -632,7 +711,6 @@ class _CreateEducationScreenState extends State<CreateEducationScreen> {
                                     color: Colors.green,
                                     size: 24.0,
                                   )
-                                
                               ],
                             ),
                           ),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_app/models/response_structure_model.dart';
-import 'package:mobile_app/services/personal_info/create_service.dart';
+import 'package:mobile_app/services/personal_info/create_personalinfo_service.dart';
 
 class CreateRelativeProvider extends ChangeNotifier {
   // Feilds

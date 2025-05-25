@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:mobile_app/app_lang.dart';
 import 'package:mobile_app/providers/global/setting_provider.dart';
 import 'package:mobile_app/providers/local/personalinfo/create_relative_provider.dart';
-import 'package:mobile_app/services/personal_info/create_service.dart';
+import 'package:mobile_app/services/personal_info/create_personalinfo_service.dart';
 import 'package:provider/provider.dart';
 
 class UpdateRelativeScreen extends StatefulWidget {
