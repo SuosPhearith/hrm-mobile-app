@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:mobile_app/models/pagination_structure_model.dart';
 import 'package:mobile_app/models/response_structure_model.dart';
 import 'package:mobile_app/services/home_service.dart';
@@ -46,18 +45,6 @@ class HomeProvider extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
     try {
-      // =================================================
-      final storage = FlutterSecureStorage();
-      final String loadedNameKh = await storage.read(key: 'name_kh') ?? '';
-      final String loadedNameEn = await storage.read(key: 'name_en') ?? '';
-      final String loadedEmail = await storage.read(key: 'avatar') ?? '';
-      final String loadedDepartKh =
-          await storage.read(key: 'department_kh') ?? '';
-      final String loadedDepartEn =
-          await storage.read(key: 'department_en') ?? '';
-      _name = {'name_kh': loadedNameKh, 'name_en': loadedNameEn};
-      _email = loadedEmail;
-      _department = {'name_kh': loadedDepartKh, 'name_en': loadedDepartEn};
       // =================================================
       final response = await _homeService.scanByDay();
       _scanByDayData = response;

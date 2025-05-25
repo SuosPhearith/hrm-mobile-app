@@ -20,4 +20,5 @@ class AppRoutes {
   static const String createEducation = '/create-education';
   static const String createLanguageLevel = '/create-langauge-level';
   static const String updateRelative = '/update-relative';
+  static const String salary = '/salary';
 }

@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 import 'package:mobile_app/app_lang.dart';
 import 'package:mobile_app/app_routes.dart';
+import 'package:mobile_app/providers/global/auth_provider.dart';
 import 'package:mobile_app/providers/global/setting_provider.dart';
 import 'package:mobile_app/providers/local/home_provider.dart';
 import 'package:mobile_app/utils/help_util.dart';
+import 'package:mobile_app/widgets/custom_progress_bar.dart';
 import 'package:mobile_app/widgets/skeleton.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
-import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:provider/provider.dart';
 
 // Main HomeScreen widget
@@ -43,10 +43,10 @@ class _HomeScreenState extends State<HomeScreen> {
       providers: [
         ChangeNotifierProvider(create: (_) => HomeProvider()),
       ],
-      child: Consumer2<HomeProvider, SettingProvider>(
-        builder: (context, homeProvider, settingProvider, child) {
+      child: Consumer3<AuthProvider, HomeProvider, SettingProvider>(
+        builder: (context, authProvider, homeProvider, settingProvider, child) {
           return Scaffold(
-            backgroundColor: Colors.grey[100],
+            backgroundColor: Color(0xFFF1F5F9),
             body: RefreshIndicator(
               key: _refreshIndicatorKey,
               color: Colors.blue[800],
@@ -58,7 +58,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       physics: const AlwaysScrollableScrollPhysics(),
                       child: Column(
                         children: [
-                          UserProfileHeader(homeProvider: homeProvider),
+                          UserProfileHeader(authProvider: authProvider),
                           DailyMonthlyView(
                             currentIndex: _currentIndex,
                             onPageChanged: (index) =>
@@ -87,9 +87,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
 // Widget for user profile header
 class UserProfileHeader extends StatelessWidget {
-  final HomeProvider homeProvider;
+  final AuthProvider authProvider;
 
-  const UserProfileHeader({super.key, required this.homeProvider});
+  const UserProfileHeader({super.key, required this.authProvider});
 
   @override
   Widget build(BuildContext context) {
@@ -102,15 +102,24 @@ class UserProfileHeader extends StatelessWidget {
           Flexible(
             child: Row(
               children: [
-                Container(
-                  width: 40.0,
-                  height: 40.0,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.grey[600],
-                  ),
-                  child: const Center(
-                    child: Icon(Icons.person, size: 30.0, color: Colors.white),
+                ClipOval(
+                  child: Image.network(
+                    '${authProvider.profile?.data['user']['avatar']['file_domain']}${authProvider.profile?.data['user']['avatar']['uri']}', // Replace with actual URL
+                    width: 40.0,
+                    height: 40.0,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) => Container(
+                      width: 40.0,
+                      height: 40.0,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.grey[600],
+                      ),
+                      child: const Center(
+                        child:
+                            Icon(Icons.person, size: 30.0, color: Colors.white),
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(width: 6.0),
@@ -120,7 +129,8 @@ class UserProfileHeader extends StatelessWidget {
                     children: [
                       Text(
                         AppLang.translate(
-                            data: homeProvider.name, lang: lang ?? 'kh'),
+                            data: authProvider.profile?.data['user'],
+                            lang: lang ?? 'kh'),
                         style: TextStyle(
                           fontSize:
                               Theme.of(context).textTheme.bodyLarge!.fontSize,
@@ -129,7 +139,9 @@ class UserProfileHeader extends StatelessWidget {
                       ),
                       Text(
                         AppLang.translate(
-                            data: homeProvider.department, lang: lang ?? 'kh'),
+                            data: authProvider.profile?.data['user']['roles'][0]
+                                ['role'],
+                            lang: lang ?? 'kh'),
                         style: TextStyle(
                           fontSize:
                               Theme.of(context).textTheme.bodySmall!.fontSize,
@@ -198,7 +210,7 @@ class DailyMonthlyView extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: SizedBox(
-        height: 220,
+        height: 240,
         child: Column(
           children: [
             Expanded(
@@ -211,6 +223,7 @@ class DailyMonthlyView extends StatelessWidget {
                     formatDateToDDMMYY: formatDateToDDMMYY,
                   ),
                   MonthlyView(homeProvider: homeProvider),
+                  // CardView(homeProvider: homeProvider),
                 ],
               ),
             ),
@@ -256,13 +269,12 @@ class DailyView extends StatelessWidget {
     final lang = Provider.of<SettingProvider>(context).lang;
     return Container(
       padding: const EdgeInsets.all(13.0),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Colors.white, Colors.grey[50]!],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+      decoration: ShapeDecoration(
+        color: Colors.white,
+        shape: RoundedRectangleBorder(
+          side: BorderSide(width: 1, color: const Color(0xFFCBD5E1)),
+          borderRadius: BorderRadius.circular(12),
         ),
-        borderRadius: BorderRadius.circular(16.0),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -279,24 +291,27 @@ class DailyView extends StatelessWidget {
                 ),
               ),
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10.0, vertical: 4.0),
-                decoration: BoxDecoration(
-                  color: Colors.grey[100],
-                  borderRadius: BorderRadius.circular(20.0),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                decoration: ShapeDecoration(
+                  color: const Color(0x0C1E293B),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
                 child: Row(
                   children: [
                     Text(
-                      DateFormat('dd-MM-yyyy').format(DateTime.now()),
+                      '03-03-2025',
                       style: TextStyle(
-                        fontSize:
-                            Theme.of(context).textTheme.bodySmall!.fontSize,
+                        color: const Color(0xFF64748B),
+                        fontSize: 12,
+                        fontFamily: 'Kantumruy Pro',
+                        fontWeight: FontWeight.w400,
                       ),
                     ),
-                    const SizedBox(width: 4.0),
+                    SizedBox(width: 4),
                     Icon(Icons.calendar_today,
-                        size: 16.0, color: Colors.grey[800]),
+                        size: 16, color: const Color(0xFF64748B)),
                   ],
                 ),
               ),
@@ -455,13 +470,12 @@ class MonthlyView extends StatelessWidget {
     final lang = Provider.of<SettingProvider>(context).lang;
     return Container(
       padding: const EdgeInsets.all(13.0),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Colors.white, Colors.grey[50]!],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+      decoration: ShapeDecoration(
+        color: Colors.white,
+        shape: RoundedRectangleBorder(
+          side: BorderSide(width: 1, color: const Color(0xFFCBD5E1)),
+          borderRadius: BorderRadius.circular(12),
         ),
-        borderRadius: BorderRadius.circular(16.0),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -478,24 +492,27 @@ class MonthlyView extends StatelessWidget {
                 ),
               ),
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10.0, vertical: 4.0),
-                decoration: BoxDecoration(
-                  color: Colors.grey[100],
-                  borderRadius: BorderRadius.circular(20.0),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                decoration: ShapeDecoration(
+                  color: const Color(0x0C1E293B),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
                 child: Row(
                   children: [
                     Text(
-                      DateFormat('MMMM yyyy', 'en_US').format(DateTime.now()),
+                      '03-03-2025',
                       style: TextStyle(
-                        fontSize:
-                            Theme.of(context).textTheme.bodySmall!.fontSize,
+                        color: const Color(0xFF64748B),
+                        fontSize: 12,
+                        fontFamily: 'Kantumruy Pro',
+                        fontWeight: FontWeight.w400,
                       ),
                     ),
-                    const SizedBox(width: 4.0),
+                    SizedBox(width: 4),
                     Icon(Icons.calendar_today,
-                        size: 16.0, color: Colors.grey[800]),
+                        size: 16, color: const Color(0xFF64748B)),
                   ],
                 ),
               ),
@@ -556,28 +573,203 @@ class MonthlyView extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 4.0),
-              LinearPercentIndicator(
-                padding: const EdgeInsets.symmetric(horizontal: 0.0),
-                lineHeight: 25.0,
-                center: Text(
-                  "${getHoursFromSumHour(homeProvider.scanByMonthData?.data['sum_hour'])} ${AppLang.translate(key: 'hour', lang: lang ?? 'kh')} / ${homeProvider.scanByMonthData?.data['max_hour'] ?? '...'} ${AppLang.translate(key: 'hour', lang: lang ?? 'kh')}",
-                  style: TextStyle(
-                    fontSize: Theme.of(context).textTheme.bodySmall!.fontSize,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                percent: clampToZeroOne(getSafeDouble(
-                    value: homeProvider.scanByMonthData?.data['percentage'])),
-                backgroundColor: Colors.grey[300],
-                progressColor: Colors.blue[400],
-                barRadius: const Radius.circular(4.0),
-                animation: true,
-                animationDuration: 500,
-              ),
+              // LinearPercentIndicator(
+              //   padding: const EdgeInsets.symmetric(horizontal: 0.0),
+              //   lineHeight: 25.0,
+              //   center: Text(
+              //     "${getHoursFromSumHour(homeProvider.scanByMonthData?.data['sum_hour'])} ${AppLang.translate(key: 'hour', lang: lang ?? 'kh')} / ${homeProvider.scanByMonthData?.data['max_hour'] ?? '...'} ${AppLang.translate(key: 'hour', lang: lang ?? 'kh')}",
+              //     style: TextStyle(
+              //       fontSize: Theme.of(context).textTheme.bodySmall!.fontSize,
+              //       fontWeight: FontWeight.w600,
+              //     ),
+              //   ),
+              //   percent: clampToZeroOne(getSafeDouble(
+              //       value: homeProvider.scanByMonthData?.data['percentage'])),
+              //   backgroundColor: Colors.grey[300],
+              //   progressColor: Colors.blue[400],
+              //   barRadius: const Radius.circular(4.0),
+              //   animation: true,
+              //   animationDuration: 500,
+              // ),
+              CustomProgressBar(
+                percent: getSafeDouble(
+                    value: homeProvider.scanByMonthData?.data['percentage']),
+                grade: getSafeString(
+                    value: homeProvider.scanByMonthData?.data['grade']),
+              )
             ],
           ),
         ],
       ),
+    );
+  }
+}
+
+class CardView extends StatelessWidget {
+  final HomeProvider homeProvider;
+
+  const CardView({super.key, required this.homeProvider});
+
+  @override
+  Widget build(BuildContext context) {
+    final lang = Provider.of<SettingProvider>(context).lang;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      clipBehavior: Clip.antiAlias,
+      decoration: ShapeDecoration(
+        color: Colors.white,
+        shape: RoundedRectangleBorder(
+          side: const BorderSide(
+            width: 1,
+            color: Color(0xFFCBD5E1),
+          ),
+          borderRadius: BorderRadius.circular(10),
+        ),
+      ),
+      child: IntrinsicHeight(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Profile Image Section
+            Column(
+              children: [
+                Container(
+                  width: 80,
+                  height: 80,
+                  decoration: ShapeDecoration(
+                    image: const DecorationImage(
+                      image: NetworkImage("https://placehold.co/80x80"),
+                      fit: BoxFit.cover,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(100),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Container(
+                  width: 56,
+                  height: 56,
+                  decoration: const BoxDecoration(
+                    image: DecorationImage(
+                      image: NetworkImage("https://placehold.co/56x56"),
+                      fit: BoxFit.fill,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(width: 16),
+            // Content Section
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Name and Title Section
+                  Container(
+                    padding: const EdgeInsets.only(bottom: 4),
+                    decoration: const ShapeDecoration(
+                      shape: RoundedRectangleBorder(
+                        side: BorderSide(
+                          width: 1,
+                          color: Color(0xFFDDAD01),
+                        ),
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'ខួច គឿន',
+                          style: TextStyle(
+                            color: Color(0xFF002458),
+                            fontSize: 16,
+                            fontFamily: 'Kantumruy Pro',
+                            fontWeight: FontWeight.w500,
+                            height: 1.50,
+                          ),
+                        ),
+                        const Text(
+                          'អនុប្រធានាយកដ្ឋាន | អគ្គលេខាធិការដ្ឋាន នៃ ក.អ.ក.',
+                          style: TextStyle(
+                            color: Color(0xFF0F172A),
+                            fontSize: 12,
+                            fontFamily: 'Kantumruy Pro',
+                            fontWeight: FontWeight.w500,
+                            height: 1.33,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  // Contact Information
+                  _buildContactRow(Icons.phone, '+855 96 541 6704'),
+                  const SizedBox(height: 4),
+                  _buildContactRow(Icons.phone_android, '+855 96 541 6704'),
+                  const SizedBox(height: 4),
+                  _buildContactRow(Icons.email, 'khouch.koeun@gmail.com'),
+                  const SizedBox(height: 4),
+                  _buildContactRow(
+                    Icons.location_on,
+                    'វិមានរាជរដ្ឋាភិបាល, តីរវិថីស៊ីសុវត្ថិ, វត្តភ្នំ, ភ្នំពេញ',
+                    isAddress: true,
+                  ),
+                ],
+              ),
+            ),
+            // Action Button
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: ShapeDecoration(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(100),
+                ),
+              ),
+              child: const Icon(
+                Icons.more_vert,
+                size: 24,
+                color: Color(0xFF64748B),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildContactRow(IconData icon, String text,
+      {bool isAddress = false}) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 16,
+          height: 16,
+          margin: const EdgeInsets.only(top: 2),
+          child: Icon(
+            icon,
+            size: 14,
+            color: const Color(0xFF64748B),
+          ),
+        ),
+        const SizedBox(width: 4),
+        Expanded(
+          child: Text(
+            text,
+            style: const TextStyle(
+              color: Color(0xFF0F172A),
+              fontSize: 12,
+              fontFamily: 'Kantumruy Pro',
+              fontWeight: FontWeight.w400,
+              height: 1.33,
+            ),
+            maxLines: isAddress ? 2 : 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ],
     );
   }
 }
@@ -704,7 +896,7 @@ class MenuGrid extends StatelessWidget {
       {
         'icon': Icons.monetization_on_outlined,
         'label': AppLang.translate(key: 'home_salary', lang: lang ?? 'kh'),
-        'route': null
+        'route': AppRoutes.salary
       },
       {
         'icon': Icons.account_box_outlined,
@@ -718,39 +910,52 @@ class MenuGrid extends StatelessWidget {
       },
     ];
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16.0),
+    return Container(
+      margin: const EdgeInsets.only(bottom: 25),
+      clipBehavior: Clip.antiAlias,
+      decoration: const BoxDecoration(color: Colors.white),
       child: GridView.count(
         crossAxisCount: 3,
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
-        crossAxisSpacing: 3.0,
-        mainAxisSpacing: 3.0,
-        childAspectRatio: 1.3,
+        mainAxisSpacing: 0,
+        crossAxisSpacing: 0,
+        childAspectRatio: 142 / 100,
         children: menuItems.map((item) {
           return GestureDetector(
             onTap: item['route'] != null
                 ? () => context.push(item['route'] as String)
                 : null,
             child: Container(
-              decoration: const BoxDecoration(color: Colors.white),
+              decoration: ShapeDecoration(
+                shape: RoundedRectangleBorder(
+                  side: BorderSide(
+                    width: 1,
+                    strokeAlign: BorderSide.strokeAlignCenter,
+                    color: const Color(0xFFF1F5F9),
+                  ),
+                ),
+              ),
               child: Column(
+                mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Icon(
                     item['icon'] as IconData,
-                    size: 24.0,
-                    color: Colors.grey[700],
+                    size: 24,
+                    color: Color(0xFF0F172A),
                   ),
-                  const SizedBox(height: 8.0),
+                  SizedBox(height: 12),
                   Text(
-                    item['label'] as String,
+                    '${item['label']}',
                     style: TextStyle(
-                      fontSize:
-                          Theme.of(context).textTheme.bodyMedium!.fontSize,
-                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF0F172A),
+                      fontSize: 16,
+                      fontFamily: 'Kantumruy Pro',
+                      fontWeight: FontWeight.w400,
+                      height: 1.50,
                     ),
-                    textAlign: TextAlign.center,
                   ),
                 ],
               ),
@@ -789,6 +994,7 @@ class RequestSection extends StatelessWidget {
       child: Column(
         children: [
           Container(
+            margin: EdgeInsets.only(bottom: 12),
             decoration: BoxDecoration(
               color: Colors.grey[200],
               borderRadius: BorderRadius.circular(20.0),
@@ -885,88 +1091,115 @@ class RequestCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final lang = Provider.of<SettingProvider>(context).lang;
+
     return Container(
       width: double.infinity,
-      margin: const EdgeInsets.only(top: 12.0),
-      padding: const EdgeInsets.all(10.0),
-      decoration: BoxDecoration(
+      margin: const EdgeInsets.symmetric(vertical: 6),
+      clipBehavior: Clip.antiAlias,
+      decoration: ShapeDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12.0),
-        border: Border.all(color: Colors.grey.shade200),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey[100]!,
-            blurRadius: 6,
-            offset: const Offset(0, 2),
+        shape: RoundedRectangleBorder(
+          side: const BorderSide(
+            width: 1,
+            color: Color(0xFFCBD5E1),
           ),
-        ],
+          borderRadius: BorderRadius.circular(12),
+        ),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                AppLang.translate(
-                    data: item['request_category'], lang: lang ?? 'kh'),
-                style: TextStyle(
-                  fontSize: Theme.of(context).textTheme.bodyMedium!.fontSize,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10.0, vertical: 4.0),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                      colors: [Colors.yellow[300]!, Colors.yellow[500]!]),
-                  borderRadius: BorderRadius.circular(20.0),
-                ),
-                child: Text(
-                  AppLang.translate(
-                      data: item['request_status'], lang: lang ?? 'kh'),
-                  style: TextStyle(
-                    fontSize: Theme.of(context).textTheme.bodySmall!.fontSize,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'P-12345',
+                    style: TextStyle(
+                      color: const Color(0xFF64748B),
+                      fontSize: 12,
+                      fontFamily: 'Kantumruy Pro',
+                      fontWeight: FontWeight.w400,
+                      height: 1.67,
+                    ),
                   ),
-                ),
-              ),
-            ],
-          ),
-          Row(
-            children: [
-              Text(
-                '${formatDate(item['start_datetime'])} to ${formatDate(item['end_datetime'])}',
-                style: TextStyle(
-                  fontSize: Theme.of(context).textTheme.bodySmall!.fontSize,
-                ),
-              ),
-              const SizedBox(width: 8.0),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10.0, vertical: 4.0),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                      colors: [Colors.blue[100]!, Colors.blue[200]!]),
-                  borderRadius: BorderRadius.circular(20.0),
-                ),
-                child: Text(
-                  calculateDateDifference(
-                      item['start_datetime'], item['end_datetime']),
-                  style: TextStyle(
-                    fontSize: Theme.of(context).textTheme.bodySmall!.fontSize,
-                    color: Colors.blue.shade800,
+                  const SizedBox(height: 4),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Flexible(
+                        child: Text(
+                          '20-01-2025 ដល់ 23-01-2025',
+                          style: TextStyle(
+                            color: const Color(0xFF0F172A),
+                            fontSize: 16,
+                            fontFamily: 'Kantumruy Pro',
+                            fontWeight: FontWeight.w400,
+                            height: 1.50,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 6, vertical: 2),
+                        decoration: ShapeDecoration(
+                          color: const Color(0x193B82F6),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                        ),
+                        child: Text(
+                          '4 ថ្ងៃ',
+                          style: TextStyle(
+                            color: const Color(0xFF3B82F6),
+                            fontSize: 10,
+                            fontFamily: 'Kantumruy Pro',
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'ច្បាប់ឈប់សម្រាក (រយះពេលខ្លី) | បញ្ហាសុខភាព',
+                    style: TextStyle(
+                      color: const Color(0xFF64748B),
+                      fontSize: 12,
+                      fontFamily: 'Kantumruy Pro',
+                      fontWeight: FontWeight.w400,
+                      height: 1.67,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 12),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              decoration: ShapeDecoration(
+                color: const Color(0x19F59E0B),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
                 ),
               ),
-            ],
-          ),
-          Text(
-            '${AppLang.translate(data: item['request_type'], lang: lang ?? 'kh')} | ${formatStringValue(item['objective'])}',
-            style: TextStyle(
-                fontSize: Theme.of(context).textTheme.bodySmall!.fontSize),
-          ),
-        ],
+              child: Text(
+                'កំពុងរង់ចាំ',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: const Color(0xFFF59E0B),
+                  fontSize: 10,
+                  fontFamily: 'Kantumruy Pro',
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

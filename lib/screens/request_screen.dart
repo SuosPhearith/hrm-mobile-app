@@ -5,6 +5,7 @@ import 'package:mobile_app/app_routes.dart';
 import 'package:mobile_app/providers/global/setting_provider.dart';
 import 'package:mobile_app/providers/local/request_provider.dart';
 import 'package:mobile_app/utils/help_util.dart';
+import 'package:mobile_app/widgets/custom_header.dart';
 import 'package:provider/provider.dart';
 
 class RequestScreen extends StatefulWidget {
@@ -29,8 +30,9 @@ class _RequestScreenState extends State<RequestScreen> {
         builder: (context, requestProvider, settingProvider, child) {
           final dataSetup = requestProvider.dataSetup?.data;
           return Scaffold(
-            backgroundColor: Colors.grey[100],
+            backgroundColor: Color(0xFFF1F5F9),
             appBar: AppBar(
+              bottom: CustomHeader(),
               title: Text(
                 AppLang.translate(
                   key: 'request',
@@ -225,79 +227,112 @@ class _RequestScreenState extends State<RequestScreen> {
   }) {
     return Container(
       width: double.infinity,
-      margin: const EdgeInsets.only(bottom: 12.0),
-      padding: const EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
+      margin: const EdgeInsets.symmetric(vertical: 6),
+      clipBehavior: Clip.antiAlias,
+      decoration: ShapeDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16.0),
-        border: Border.all(width: 1, color: Colors.grey),
+        shape: RoundedRectangleBorder(
+          side: const BorderSide(
+            width: 1,
+            color: Color(0xFFCBD5E1),
+          ),
+          borderRadius: BorderRadius.circular(12),
+        ),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                id,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    id,
+                    style: TextStyle(
+                      color: const Color(0xFF64748B),
+                      fontSize: 12,
+                      fontFamily: 'Kantumruy Pro',
+                      fontWeight: FontWeight.w400,
+                      height: 1.67,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Flexible(
+                        child: Text(
+                          dates,
+                          style: TextStyle(
+                            color: const Color(0xFF0F172A),
+                            fontSize: 14,
+                            fontFamily: 'Kantumruy Pro',
+                            fontWeight: FontWeight.w400,
+                            height: 1.50,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 6, vertical: 2),
+                        decoration: ShapeDecoration(
+                          color: const Color(0x193B82F6),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                        ),
+                        child: Text(
+                          days,
+                          style: TextStyle(
+                            color: const Color(0xFF3B82F6),
+                            fontSize: 10,
+                            fontFamily: 'Kantumruy Pro',
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    description,
+                    style: TextStyle(
+                      color: const Color(0xFF64748B),
+                      fontSize: 12,
+                      fontFamily: 'Kantumruy Pro',
+                      fontWeight: FontWeight.w400,
+                      height: 1.67,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 12),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              decoration: ShapeDecoration(
+                color: const Color(0x19F59E0B),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: Text(
+                status,
+                textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 12.0,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.grey.shade800,
+                  color: const Color(0xFFF59E0B),
+                  fontSize: 10,
+                  fontFamily: 'Kantumruy Pro',
+                  fontWeight: FontWeight.w500,
                 ),
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10.0,
-                  vertical: 4.0,
-                ),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.blue),
-                  borderRadius: BorderRadius.circular(20.0),
-                ),
-                child: Text(
-                  status,
-                  style: TextStyle(
-                    fontSize: 10.0,
-                    color: Colors.black87,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          Row(
-            children: [
-              Text(
-                dates,
-                style: TextStyle(fontSize: 14.0, color: Colors.grey.shade700),
-              ),
-              const SizedBox(width: 8.0),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 8.0,
-                  vertical: 2.0,
-                ),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.blue),
-                  borderRadius: BorderRadius.circular(20.0),
-                ),
-                child: Text(
-                  days,
-                  style: TextStyle(
-                    fontSize: 10.0,
-                    color: Colors.blue[800],
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          Text(
-            description,
-            style: TextStyle(fontSize: 14.0, color: Colors.grey.shade600),
-          ),
-        ],
+            ),
+          ],
+        ),
       ),
     );
   }

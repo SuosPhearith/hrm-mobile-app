@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:intl/intl.dart';
 
 void printError({required String? errorMessage, int? statusCode}) {
@@ -334,6 +336,53 @@ List<Map<String, int>> convertSelectedUsersToReviewers(
   return reviewers;
 }
 
+Map<DateTime, List<String>> convertToHolidaysMap(List<dynamic> jsonList) {
+  final Map<DateTime, List<String>> holidays = {};
+
+  for (var item in jsonList) {
+    // Parse the date string to DateTime
+    DateTime date = DateTime.parse(item['date']);
+    // Get the name and store it as a single-item list
+    String name = item['name'];
+    holidays[DateTime(date.year, date.month, date.day)] = [name];
+  }
+
+  return holidays;
+}
+
+Map<String, dynamic> parseErrorResponse(dynamic responseData) {
+  try {
+    if (responseData == null) {
+      return {};
+    }
+
+    // If it's already a Map<String, dynamic>
+    if (responseData is Map<String, dynamic>) {
+      return responseData;
+    }
+
+    // If it's a Map but not the right type, convert it
+    if (responseData is Map) {
+      return Map<String, dynamic>.from(responseData);
+    }
+
+    // If it's a JSON string, try to decode it
+    if (responseData is String) {
+      final decoded = json.decode(responseData);
+      if (decoded is Map<String, dynamic>) {
+        return decoded;
+      } else if (decoded is Map) {
+        return Map<String, dynamic>.from(decoded);
+      }
+    }
+
+    // If none of the above worked, return empty map
+    return {};
+  } catch (e) {
+    // If any parsing fails, return empty map
+    return {};
+  }
+}
 
 // AppLang.translate(lang: settingProvider.lang ?? 'kh', data: data?['request']['request_category'])
 // getSafeString(value: formatDate(data?['request']['end_datetime']))

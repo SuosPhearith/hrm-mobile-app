@@ -4,9 +4,8 @@ import 'package:mobile_app/models/response_structure_model.dart';
 import 'package:mobile_app/utils/dio.client.dart';
 import 'package:mobile_app/utils/help_util.dart';
 
-class AuthService {
-  Future<ResponseStructure<Map<String, dynamic>>> detail(
-      {required String id}) async {
+class HolidayService {
+  Future<ResponseStructure<Map<String, dynamic>>> holidays() async {
     try {
       final response = await DioClient.dio.get("/user/holiday");
       return ResponseStructure<Map<String, dynamic>>.fromJson(

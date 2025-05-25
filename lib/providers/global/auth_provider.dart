@@ -1,23 +1,26 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:mobile_app/services/auth_service.dart';
+import 'package:mobile_app/models/response_structure_model.dart';
+import 'package:mobile_app/utils/help_util.dart';
 
 class AuthProvider extends ChangeNotifier {
   // Feilds
-  bool _isLoading = false;
   String? _error;
   bool _isLoggedIn = false;
   bool _isChecking = false;
+  ResponseStructure<Map<String, dynamic>>? _profile;
 
   // Services
   final FlutterSecureStorage _storage = FlutterSecureStorage();
-  final AuthService _authService = AuthService();
+  final dio = Dio();
 
   // Getters
-  bool get isLoading => _isLoading;
   String? get error => _error;
   bool get isLoggedIn => _isLoggedIn;
   bool get isChecking => _isChecking;
+  ResponseStructure<Map<String, dynamic>>? get profile => _profile;
 
   // Setters
   void setIsChecking(bool value) {
@@ -30,84 +33,70 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setSaveToken(
+      bool value, ResponseStructure<Map<String, dynamic>> data) async {
+    await _storage.write(
+        key: 'access_token',
+        value: getSafeString(value: data.data['access_token']));
+    await _storage.write(
+        key: 'refresh_token',
+        value: getSafeString(value: data.data['refresh_token']));
+    _isLoggedIn = true;
+    notifyListeners();
+  }
+
   // Initialize
   AuthProvider() {
     handleCheckAuth();
-  }
-  // Login
-  Future<void> handleLogin(
-      {required String username, required String password}) async {
-    _isLoading = true;
-    notifyListeners();
-    try {
-      Map<String, dynamic> data =
-          await _authService.login(username: username, password: password);
-      await saveAuthData(data['data']);
-      _isLoggedIn = true;
-    } catch (e) {
-      _error = "Invalid Credential.";
-    } finally {
-      _isLoading = false;
-      notifyListeners();
-    }
   }
 
   // Logout
   Future<void> handleLogout() async {
     _isLoggedIn = false;
-    _storage.delete(key: 'token');
-    _storage.delete(key: 'lang');
+    _storage.delete(key: 'access_token');
     notifyListeners();
   }
 
   // Check Auth
-  Future<void> handleCheckAuth() async {
+  Future<bool> handleCheckAuth() async {
     try {
       _isChecking = true;
       notifyListeners();
-      _isLoggedIn = await _validateToken();
-      _isLoggedIn = true;
+
+      String token = await _storage.read(key: 'access_token') ?? '';
+      if (token.isEmpty) {
+        _isLoggedIn = false;
+        return false;
+      }
+
+      String apiUrl = dotenv.get('API_URL',
+          fallback: 'https://hrm-api.dev.camcyber.com/api/v1');
+      final response = await dio.get(
+        '$apiUrl/account/profile',
+        options: Options(
+          headers: {'Authorization': 'Bearer $token'},
+        ),
+      );
+
+      final profile = ResponseStructure<Map<String, dynamic>>.fromJson(
+        response.data as Map<String, dynamic>,
+        dataFromJson: (json) => json,
+      );
+
+      if (response.statusCode == 200 && response.data != null) {
+        _profile = profile;
+        _isLoggedIn = true;
+        return true;
+      } else {
+        _isLoggedIn = false;
+        return false;
+      }
     } catch (e) {
       _isLoggedIn = false;
+      return false;
     } finally {
       _isChecking = false;
       notifyListeners();
-    }
-  }
-
-  Future<bool> _validateToken() async {
-    // Verrify token in here
-    try {
-      return await _authService.checkAuth();
-    } catch (e) {
-      return false;
-    }
-  }
-
-  Future<void> saveAuthData(Map<String, dynamic> data) async {
-    try {
-      await _storage.write(key: 'token', value: data['access_token'] ?? '');
-      await _storage.write(
-          key: 'name_kh', value: data['user']['name_kh'] ?? '');
-      await _storage.write(
-          key: 'name_en', value: data['user']['name_en'] ?? '');
-      await _storage.write(
-          key: 'phone_number', value: data['user']['phone_number'] ?? '');
-      await _storage.write(key: 'email', value: data['user']['email'] ?? '');
-      await _storage.write(
-          key: 'department_kh',
-          value: data['user']['roles'][0]['department']['name_kh'] ?? '');
-      await _storage.write(
-          key: 'department_en',
-          value: data['user']['roles'][0]['department']['name_en'] ?? '');
-      await _storage.write(
-          key: 'salute', value: data['user']['salute']['name_kh'] ?? '');
-      await _storage.write(
-          key: 'avatar',
-          value:
-              "${data['user']['avatar']['file_domain']}${data['user']['avatar']['uri']}");
-    } catch (e) {
-      rethrow;
     }
   }
 }
