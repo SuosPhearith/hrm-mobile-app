@@ -7,10 +7,10 @@ import 'package:mobile_app/utils/dio.client.dart';
 import 'package:mobile_app/utils/help_util.dart';
 
 class CreatePersonalService {
-
   Future<ResponseStructure<Map<String, dynamic>>> dataSetup() async {
     try {
-      final response = await DioClient.dio.get("/shared/setup?models=family_role,education_type,certificate_type,language_level,major,school,province,education_level");
+      final response = await DioClient.dio.get(
+          "/shared/setup?models=family_role,education_type,certificate_type,language,language_level,major,school,province,education_level");
       return ResponseStructure<Map<String, dynamic>>.fromJson(
         response.data as Map<String, dynamic>,
         dataFromJson: (json) => json,
@@ -50,16 +50,16 @@ class CreatePersonalService {
           "name_kh": nameKh,
           "name_en": nameEn,
           "sex_id": sexId,
-          "dob":dob,
-          "family_role_id":familyRoleId,
-          "job":job,
-          "work_place":workPlace,
-          "note_":note,
+          "dob": dob,
+          "family_role_id": familyRoleId,
+          "job": job,
+          "work_place": workPlace,
+          "note_": note,
         },
       );
       log(response.data);
-      
-     return response.data;
+
+      return response.data;
     } on DioException catch (dioError) {
       if (dioError.response != null) {
         printError(
@@ -76,6 +76,7 @@ class CreatePersonalService {
       throw Exception(ErrorType.unexpectedError);
     }
   }
+
   //create education for personal info
   Future<String> createUserEducation({
     required String userId,
@@ -97,12 +98,12 @@ class CreatePersonalService {
           "education_type_id": educationTypeId,
           "education_level_id": educationLevelId,
           "certificate_type_id": certificateTypeId,
-          "major_id":majorId,
-          "school_id":schoolId,
-          "education_place_id":educationPlaceId,
-          "study_at":studyAt,
-          "graduate_at":graduateAt,
-          "note":note,
+          "major_id": majorId,
+          "school_id": schoolId,
+          "education_place_id": educationPlaceId,
+          "study_at": studyAt,
+          "graduate_at": graduateAt,
+          "note": note,
           // "attachment_id":attachmentId,
         },
       );
@@ -140,11 +141,11 @@ class CreatePersonalService {
       final response = await DioClient.dio.post(
         "/account/profile/$userId/user_language",
         data: {
-          "language_id": languageId,
-          "speaking_level_id": speakingLevelId,
-          "writing_level_id": writingLevelId,
-          "listening_level_id":listeningLevelId,
-          "reading_level_id":readingLevelId,
+          "language_id": int.tryParse(languageId) ?? 0,
+          "speaking_level_id": int.tryParse(speakingLevelId) ?? 0,
+          "writing_level_id": int.tryParse(writingLevelId) ?? 0,
+          "listening_level_id": int.tryParse(listeningLevelId) ?? 0,
+          "reading_level_id": int.tryParse(readingLevelId) ?? 0,
         },
       );
       return response.data;

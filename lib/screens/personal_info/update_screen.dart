@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mobile_app/app_lang.dart';
 import 'package:mobile_app/providers/global/setting_provider.dart';
 import 'package:mobile_app/providers/local/personalinfo/update_personal_info_provider.dart';
+import 'package:mobile_app/services/personal_info/update_personal_info_service.dart';
 import 'package:mobile_app/utils/help_util.dart';
 import 'package:provider/provider.dart';
 
@@ -19,6 +20,10 @@ class _UpdatePersonalInfoScreenState extends State<UpdatePersonalInfoScreen> {
   Future<void> _refreshData(UpdatePersonalInfoProvider provider) async {
     return await provider.getHome();
   }
+
+  final UpdatePersonalInfoService _service = UpdatePersonalInfoService();
+
+
 
   @override
   void dispose() {
@@ -65,6 +70,9 @@ class _UpdatePersonalInfoScreenState extends State<UpdatePersonalInfoScreen> {
     {"id": 1, "name_kh": "ប្រុស", "name_en": "Male"},
     {"id": 2, "name_kh": "ស្រី", "name_en": "Female"},
   ];
+
+
+  
 
   @override
   Widget build(BuildContext context) {
