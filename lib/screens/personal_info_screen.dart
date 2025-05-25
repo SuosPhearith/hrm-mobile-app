@@ -33,7 +33,7 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
               content:
                   Text(AppLang.translate(lang: 'kh', key: 'deleted success'))),
         );
-        
+
         // context.pop();
       }
     } catch (e) {
@@ -44,10 +44,11 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
       }
     }
   }
+
   //delete  education
-  void _deleteEducation(int id,int userID) async {
+  void _deleteEducation(int id, int userID) async {
     try {
-      await _service.deleteEducation(id: id,userId: userID);
+      await _service.deleteEducation(id: id, userId: userID);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -66,9 +67,9 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
   }
 
   //delete  language level
-  void _deleteLanuageLevel(int id,int userID) async {
+  void _deleteLanuageLevel(int id, int userID) async {
     try {
-      await _service.deleteLanguageLevel(id: id,userId: userID);
+      await _service.deleteLanguageLevel(id: id, userId: userID);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -229,6 +230,11 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                                     '${formatDate(record['dob'])} • ${getSafeString(value: record?['job'])} • ${getSafeString(value: record?['work_place'])}',
                                 icon: Icons.person,
                                 onDelete: () => _deleteRelative(record['id']),
+                                onUpdated: () {
+                                  // Navigator.pop(context);
+                                  context
+                                      .push('/update-relative/${record['id']}');
+                                },
                               );
                             }),
                             buildContainer(
@@ -253,7 +259,9 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                                 description:
                                     '• ${AppLang.translate(data: record['school'], lang: settingProvider.lang ?? 'kh')} \n• ${AppLang.translate(data: record['education_place'], lang: settingProvider.lang ?? 'kh')} \n• ${AppLang.translate(data: record['major'], lang: settingProvider.lang ?? 'kh')}\n• ${AppLang.translate(data: record['education_place'], lang: settingProvider.lang ?? 'kh')}\n• ${formatDate(record['study_at'])} | ${formatDate(record['graduate_at'])}',
                                 icon: Icons.person,
-                                onDelete: () =>_deleteEducation(record['id'],user['id']),
+                                onDelete: () =>
+                                    _deleteEducation(record['id'], user['id']),
+                                onUpdated: () {},
                               );
                             }),
 
@@ -283,7 +291,11 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                                 description:
                                     '🗣️${AppLang.translate(data: record['speaking_level'], lang: settingProvider.lang ?? 'kh')} ✍️${AppLang.translate(data: record['writing_level'], lang: settingProvider.lang ?? 'kh')} 📖${AppLang.translate(data: record['reading_level'], lang: settingProvider.lang ?? 'kh')} 🦻${AppLang.translate(data: record['listening_level'], lang: settingProvider.lang ?? 'kh')}',
                                 icon: Icons.flag,
-                                onDelete: () =>_deleteLanuageLevel(record['id'], user['id']),
+                                onDelete: () => _deleteLanuageLevel(
+                                    record['id'], user['id']),
+                                onUpdated: () {
+                                  // context.push('');
+                                },
                               );
                             }),
                             // buildProfileContainerAction(
@@ -456,6 +468,7 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
     required String name,
     required String description,
     required VoidCallback? onDelete,
+    required VoidCallback? onUpdated,
     IconData icon = Icons.person,
   }) {
     return Container(
@@ -486,7 +499,7 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
           IconButton(
             icon: Icon(Icons.edit, size: 20.0, color: Colors.grey),
             onPressed: () {
-              _showBottomSheet(context, onDelete!);
+              _showBottomSheet(context, onDelete!, onUpdated!);
             },
           ),
         ],
@@ -551,7 +564,8 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
   //     },
   //   );
   // }
-  void _showBottomSheet(BuildContext context, VoidCallback onDelete) {
+  void _showBottomSheet(
+      BuildContext context, VoidCallback onDelete, VoidCallback onUpdated) {
     final lang = Provider.of<SettingProvider>(context, listen: false).lang;
 
     showModalBottomSheet(
@@ -571,7 +585,8 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                 icon: Icons.edit,
                 label: AppLang.translate(key: 'update', lang: lang ?? 'kh'),
                 onTap: () {
-                  Navigator.pop(context);
+                  Navigator.pop(context); // Close the bottom sheet first
+                  onUpdated(); // Then execute the callback
                 },
               ),
               _buildBottomSheetOption(

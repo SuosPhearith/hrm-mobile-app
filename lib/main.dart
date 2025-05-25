@@ -10,6 +10,7 @@ import 'package:mobile_app/screens/holliday_screen.dart';
 import 'package:mobile_app/screens/personal_info/create_education_screen.dart';
 import 'package:mobile_app/screens/personal_info/create_language_level.dart';
 import 'package:mobile_app/screens/personal_info/create_relative_screen.dart';
+import 'package:mobile_app/screens/personal_info/update_relative_screen.dart';
 import 'package:mobile_app/screens/personal_info/update_screen.dart';
 import 'package:mobile_app/screens/personal_info_screen.dart';
 import 'package:mobile_app/screens/request/create_request_screen.dart';
@@ -227,6 +228,13 @@ final GoRouter _router = GoRouter(
       builder: (context, state) {
         final id = state.pathParameters['id'];
         return CreateLanguageLevel(id: id);
+      },
+    ),
+    GoRoute(
+      path: '${AppRoutes.updateRelative}/:id',
+      builder: (context, state) {
+        final id = state.pathParameters['id'];
+        return UpdateRelativeScreen(id: id);
       },
     ),
   ],

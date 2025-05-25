@@ -71,6 +71,7 @@ class AppLang {
     'user_info_street': 'Street',
     'user_info_number': 'Home Number',
     'user_info_note': 'Note',
+    'user_info_family_update':'Update Family',
 
     // Add Relative
     'relative_type':'Relative Type',
@@ -213,7 +214,7 @@ class AppLang {
     'user_info_street': 'ផ្លូវ',
     'user_info_number': 'ផ្ទះលេខ',
     'user_info_note': 'កំណត់សម្គាល់',
-
+    'user_info_family_update':'កែប្រែសាចញាតិ',
     //Add Relative 
     'relative_type':'ត្រូវជា',
     'male':'ប្រុស',
