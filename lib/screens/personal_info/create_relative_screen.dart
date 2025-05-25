@@ -1,9 +1,12 @@
-
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mobile_app/app_lang.dart';
 import 'package:mobile_app/providers/global/setting_provider.dart';
 import 'package:mobile_app/providers/local/personalinfo/create_relative_provider.dart';
 import 'package:mobile_app/services/personal_info/create_service.dart';
+import 'package:mobile_app/utils/help_util.dart';
+import 'package:mobile_app/widgets/helper.dart';
 import 'package:provider/provider.dart';
 
 class CreateRelativeScreen extends StatefulWidget {
@@ -57,47 +60,46 @@ class _CreateRelativeScreenState extends State<CreateRelativeScreen> {
       return;
     }
 
-    try {
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => const Center(child: CircularProgressIndicator()),
-      );
-
-      final result = await _service.createUserFamily(
-        userId: widget.id ?? '',
-        nameKh: _firstNameController.text.trim(),
-        nameEn: _lastNameController.text.trim(),
-        sexId: selectedGender ?? '',
-        dob: _dobController.text.isNotEmpty ? _dobController.text.trim() : null,
-        familyRoleId: selectedRelativeTypeId,
-        job: _jobController.text.trim().isNotEmpty
-            ? _jobController.text.trim()
-            : null,
-        workPlace: _workPlaceController.text.trim().isNotEmpty
-            ? _workPlaceController.text.trim()
-            : null,
-        note: _noteController.text.isNotEmpty
-            ? _noteController.text.trim()
-            : null,
-      );
-
-      if (!mounted) return;
-      Navigator.of(context).pop(); // Close loading dialog
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('បង្កើតបានជោគជ័យ')),
-      );
-      _clearAllFields();
-      Navigator.of(context).pop(result); // Return to previous screen
-    } catch (e) {
-      if (!mounted) return;
-      Navigator.of(context).pop(); // Close loading dialog
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('បញ្ហាមិនដឹងមូលហេតុ: ${e.toString()}')),
-      );
-    }
+    showConfirmDialogWithNavigation(context, 'confirm', 'c', DialogType.primary,
+        () async {
+      try {
+        await _service.createUserFamily(
+          userId: widget.id ?? '',
+          nameKh: _firstNameController.text.trim(),
+          nameEn: _lastNameController.text.trim(),
+          sexId: selectedGender ?? '',
+          dob: _dobController.text.isNotEmpty
+              ? _dobController.text.trim()
+              : null,
+          familyRoleId: selectedRelativeTypeId,
+          job: _jobController.text.trim().isNotEmpty
+              ? _jobController.text.trim()
+              : null,
+          workPlace: _workPlaceController.text.trim().isNotEmpty
+              ? _workPlaceController.text.trim()
+              : null,
+          note: _noteController.text.isNotEmpty
+              ? _noteController.text.trim()
+              : null,
+        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('ការស្នើសុំត្រូវបានបញ្ជូនដោយជោគជ័យ')),
+          );
+          context.pop();
+        }
+      } catch (e) {
+        if (e is DioException) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                  content: Text(parseErrorResponse(e.response?.data)['message']
+                      ?['name_kh'])),
+            );
+          }
+        }
+      }
+    });
   }
 
   @override
@@ -165,7 +167,7 @@ class _CreateRelativeScreenState extends State<CreateRelativeScreen> {
               backgroundColor: Theme.of(context).colorScheme.surface,
               onRefresh: () => _refreshData(createRelativeProvider),
               child: createRelativeProvider.isLoading
-                  ? const Center(child: CircularProgressIndicator())
+                  ? const Center(child: Text('Loading...'))
                   : SingleChildScrollView(
                       physics: const AlwaysScrollableScrollPhysics(),
                       padding: const EdgeInsets.all(16.0),

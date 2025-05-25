@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:dio/dio.dart';
 import 'package:mobile_app/error_type.dart';
 import 'package:mobile_app/models/response_structure_model.dart';
@@ -32,7 +30,7 @@ class CreatePersonalService {
     }
   }
 
-  Future<String> createUserFamily({
+  Future<Map<String, dynamic>> createUserFamily({
     required String userId,
     required String nameKh,
     required String nameEn,
@@ -57,23 +55,12 @@ class CreatePersonalService {
           "note_": note,
         },
       );
-      log(response.data);
 
       return response.data;
-    } on DioException catch (dioError) {
-      if (dioError.response != null) {
-        printError(
-          errorMessage: ErrorType.requestError,
-          statusCode: dioError.response!.statusCode,
-        );
-        throw Exception(ErrorType.requestError);
-      } else {
-        printError(errorMessage: ErrorType.networkError, statusCode: null);
-        throw Exception(ErrorType.networkError);
-      }
+    } on DioException catch (_) {
+      rethrow;
     } catch (e) {
-      printError(errorMessage: 'Something went wrong. $e', statusCode: 500);
-      throw Exception(ErrorType.unexpectedError);
+      rethrow;
     }
   }
 
