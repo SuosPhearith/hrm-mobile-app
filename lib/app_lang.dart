@@ -104,6 +104,8 @@ class AppLang {
     'enroll date':'Enroll Date',
     'graduated date':'Graduated Date',
     'Are you sure to create':'Are you sure to create?',
+    'Are you sure to update':'Are you sure to update',
+    'user_info_education_update':'Update Education',
     // Add User Language
     'speaking level': 'Speaking Level',
     'choose language': 'Choose Language',
@@ -113,6 +115,7 @@ class AppLang {
     'writting level':'Writting Level',
     'listenning level':'Listenning Level',
     'user_language_level':'Language Level',
+    'user_info_language_update':'Update User Language',
     // Work 
     'work':'Work',
     'id_number': 'ID Number',
@@ -247,6 +250,8 @@ class AppLang {
     'enroll date':'ថ្ងៃចូលសិក្សា',
     'graduated date':'ថ្ងៃបញ្ចប់',
    'Are you sure to create':'តើអ្នកប្រកដទេថាចង់បង្កើត?',
+   'Are you sure to update':'តើអ្នកប្រកដទេថាចង់កែប្រែ?',
+   'user_info_education_update':'កែប្រែការសិក្សា',
     //Add User Language
     'speaking level': 'កម្រិតនិយាយ',
     'please select level': 'សូមជ្រើសរើសកម្រិត',
@@ -256,6 +261,8 @@ class AppLang {
     'writting level':'កម្រិតសរសេរ',
     'listenning level':'កម្រិតស្ដាប់',
     'user_language_level':'កម្រិតភាសា',
+    'user_info_language_update':'កែប្រែកម្រិតភាសា',
+    
 
     //Work 
     'work': 'ការងារ',
@@ -283,6 +290,7 @@ class AppLang {
     'work_experience_add':'បន្ថែមប្រវត្តិការងារ',
     'medals_add':'បន្ថែមឥស្សរយស',
     'medals':'ឥស្សរយស'
+    
     // Layout ================================================
   };
 

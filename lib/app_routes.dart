@@ -19,6 +19,9 @@ class AppRoutes {
   static const String createUserRelative = '/create-user-relative'; // dynamic
   static const String createEducation = '/create-education';
   static const String createLanguageLevel = '/create-langauge-level';
+  static const String createWorkHistory = '/create-work-history';
+  static const String updateEducation = '/update-education';
   static const String updateRelative = '/update-relative';
+  static const String updateLanguageLevel = '/update-langauge-level';
   static const String salary = '/salary';
 }

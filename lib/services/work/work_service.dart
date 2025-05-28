@@ -4,11 +4,11 @@ import 'package:mobile_app/models/response_structure_model.dart';
 import 'package:mobile_app/utils/dio.client.dart';
 import 'package:mobile_app/utils/help_util.dart';
 
-class CreatePersonalService {
+class CreateWorkService {
   Future<ResponseStructure<Map<String, dynamic>>> dataSetup() async {
     try {
       final response = await DioClient.dio.get(
-          "/shared/setup?models=family_role,education_type,certificate_type,language,language_level,major,school,province,education_level");
+          "/shared/setup?models=position,department");
       return ResponseStructure<Map<String, dynamic>>.fromJson(
         response.data as Map<String, dynamic>,
         dataFromJson: (json) => json,

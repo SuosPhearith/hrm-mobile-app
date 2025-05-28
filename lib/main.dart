@@ -10,6 +10,8 @@ import 'package:mobile_app/screens/holliday_screen.dart';
 import 'package:mobile_app/screens/personal_info/create_education_screen.dart';
 import 'package:mobile_app/screens/personal_info/create_language_level.dart';
 import 'package:mobile_app/screens/personal_info/create_relative_screen.dart';
+import 'package:mobile_app/screens/personal_info/update_education_screen.dart';
+import 'package:mobile_app/screens/personal_info/update_language_level_screen.dart';
 import 'package:mobile_app/screens/personal_info/update_relative_screen.dart';
 import 'package:mobile_app/screens/personal_info/update_screen.dart';
 import 'package:mobile_app/screens/personal_info_screen.dart';
@@ -20,6 +22,7 @@ import 'package:mobile_app/screens/salary_screen.dart';
 import 'package:mobile_app/screens/scan_screen.dart';
 import 'package:mobile_app/screens/select_language_screen.dart';
 import 'package:mobile_app/screens/welcome_screen.dart';
+import 'package:mobile_app/screens/work/create_work_history_screen.dart';
 import 'package:mobile_app/screens/work_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:mobile_app/app_routes.dart';
@@ -236,10 +239,43 @@ final GoRouter _router = GoRouter(
       },
     ),
     GoRoute(
-      path: '${AppRoutes.updateRelative}/:id',
+      path: '${AppRoutes.createWorkHistory}/:id',
       builder: (context, state) {
         final id = state.pathParameters['id'];
-        return UpdateRelativeScreen(id: id);
+        return CreateWorkHistoryScreen(id: id);
+      },
+    ),
+    GoRoute(
+      path: '${AppRoutes.updateRelative}/:userId/:familyId',
+      builder: (context, state) {
+        final String userId = state.pathParameters['userId']!;
+        final String familyId = state.pathParameters['familyId']!;
+        return UpdateRelativeScreen(
+          userId: userId,
+          familyId: familyId,
+        );
+      },
+    ),
+    GoRoute(
+      path: '${AppRoutes.updateEducation}/:userId/:educationId',
+      builder: (context, state) {
+        final String userId = state.pathParameters['userId']!;
+        final String educationId = state.pathParameters['educationId']!;
+        return UpdateEducationScreen(
+          userId: userId,
+          educationId: educationId,
+        );
+      },
+    ),
+    GoRoute(
+      path: '${AppRoutes.updateLanguageLevel}/:userId/:userLanguageId',
+      builder: (context, state) {
+        final String userId = state.pathParameters['userId']!;
+        final String userLanguageId = state.pathParameters['userLanguageId']!;
+        return UpdateLanguageLevelScreen(
+          id: userId,
+         userLanguageId: userLanguageId,
+        );
       },
     ),
   ],

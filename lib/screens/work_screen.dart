@@ -290,7 +290,7 @@ class _WorkScreenState extends State<WorkScreen> {
                                   key: 'work_experience_add'),
                               icon: Icons.work_history,
                               onEditTap: () {
-                                context.push('/create-education/${user['id']}');
+                                context.push('/create-work-history/${user['id']}');
                               },
                             ),
                             ...(user?['user_work']['user_medals'] != null
