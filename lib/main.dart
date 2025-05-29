@@ -22,7 +22,10 @@ import 'package:mobile_app/screens/salary_screen.dart';
 import 'package:mobile_app/screens/scan_screen.dart';
 import 'package:mobile_app/screens/select_language_screen.dart';
 import 'package:mobile_app/screens/welcome_screen.dart';
+import 'package:mobile_app/screens/work/create_user_medal_screen.dart';
 import 'package:mobile_app/screens/work/create_work_history_screen.dart';
+import 'package:mobile_app/screens/work/update_user_medal_screen.dart';
+import 'package:mobile_app/screens/work/update_work_history_screen.dart';
 import 'package:mobile_app/screens/work_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:mobile_app/app_routes.dart';
@@ -245,6 +248,13 @@ final GoRouter _router = GoRouter(
         return CreateWorkHistoryScreen(id: id);
       },
     ),
+     GoRoute(
+      path: '${AppRoutes.createUserMedal}/:id',
+      builder: (context, state) {
+        final id = state.pathParameters['id'];
+        return CreateUserMedalScreen(id: id);
+      },
+    ),
     GoRoute(
       path: '${AppRoutes.updateRelative}/:userId/:familyId',
       builder: (context, state) {
@@ -275,6 +285,28 @@ final GoRouter _router = GoRouter(
         return UpdateLanguageLevelScreen(
           id: userId,
          userLanguageId: userLanguageId,
+        );
+      },
+    ),
+    GoRoute(
+      path: '${AppRoutes.updateWorkHistory}/:userId/:workId',
+      builder: (context, state) {
+        final String userId = state.pathParameters['userId']!;
+        final String userWorkId = state.pathParameters['workId']!;
+        return UpdateWorkHistoryScreen(
+          id: userId,
+         workId: userWorkId,
+        );
+      },
+    ),
+    GoRoute(
+      path: '${AppRoutes.updateUserMedal}/:userId/:medalId',
+      builder: (context, state) {
+        final String userId = state.pathParameters['userId']!;
+        final String medalId = state.pathParameters['medalId']!;
+        return UpdateUserMedalScreen(
+          id: userId,
+         userMedalId: medalId,
         );
       },
     ),

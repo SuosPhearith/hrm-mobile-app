@@ -144,6 +144,33 @@ class _UpdateEducationScreenState extends State<UpdateEducationScreen> {
       });
     }
   }
+  // Add this helper method to convert DD-MM-YYYY to YYYY-MM-DD
+  String convertDateForApi(String dateString) {
+    if (dateString.isEmpty) return '';
+
+    try {
+      // Check if it's already in YYYY-MM-DD format
+      if (RegExp(r'^\d{4}-\d{2}-\d{2}$').hasMatch(dateString)) {
+        return dateString;
+      }
+
+      // Handle DD-MM-YYYY format
+      if (RegExp(r'^\d{2}-\d{2}-\d{4}$').hasMatch(dateString)) {
+        List<String> parts = dateString.split('-');
+        String day = parts[0];
+        String month = parts[1];
+        String year = parts[2];
+        return '$year-$month-$day';
+      }
+
+      // Try to parse as DateTime and format
+      DateTime date = DateTime.parse(dateString);
+      return "${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
+    } catch (e) {
+      print('Date conversion error: $e');
+      return dateString; // Return original if conversion fails
+    }
+  }
 
   void _handleSubmit() async {
     // First validate the form fields
@@ -206,8 +233,8 @@ class _UpdateEducationScreenState extends State<UpdateEducationScreen> {
           majorId: selectedMajorId ?? '',
           schoolId: selectedSchoolId ?? '',
           educationPlaceId: selectedEducationPlaceId ?? '',
-          studyAt: _dateIn.text,
-          graduateAt: _dateOut.text,
+          studyAt:convertDateForApi (_dateIn.text),
+          graduateAt: convertDateForApi(_dateOut.text),
           note: null,
           attachmentId: null,
         );

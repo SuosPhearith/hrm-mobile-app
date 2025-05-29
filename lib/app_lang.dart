@@ -141,7 +141,16 @@ class AppLang {
     'work_experience':'Work Experience',
     'work_experience_add':'Add Work Experience',
     'medals_add':'Add Medal',
-    'medals':'Medal'
+    'medals':'Medal',
+    'work_experience_update':'Update Work History',
+    // create work history 
+    'Please select institution':'Please select institution',
+    'Please select department':'Please select department',
+
+    //create user medal
+    'given date':'Given date',
+    'throught':'Throught',
+    'update_user_medal':'Update Medal', 
     // Layout ================================================
   };
 
@@ -289,8 +298,19 @@ class AppLang {
     'work_experience':'ប្រវត្តិការងារ',
     'work_experience_add':'បន្ថែមប្រវត្តិការងារ',
     'medals_add':'បន្ថែមឥស្សរយស',
-    'medals':'ឥស្សរយស'
-    
+    'medals':'ឥស្សរយស',
+    'work_experience_update':'កែប្រែប្រវត្តិការងារ',
+
+    //create user work
+    'start_date':'ថ្ងៃចាប់ផ្ដើម',
+    'end_date':'ថ្ងៃបញ្ចប់',
+    'institutions':'ស្ថាប័ន',
+    'Please select institution':'សូមជ្រើសរើសស្ថាប័ន',
+    'Please select department':'សូមជ្រើសរើសនាយកដ្ឋាន',
+    //create user medal
+    'given date':'ថ្ងៃផ្ដល់',
+    'throught':'តាមរយៈ',
+    'update_user_medal':'កែប្រែឥស្សរយស'
     // Layout ================================================
   };
 
