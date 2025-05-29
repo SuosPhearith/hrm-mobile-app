@@ -3,57 +3,59 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile_app/app_lang.dart';
 import 'package:mobile_app/providers/global/setting_provider.dart';
-import 'package:mobile_app/providers/local/personalinfo/create_education_provider.dart';
-import 'package:mobile_app/services/personal_info/create_personalinfo_service.dart';
+import 'package:mobile_app/providers/local/work/create_work_provider.dart';
+
+import 'package:mobile_app/services/work/create_work_service.dart';
 import 'package:mobile_app/utils/help_util.dart';
 import 'package:mobile_app/widgets/helper.dart';
 import 'package:provider/provider.dart';
 
-class CreateEducationScreen extends StatefulWidget {
-  const CreateEducationScreen({super.key, this.id});
+class CreateWorkHistoryScreen extends StatefulWidget {
+  const CreateWorkHistoryScreen({super.key, this.id});
   final String? id;
 
   @override
-  State<CreateEducationScreen> createState() => _CreateEducationScreenState();
+  State<CreateWorkHistoryScreen> createState() =>
+      _CreateWorkHistoryScreenState();
 }
 
-class _CreateEducationScreenState extends State<CreateEducationScreen> {
+class _CreateWorkHistoryScreenState extends State<CreateWorkHistoryScreen> {
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
       GlobalKey<RefreshIndicatorState>();
-  Future<void> _refreshData(CreateEducationProvider provider) async {
+  Future<void> _refreshData(CreateWorkProvider provider) async {
     return await provider.getHome();
   }
 
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _dateIn = TextEditingController();
   final TextEditingController _dateOut = TextEditingController();
-  final TextEditingController _type = TextEditingController();
-  final TextEditingController _certificate = TextEditingController();
-  final TextEditingController _educationLevel = TextEditingController();
-  final TextEditingController _skill = TextEditingController();
-  final TextEditingController _school = TextEditingController();
+  final TextEditingController _rankPossition = TextEditingController();
+  final TextEditingController _organization = TextEditingController();
+  final TextEditingController _department = TextEditingController();
+  final TextEditingController _office = TextEditingController();
+  final TextEditingController _possition = TextEditingController();
   final TextEditingController _place = TextEditingController();
 
   // service
-  final CreatePersonalService _service = CreatePersonalService();
+  final CreateWorkService _service = CreateWorkService();
 
   // Variables to store selected IDs
-  String? selectedEducationTypeId;
-  String? selectedEducationLevelId;
-  String? selectedCertificateTypeId;
-  String? selectedMajorId;
-  String? selectedSchoolId;
-  String? selectedEducationPlaceId;
+  String? selectedPlaceId;
+  String? selectedOganizationId;
+  String? selecteddepartmentId;
+  String? selectedOfficeId;
+  String? selectedpossitionId;
+  String? selectedRankPositionId;
 
   @override
   void dispose() {
     _dateIn.dispose();
-    _type.dispose();
-    _educationLevel.dispose();
+    _rankPossition.dispose();
+    _department.dispose();
     _dateOut.dispose();
-    _certificate.dispose();
-    _skill.dispose();
-    _school.dispose();
+    _organization.dispose();
+    _office.dispose();
+    _possition.dispose();
     _place.dispose();
     super.dispose();
   }
@@ -72,7 +74,6 @@ class _CreateEducationScreenState extends State<CreateEducationScreen> {
     }
   }
 
-  
   void _handleSubmit() async {
     // First validate the form fields
     if (!_formKey.currentState!.validate()) {
@@ -81,12 +82,11 @@ class _CreateEducationScreenState extends State<CreateEducationScreen> {
 
     // Validate each field one by one and show first error encountered
     String? getFirstValidationError() {
-      if (selectedEducationTypeId == null || selectedEducationTypeId!.isEmpty) {
-        return 'Please select education type';
+      if (selectedPlaceId == null || selectedPlaceId!.isEmpty) {
+        return 'Please select institution';
       }
-      if (selectedEducationLevelId == null ||
-          selectedEducationLevelId!.isEmpty) {
-        return 'Please select education level';
+      if (selecteddepartmentId == null || selecteddepartmentId!.isEmpty) {
+        return 'Please select department';
       }
       if (_dateIn.text.isEmpty) {
         return 'Start Date is required';
@@ -125,18 +125,16 @@ class _CreateEducationScreenState extends State<CreateEducationScreen> {
             key: 'Are you sure to create'),
         DialogType.primary, () async {
       try {
-        await _service.createUserEducation(
+        await _service.createUserWorkHistory(
           userId: widget.id ?? '',
-          educationTypeId: selectedEducationTypeId!,
-          educationLevelId: selectedEducationLevelId!,
-          certificateTypeId: selectedCertificateTypeId ?? '',
-          majorId: selectedMajorId ?? '',
-          schoolId: selectedSchoolId ?? '',
-          educationPlaceId: selectedEducationPlaceId ?? '',
-          studyAt: _dateIn.text,
-          graduateAt: _dateOut.text,
-          note: null,
-          attachmentId: null,
+          departmentId: selecteddepartmentId!,
+          organizatioId: selectedOganizationId!,
+          generalDepartmentId: null,
+          officeId:selectedOfficeId,
+          positionId: selectedpossitionId,
+          rankPositionId: selectedRankPositionId,
+          startWorkingAt: _dateIn.text,
+          stopWorkingAt: _dateOut.text,
         );
 
         if (mounted) {
@@ -164,51 +162,32 @@ class _CreateEducationScreenState extends State<CreateEducationScreen> {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-        create: (_) => CreateEducationProvider(),
-        child: Consumer2<CreateEducationProvider, SettingProvider>(builder:
-            (context, createEducationProvider, settingProvider, child) {
-          final educationTypes = _buildEducationSelectionMap(
-            apiData: createEducationProvider.data,
-            dataKey: 'education_types',
-            settingProvider: settingProvider,
-          );
-
-          final educationLevels = _buildEducationSelectionMap(
-            apiData: createEducationProvider.data,
-            dataKey: 'education_levels',
-            settingProvider: settingProvider,
-          );
-
-          final certificateTypes = _buildEducationSelectionMap(
-              apiData: createEducationProvider.data,
-              dataKey: 'certificate_types',
+        create: (_) => CreateWorkProvider(),
+        child: Consumer2<CreateWorkProvider, SettingProvider>(
+            builder: (context, provider, settingProvider, child) {
+          final department = _buildEducationSelectionMap(
+              apiData: provider.dataSetup,
+              dataKey: 'departments',
               settingProvider: settingProvider);
-          final majors = _buildEducationSelectionMap(
-              apiData: createEducationProvider.data,
-              dataKey: 'majors',
-              settingProvider: settingProvider);
-          final schools = _buildEducationSelectionMap(
-              apiData: createEducationProvider.data,
-              dataKey: 'schools',
-              settingProvider: settingProvider);
-          final educationPlaces = _buildEducationSelectionMap(
-              apiData: createEducationProvider.data,
-              dataKey: 'education_places',
+          final position = _buildEducationSelectionMap(
+              apiData: provider.dataSetup,
+              dataKey: 'positions',
               settingProvider: settingProvider);
 
           return Scaffold(
             backgroundColor: Colors.grey[100],
             appBar: AppBar(
               title: Text(AppLang.translate(
-                  lang: 'kh', key: 'user_info_education_add')),
+                  lang: settingProvider.lang ?? 'kh',
+                  key: 'work_experience_add')),
               centerTitle: true,
             ),
             body: RefreshIndicator(
               key: _refreshIndicatorKey,
               color: Colors.blue[800],
               backgroundColor: Colors.white,
-              onRefresh: () => _refreshData(createEducationProvider),
-              child: createEducationProvider.isLoading
+              onRefresh: () => _refreshData(provider),
+              child: provider.isLoading
                   ? const Center(child: Text('Loading...'))
                   : SingleChildScrollView(
                       physics: const AlwaysScrollableScrollPhysics(),
@@ -218,106 +197,6 @@ class _CreateEducationScreenState extends State<CreateEducationScreen> {
                         child: Column(
                           children: [
                             const SizedBox(height: 10),
-                            // Education Type
-                            _buildSelectionField(
-                              controller: _type,
-                              label:
-                                  '${AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'user_education_type')} *',
-                              items: educationTypes,
-                              selectedId:
-                                  selectedEducationTypeId, // Pass current selection
-                              onSelected: (id, value) {
-                                setState(() {
-                                  selectedEducationTypeId = id;
-                                  _type.text = value;
-                                });
-                              },
-                            ),
-                            const SizedBox(height: 16),
-                            // Education Level
-                            _buildSelectionField(
-                              controller: _educationLevel,
-                              label:
-                                  '${AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'user_educationLevel')} *',
-                              items: educationLevels,
-                              selectedId:
-                                  selectedEducationLevelId, // Pass current selection
-                              onSelected: (id, value) {
-                                setState(() {
-                                  selectedEducationLevelId = id;
-                                  _educationLevel.text = value;
-                                });
-                              },
-                            ),
-                            const SizedBox(height: 16),
-                            // Certificate
-                            _buildSelectionField(
-                              controller: _certificate,
-                              label:
-                                  '${AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'certificate')} *',
-                              items: certificateTypes,
-                              selectedId:
-                                  selectedCertificateTypeId, // Pass current selection
-                              onSelected: (id, value) {
-                                setState(() {
-                                  selectedCertificateTypeId = id;
-                                  _certificate.text = value;
-                                });
-                              },
-                            ),
-                            const SizedBox(height: 16),
-                            // Majors
-                            _buildSelectionField(
-                              controller: _skill,
-                              label: AppLang.translate(
-                                  lang: settingProvider.lang ?? 'kh',
-                                  key: 'majors'),
-                              items: majors,
-                              selectedId:
-                                  selectedMajorId, // Pass current selection
-                              onSelected: (id, value) {
-                                setState(() {
-                                  selectedMajorId = id;
-                                  _skill.text = value;
-                                });
-                              },
-                            ),
-                            const SizedBox(height: 16),
-                            // School
-                            _buildSelectionField(
-                              controller: _school,
-                              label: AppLang.translate(
-                                  lang: settingProvider.lang ?? 'kh',
-                                  key: 'school'),
-                              items: schools,
-                              selectedId:
-                                  selectedSchoolId, // Pass current selection
-                              onSelected: (id, value) {
-                                setState(() {
-                                  selectedSchoolId = id;
-                                  _school.text = value;
-                                });
-                              },
-                            ),
-                            const SizedBox(height: 16),
-                            // Place Study
-                            _buildSelectionField(
-                              controller: _place,
-                              label: AppLang.translate(
-                                  lang: settingProvider.lang ?? 'kh',
-                                  key: 'school place'),
-                              items: educationPlaces,
-                              selectedId:
-                                  selectedEducationPlaceId, // Pass current selection
-                              onSelected: (id, value) {
-                                setState(() {
-                                  selectedEducationPlaceId = id;
-                                  _place.text = value;
-                                });
-                              },
-                            ),
-                            const SizedBox(height: 16),
-
                             // Date Picker Row
                             Row(
                               children: [
@@ -328,7 +207,9 @@ class _CreateEducationScreenState extends State<CreateEducationScreen> {
                                     decoration: InputDecoration(
                                       labelText: AppLang.translate(
                                           lang: settingProvider.lang ?? 'kh',
-                                          key: 'enroll date'),
+                                          key: 'start_date'),
+                                      labelStyle:
+                                          TextStyle(color: Colors.blueGrey),
                                       border: OutlineInputBorder(
                                         borderRadius:
                                             BorderRadius.circular(12.0),
@@ -383,8 +264,10 @@ class _CreateEducationScreenState extends State<CreateEducationScreen> {
                                     decoration: InputDecoration(
                                       labelText: AppLang.translate(
                                         lang: settingProvider.lang ?? 'kh',
-                                        key: 'graduated date',
+                                        key: 'end_date',
                                       ),
+                                      labelStyle:
+                                          TextStyle(color: Colors.blueGrey),
                                       border: OutlineInputBorder(
                                         borderRadius:
                                             BorderRadius.circular(12.0),
@@ -433,6 +316,112 @@ class _CreateEducationScreenState extends State<CreateEducationScreen> {
                                 ),
                               ],
                             ),
+                            SizedBox(
+                              height: 16,
+                            ),
+                            //Institution
+                            _buildSelectionField(
+                              controller: _place,
+                              label: AppLang.translate(
+                                  lang: settingProvider.lang ?? 'kh',
+                                  key: 'institutions'),
+                              items: department,
+                              selectedId:
+                                  selectedPlaceId, // Pass current selection
+                              onSelected: (id, value) {
+                                setState(() {
+                                  selectedPlaceId = id;
+                                  _place.text = value;
+                                });
+                              },
+                            ),
+                            const SizedBox(height: 16),
+                            // Oganization
+                            _buildSelectionField(
+                              controller: _organization,
+                              label: AppLang.translate(
+                                  lang: settingProvider.lang ?? 'kh',
+                                  key: 'organization'),
+                              items: department,
+                              selectedId:
+                                  selectedOganizationId, // Pass current selection
+                              onSelected: (id, value) {
+                                setState(() {
+                                  selectedOganizationId = id;
+                                  _organization.text = value;
+                                });
+                              },
+                            ),
+
+                            const SizedBox(height: 16),
+                            // Department
+                            _buildSelectionField(
+                              controller: _department,
+                              label: AppLang.translate(
+                                  lang: settingProvider.lang ?? 'kh',
+                                  key: 'department'),
+                              items: department,
+                              selectedId:
+                                  selecteddepartmentId, // Pass current selection
+                              onSelected: (id, value) {
+                                setState(() {
+                                  selecteddepartmentId = id;
+                                  _department.text = value;
+                                });
+                              },
+                            ),
+                            const SizedBox(height: 16),
+                            // Office
+                            _buildSelectionField(
+                              controller: _office,
+                              label: AppLang.translate(
+                                  lang: settingProvider.lang ?? 'kh',
+                                  key: 'office'),
+                              items: department,
+                              selectedId:
+                                  selectedOfficeId, // Pass current selection
+                              onSelected: (id, value) {
+                                setState(() {
+                                  selectedOfficeId = id;
+                                  _office.text = value;
+                                });
+                              },
+                            ),
+                            const SizedBox(height: 16),
+                            // possition
+                            _buildSelectionField(
+                              controller: _possition,
+                              label: AppLang.translate(
+                                  lang: settingProvider.lang ?? 'kh',
+                                  key: 'position'),
+                              items: position,
+                              selectedId:
+                                  selectedpossitionId, // Pass current selection
+                              onSelected: (id, value) {
+                                setState(() {
+                                  selectedpossitionId = id;
+                                  _possition.text = value;
+                                });
+                              },
+                            ),
+                            const SizedBox(height: 16),
+                            // rank position
+                            _buildSelectionField(
+                              controller: _rankPossition,
+                              label: AppLang.translate(
+                                  lang: settingProvider.lang ?? 'kh',
+                                  key: 'rank_position'),
+                              items: position,
+                              selectedId:
+                                  selectedRankPositionId, // Pass current selection
+                              onSelected: (id, value) {
+                                setState(() {
+                                  selectedRankPositionId = id;
+                                  _rankPossition.text = value;
+                                });
+                              },
+                            ),
+                            const SizedBox(height: 16),
 
                             // const SizedBox(
                             //     height: 30), // Extra space before button
@@ -517,7 +506,7 @@ class _CreateEducationScreenState extends State<CreateEducationScreen> {
           title: label,
           items: items,
           onSelected: onSelected,
-          //  selectedId: selectedEducationTypeId, // Pass current selection
+          //  selectedId: selectedEducationrankPossitionId, // Pass current selection
           selectedId: selectedId, // Pass current selection
         );
       },

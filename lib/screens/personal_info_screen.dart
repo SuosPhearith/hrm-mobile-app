@@ -24,9 +24,11 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
 
   final PersonalInfoService _service = PersonalInfoService();
   // delete relative
-  void _deleteRelative(int id) async {
+  void _deleteRelative(int id, PersonalInfoProvider provider) async {
     try {
       await _service.delete(id: id);
+      provider.getHome();
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -46,9 +48,10 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
   }
 
   //delete  education
-  void _deleteEducation(int id, int userID) async {
+  void _deleteEducation(int id, int userID,PersonalInfoProvider provider) async {
     try {
       await _service.deleteEducation(id: id, userId: userID);
+      provider.getHome();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -67,9 +70,10 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
   }
 
   //delete  language level
-  void _deleteLanuageLevel(int id, int userID) async {
+  void _deleteLanuageLevel(int id, int userID,PersonalInfoProvider provider) async {
     try {
       await _service.deleteLanguageLevel(id: id, userId: userID);
+      provider.getHome();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -229,11 +233,12 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                                 description:
                                     '${formatDate(record['dob'])} • ${getSafeString(value: record?['job'])} • ${getSafeString(value: record?['work_place'])}',
                                 icon: Icons.person,
-                                onDelete: () => _deleteRelative(record['id']),
+                                onDelete: () =>
+                                    _deleteRelative(record['id'], provider),
                                 onUpdated: () {
                                   // Navigator.pop(context);
                                   context
-                                      .push('/update-relative/${record['id']}');
+                                      .push('/update-relative/${user['id']}/${record['id']}');
                                 },
                               );
                             }),
@@ -260,8 +265,11 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                                     '• ${AppLang.translate(data: record['school'], lang: settingProvider.lang ?? 'kh')} \n• ${AppLang.translate(data: record['education_place'], lang: settingProvider.lang ?? 'kh')} \n• ${AppLang.translate(data: record['major'], lang: settingProvider.lang ?? 'kh')}\n• ${AppLang.translate(data: record['education_place'], lang: settingProvider.lang ?? 'kh')}\n• ${formatDate(record['study_at'])} | ${formatDate(record['graduate_at'])}',
                                 icon: Icons.person,
                                 onDelete: () =>
-                                    _deleteEducation(record['id'], user['id']),
-                                onUpdated: () {},
+                                    _deleteEducation(record['id'], user['id'],provider),
+                                onUpdated: () {
+                                  context
+                                      .push('/update-education/${user['id']}/${record['id']}');
+                                },
                               );
                             }),
 
@@ -292,9 +300,11 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                                     '🗣️${AppLang.translate(data: record['speaking_level'], lang: settingProvider.lang ?? 'kh')} ✍️${AppLang.translate(data: record['writing_level'], lang: settingProvider.lang ?? 'kh')} 📖${AppLang.translate(data: record['reading_level'], lang: settingProvider.lang ?? 'kh')} 🦻${AppLang.translate(data: record['listening_level'], lang: settingProvider.lang ?? 'kh')}',
                                 icon: Icons.flag,
                                 onDelete: () => _deleteLanuageLevel(
-                                    record['id'], user['id']),
+                                    record['id'], user['id'],provider),
                                 onUpdated: () {
                                   // context.push('');
+                                  context
+                                      .push('/update-langauge-level/${user['id']}/${record['id']}');
                                 },
                               );
                             }),

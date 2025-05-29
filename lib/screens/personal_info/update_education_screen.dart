@@ -3,24 +3,27 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile_app/app_lang.dart';
 import 'package:mobile_app/providers/global/setting_provider.dart';
-import 'package:mobile_app/providers/local/personalinfo/create_education_provider.dart';
+
+import 'package:mobile_app/providers/local/personalinfo/update_education_provider.dart';
 import 'package:mobile_app/services/personal_info/create_personalinfo_service.dart';
 import 'package:mobile_app/utils/help_util.dart';
 import 'package:mobile_app/widgets/helper.dart';
 import 'package:provider/provider.dart';
 
-class CreateEducationScreen extends StatefulWidget {
-  const CreateEducationScreen({super.key, this.id});
-  final String? id;
+class UpdateEducationScreen extends StatefulWidget {
+  const UpdateEducationScreen(
+      {super.key, required this.userId, required this.educationId});
+  final String userId;
+  final String educationId;
 
   @override
-  State<CreateEducationScreen> createState() => _CreateEducationScreenState();
+  State<UpdateEducationScreen> createState() => _UpdateEducationScreenState();
 }
 
-class _CreateEducationScreenState extends State<CreateEducationScreen> {
+class _UpdateEducationScreenState extends State<UpdateEducationScreen> {
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
       GlobalKey<RefreshIndicatorState>();
-  Future<void> _refreshData(CreateEducationProvider provider) async {
+  Future<void> _refreshData(UpdateEducationProvider provider) async {
     return await provider.getHome();
   }
 
@@ -44,7 +47,7 @@ class _CreateEducationScreenState extends State<CreateEducationScreen> {
   String? selectedMajorId;
   String? selectedSchoolId;
   String? selectedEducationPlaceId;
-
+  bool _isDataLoaded = false;
   @override
   void dispose() {
     _dateIn.dispose();
@@ -58,21 +61,117 @@ class _CreateEducationScreenState extends State<CreateEducationScreen> {
     super.dispose();
   }
 
+  void _loadExistingData(UpdateEducationProvider provider) {
+    if (_isDataLoaded || provider.data == null) return;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+
+      setState(() {
+        // Set text fields
+        _dateIn.text = formatDate(provider.data?.data['study_at']);
+        _dateOut.text = formatDate(provider.data?.data['graduate_at']);
+
+        _type.text = getSafeString(
+            value: provider.data?.data['education_type']?['name_kh'],
+            safeValue: '');
+        _educationLevel.text = getSafeString(
+            value: provider.data?.data['education_level']?['name_kh'],
+            safeValue: '');
+        _certificate.text = getSafeString(
+            value: provider.data?.data['certificate_type']?['name_kh'],
+            safeValue: '');
+        _skill.text = getSafeString(
+            value: provider.data?.data['major']?['name_kh'], safeValue: '');
+        _school.text = getSafeString(
+            value: provider.data?.data['school']?['name_kh'], safeValue: '');
+        _place.text = getSafeString(
+            value: provider.data?.data['education_place']?['name_kh'],
+            safeValue: '');
+
+        // Set selected IDs for dropdowns
+        selectedEducationTypeId =
+            provider.data?.data['education_type']?['id'].toString();
+        selectedEducationLevelId =
+            provider.data?.data['education_level']?['id'].toString();
+        selectedCertificateTypeId =
+            provider.data?.data['certificate_type']?['id'].toString();
+        selectedMajorId = provider.data?.data['major']?['id'].toString();
+        selectedSchoolId = provider.data?.data['school']?['id'].toString();
+        selectedEducationPlaceId =
+            provider.data?.data['education_place']?['id'].toString();
+
+        _isDataLoaded = true;
+      });
+    });
+  }
+
+  // Future<void> _selectDate(TextEditingController controller) async {
+  //   DateTime? picked = await showDatePicker(
+  //     context: context,
+  //     initialDate: DateTime.now(),
+  //     firstDate: DateTime(1900),
+  //     lastDate: DateTime(2100),
+  //   );
+  //   if (picked != null) {
+  //     setState(() {
+  //       controller.text = "${picked.toLocal()}".split(' ')[0];
+  //     });
+  //   }
+  // }
   Future<void> _selectDate(TextEditingController controller) async {
+    // Parse existing date if available
+    DateTime? initialDate;
+    if ( controller.text.isNotEmpty &&  controller.text != 'N/A') {
+      try {
+        initialDate = DateTime.parse( controller.text);
+      } catch (e) {
+        initialDate = DateTime.now();
+      }
+    } else {
+      initialDate = DateTime.now();
+    }
+
     DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
+      initialDate: initialDate,
       firstDate: DateTime(1900),
-      lastDate: DateTime(2100),
+      lastDate: DateTime.now(),
     );
     if (picked != null) {
       setState(() {
-        controller.text = "${picked.toLocal()}".split(' ')[0];
+         controller.text = "${picked.toLocal()}".split(' ')[0];
       });
     }
   }
+  // Add this helper method to convert DD-MM-YYYY to YYYY-MM-DD
+  String convertDateForApi(String dateString) {
+    if (dateString.isEmpty) return '';
 
-  
+    try {
+      // Check if it's already in YYYY-MM-DD format
+      if (RegExp(r'^\d{4}-\d{2}-\d{2}$').hasMatch(dateString)) {
+        return dateString;
+      }
+
+      // Handle DD-MM-YYYY format
+      if (RegExp(r'^\d{2}-\d{2}-\d{4}$').hasMatch(dateString)) {
+        List<String> parts = dateString.split('-');
+        String day = parts[0];
+        String month = parts[1];
+        String year = parts[2];
+        return '$year-$month-$day';
+      }
+
+      // Try to parse as DateTime and format
+      DateTime date = DateTime.parse(dateString);
+      return "${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
+    } catch (e) {
+      print('Date conversion error: $e');
+      return dateString; // Return original if conversion fails
+    }
+  }
+
   void _handleSubmit() async {
     // First validate the form fields
     if (!_formKey.currentState!.validate()) {
@@ -118,23 +217,24 @@ class _CreateEducationScreenState extends State<CreateEducationScreen> {
         AppLang.translate(
             lang: Provider.of<SettingProvider>(context, listen: false).lang ??
                 'kh',
-            key: 'create'),
+            key: 'update'),
         AppLang.translate(
             lang: Provider.of<SettingProvider>(context, listen: false).lang ??
                 'kh',
-            key: 'Are you sure to create'),
+            key: 'Are you sure to update'),
         DialogType.primary, () async {
       try {
-        await _service.createUserEducation(
-          userId: widget.id ?? '',
-          educationTypeId: selectedEducationTypeId!,
-          educationLevelId: selectedEducationLevelId!,
+        await _service.updatedUserEducation(
+          educationId: widget.educationId,
+          userId: widget.userId,
+          educationTypeId: selectedEducationTypeId ?? '',
+          educationLevelId: selectedEducationLevelId ?? '',
           certificateTypeId: selectedCertificateTypeId ?? '',
           majorId: selectedMajorId ?? '',
           schoolId: selectedSchoolId ?? '',
           educationPlaceId: selectedEducationPlaceId ?? '',
-          studyAt: _dateIn.text,
-          graduateAt: _dateOut.text,
+          studyAt:convertDateForApi (_dateIn.text),
+          graduateAt: convertDateForApi(_dateOut.text),
           note: null,
           attachmentId: null,
         );
@@ -164,43 +264,46 @@ class _CreateEducationScreenState extends State<CreateEducationScreen> {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-        create: (_) => CreateEducationProvider(),
-        child: Consumer2<CreateEducationProvider, SettingProvider>(builder:
+        create: (_) => UpdateEducationProvider(
+            userId: widget.userId, educationId: widget.educationId),
+        child: Consumer2<UpdateEducationProvider, SettingProvider>(builder:
             (context, createEducationProvider, settingProvider, child) {
           final educationTypes = _buildEducationSelectionMap(
-            apiData: createEducationProvider.data,
+            apiData: createEducationProvider.dataSetup,
             dataKey: 'education_types',
             settingProvider: settingProvider,
           );
 
           final educationLevels = _buildEducationSelectionMap(
-            apiData: createEducationProvider.data,
+            apiData: createEducationProvider.dataSetup,
             dataKey: 'education_levels',
             settingProvider: settingProvider,
           );
 
           final certificateTypes = _buildEducationSelectionMap(
-              apiData: createEducationProvider.data,
+              apiData: createEducationProvider.dataSetup,
               dataKey: 'certificate_types',
               settingProvider: settingProvider);
           final majors = _buildEducationSelectionMap(
-              apiData: createEducationProvider.data,
+              apiData: createEducationProvider.dataSetup,
               dataKey: 'majors',
               settingProvider: settingProvider);
           final schools = _buildEducationSelectionMap(
-              apiData: createEducationProvider.data,
+              apiData: createEducationProvider.dataSetup,
               dataKey: 'schools',
               settingProvider: settingProvider);
           final educationPlaces = _buildEducationSelectionMap(
-              apiData: createEducationProvider.data,
+              apiData: createEducationProvider.dataSetup,
               dataKey: 'education_places',
               settingProvider: settingProvider);
-
+          if (!createEducationProvider.isLoading && !_isDataLoaded) {
+            _loadExistingData(createEducationProvider);
+          }
           return Scaffold(
             backgroundColor: Colors.grey[100],
             appBar: AppBar(
               title: Text(AppLang.translate(
-                  lang: 'kh', key: 'user_info_education_add')),
+                  lang: 'kh', key: 'user_info_education_update')),
               centerTitle: true,
             ),
             body: RefreshIndicator(
@@ -329,6 +432,8 @@ class _CreateEducationScreenState extends State<CreateEducationScreen> {
                                       labelText: AppLang.translate(
                                           lang: settingProvider.lang ?? 'kh',
                                           key: 'enroll date'),
+                                      labelStyle:
+                                          TextStyle(color: Colors.blueGrey),
                                       border: OutlineInputBorder(
                                         borderRadius:
                                             BorderRadius.circular(12.0),
@@ -385,6 +490,8 @@ class _CreateEducationScreenState extends State<CreateEducationScreen> {
                                         lang: settingProvider.lang ?? 'kh',
                                         key: 'graduated date',
                                       ),
+                                      labelStyle:
+                                          TextStyle(color: Colors.blueGrey),
                                       border: OutlineInputBorder(
                                         borderRadius:
                                             BorderRadius.circular(12.0),
@@ -458,7 +565,7 @@ class _CreateEducationScreenState extends State<CreateEducationScreen> {
                   },
                   child: Text(
                     AppLang.translate(
-                        lang: settingProvider.lang ?? 'kh', key: 'create'),
+                        lang: settingProvider.lang ?? 'kh', key: 'update'),
                     style: TextStyle(fontSize: 16, color: Colors.white),
                   ),
                 ),

@@ -3,7 +3,9 @@ import 'package:go_router/go_router.dart';
 import 'package:mobile_app/app_lang.dart';
 import 'package:mobile_app/providers/global/setting_provider.dart';
 import 'package:mobile_app/providers/local/work_provider.dart';
+import 'package:mobile_app/services/work_service.dart';
 import 'package:mobile_app/utils/help_util.dart';
+import 'package:mobile_app/widgets/helper.dart';
 import 'package:provider/provider.dart';
 
 class WorkScreen extends StatefulWidget {
@@ -18,6 +20,55 @@ class _WorkScreenState extends State<WorkScreen> {
       GlobalKey<RefreshIndicatorState>();
   Future<void> _refreshData(WorkProvider provider) async {
     return await provider.getHome();
+  }
+
+  final WorkService _service = WorkService();
+  // delete medal
+  void _deleteUserMedal(int id, WorkProvider provider, int userId) async {
+    try {
+      await _service.delete(id: id, userId: userId);
+      provider.getHome();
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content:
+                  Text(AppLang.translate(lang: 'kh', key: 'deleted success'))),
+        );
+
+        // context.pop();
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('មានបញ្ហាក្នុងការលុប: $e')),
+        );
+      }
+    }
+  }
+
+  // delete work history
+  void _deleteWorkHistory(int id, WorkProvider provider, int userId) async {
+    try {
+      await _service.deleteWorkHistory(id: id, userId: userId);
+      provider.getHome();
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content:
+                  Text(AppLang.translate(lang: 'kh', key: 'deleted success'))),
+        );
+
+        // context.pop();
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('មានបញ្ហាក្នុងការលុប: $e')),
+        );
+      }
+    }
   }
 
   @override
@@ -290,23 +341,32 @@ class _WorkScreenState extends State<WorkScreen> {
                                   key: 'work_experience_add'),
                               icon: Icons.work_history,
                               onEditTap: () {
-                                context.push('/create-education/${user['id']}');
+                                context
+                                    .push('/create-work-history/${user['id']}');
                               },
                             ),
-                            ...(user?['user_work']['user_medals'] != null
-                                    ? user['user_work']['user_medals'] as List
+                            ...(user?['user_work_history'] != null
+                                    ? user['user_work_history'] as List
                                     : [])
                                 .map((record) {
-                              return buildProfileContainer(
+                              return buildProfileContainerAction(
                                 name:
-                                    "${AppLang.translate(data: record['user_medals'], lang: settingProvider.lang ?? 'kh')} - ${AppLang.translate(data: record['medal_types'], lang: settingProvider.lang ?? 'kh')}",
+                                    "${AppLang.translate(data: record['organization'], lang: settingProvider.lang ?? 'kh')} - ${AppLang.translate(data: record['department'], lang: settingProvider.lang ?? 'kh')}",
                                 description:
-                                    '• ${AppLang.translate(data: record['note'], lang: settingProvider.lang ?? 'kh')} \n• ${AppLang.translate(data:record['given_at'], lang: settingProvider.lang ?? 'kh')} \n• ${AppLang.translate(data: record['major'], lang: settingProvider.lang ?? 'kh')}\n• ${AppLang.translate(data: record['education_place'], lang: settingProvider.lang ?? 'kh')}\n• ${formatDate(record['study_at'])} | ${formatDate(record['graduate_at'])}',
+                                    '• ${AppLang.translate(data: record['office'], lang: settingProvider.lang ?? 'kh')} \n• ${AppLang.translate(data: record['position'], lang: settingProvider.lang ?? 'kh')} \n• ឋានៈស្មើ ${AppLang.translate(data: record['rank_position'], lang: settingProvider.lang ?? 'kh')}\n• ${formatDate(record['start_working_at'])} | ${formatDate(record['stop_working_at'])}',
                                 icon: Icons.person,
+                                onDelete: () {
+                                  _deleteWorkHistory(
+                                      record['id'], provider, user['id']);
+                                },
+                                onUpdated: () {
+                                  context.push(
+                                      '/update-work-history/${user['id']}/${record['id']}');
+                                },
                               );
                             }),
 
-                            //Language
+                            //Medal
                             buildContainer(
                               text: AppLang.translate(
                                   lang: settingProvider.lang ?? 'kh',
@@ -318,28 +378,37 @@ class _WorkScreenState extends State<WorkScreen> {
                                   lang: settingProvider.lang ?? 'kh'),
                               icon: Icons.star,
                               onEditTap: () {
-                                context.push(
-                                    '/create-langauge-level/${user['id']}');
+                                context
+                                    .push('/create-user-medal/${user['id']}');
                               },
                             ),
-                            ...(user?['user_work']['user_medals'] != null
-                                    ? user['user_work']['user_medals'] as List
+                            ...(user?['user_medals'] != null
+                                    ? user['user_medals'] as List
                                     : [])
                                 .map((record) {
-                              return buildProfileContainer(
+                              // Check if note_ is null or empty
+                              String noteText = record['note_'] != null &&
+                                      record['note_'].toString().isNotEmpty
+                                  ? ' | ${getSafeString(value: record['note_'])}'
+                                  : '';
+
+                              return buildProfileContainerAction(
                                 name:
-                                    "${AppLang.translate(data: record['user_medals'], lang: settingProvider.lang ?? 'kh')} - ${AppLang.translate(data: record['medal_types'], lang: settingProvider.lang ?? 'kh')}",
+                                    "${AppLang.translate(data: record['medals'], lang: settingProvider.lang ?? 'kh')} ",
                                 description:
-                                    '• ${AppLang.translate(data: record['note'], lang: settingProvider.lang ?? 'kh')} \n• ${AppLang.translate(data:record['given_at'], lang: settingProvider.lang ?? 'kh')} \n• ${AppLang.translate(data: record['major'], lang: settingProvider.lang ?? 'kh')}\n• ${AppLang.translate(data: record['education_place'], lang: settingProvider.lang ?? 'kh')}\n• ${formatDate(record['study_at'])} | ${formatDate(record['graduate_at'])}',
+                                    '• ${AppLang.translate(data: record['medal_types'], lang: settingProvider.lang ?? 'kh')}$noteText\n• ${formatDate(record['given_at'])}',
                                 icon: Icons.person,
+                                onDelete: () {
+                                  // _deleteUserMedal(record['id'],user['id']);
+                                  _deleteUserMedal(
+                                      record['id'], provider, user['id']);
+                                },
+                                onUpdated: () {
+                                  context.push(
+                                      '/update-user-medal/${user['id']}/${record['id']}');
+                                },
                               );
                             }),
-                            // buildProfileContainerAction(
-                            //   name: 'ឃួច ទីទ្ធ (khouch tith)',
-                            //   description:
-                            //       '01-01-1965 (60 ឆ្នាំ) • នារីជនជាតិខ្មែរ • សញ្ញាតិ ABA\nភេទ: ស្ត្រី',
-                            //   icon: Icons.person,
-                            // ),
                             SizedBox(
                                 height:
                                     MediaQuery.of(context).size.height * 0.1),
@@ -458,7 +527,9 @@ class _WorkScreenState extends State<WorkScreen> {
   Widget buildProfileContainerAction({
     required String name,
     required String description,
-    IconData icon = Icons.person, // Default icon is person
+    required VoidCallback? onDelete,
+    required VoidCallback? onUpdated,
+    IconData icon = Icons.person,
   }) {
     return Container(
       padding: EdgeInsets.only(bottom: 16.0),
@@ -475,25 +546,108 @@ class _WorkScreenState extends State<WorkScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  name,
-                  style: TextStyle(fontSize: 16.0, color: Colors.black87),
-                  softWrap: true,
-                ),
+                Text(name,
+                    style: TextStyle(fontSize: 16.0, color: Colors.black87),
+                    softWrap: true),
                 SizedBox(height: 2.0),
-                Text(
-                  description,
-                  style: TextStyle(fontSize: 14.0, color: Colors.grey),
-                  softWrap: true,
-                ),
+                Text(description,
+                    style: TextStyle(fontSize: 14.0, color: Colors.grey),
+                    softWrap: true),
               ],
             ),
           ),
           IconButton(
             icon: Icon(Icons.edit, size: 20.0, color: Colors.grey),
-            onPressed: () {},
+            onPressed: () {
+              _showBottomSheet(context, onDelete!, onUpdated!);
+            },
           ),
         ],
+      ),
+    );
+  }
+
+  void _showBottomSheet(
+      BuildContext context, VoidCallback onDelete, VoidCallback onUpdated) {
+    final lang = Provider.of<SettingProvider>(context, listen: false).lang;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
+      ),
+      backgroundColor: Colors.white,
+      builder: (BuildContext context) {
+        return Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildBottomSheetOption(
+                icon: Icons.edit,
+                label: AppLang.translate(key: 'update', lang: lang ?? 'kh'),
+                onTap: () {
+                  Navigator.pop(context); // Close the bottom sheet first
+                  onUpdated(); // Then execute the callback
+                },
+              ),
+              _buildBottomSheetOption(
+                icon: Icons.delete,
+                label: AppLang.translate(key: 'delete', lang: lang ?? 'kh'),
+                colors: Colors.red,
+                onTap: () {
+                  Navigator.pop(context);
+                  showConfirmDialog(
+                    context,
+                    AppLang.translate(
+                        lang: lang ?? 'kh', key: 'Confirm Delete'),
+                    '${AppLang.translate(lang: lang ?? 'kh', key: 'Are you sure to delete')}?',
+                    DialogType.primary,
+                    onDelete,
+                  );
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildBottomSheetOption({
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+    Color? colors,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(12.0),
+        margin: EdgeInsets.only(bottom: 8),
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey),
+          borderRadius: BorderRadius.circular(12.0),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8.0),
+              decoration: BoxDecoration(shape: BoxShape.circle),
+              child: Icon(icon, size: 24.0, color: colors ?? Colors.grey),
+            ),
+            const SizedBox(width: 12.0),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 16.0,
+                fontWeight: FontWeight.w600,
+                color: Colors.grey.shade800,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -2,35 +2,46 @@ import 'package:flutter/material.dart';
 import 'package:mobile_app/models/response_structure_model.dart';
 import 'package:mobile_app/services/personal_info/create_personalinfo_service.dart';
 
-class CreateRelativeProvider extends ChangeNotifier {
+class UpdateUserFamilyProvider extends ChangeNotifier {
   // Feilds
   bool _isLoading = false;
   String? _error;
-  // ResponseStructure<Map<String, dynamic>>? _data;
-    ResponseStructure<Map<String, dynamic>>? _dataSetup;
+  ResponseStructure<Map<String, dynamic>>? _dataSetup;
+  ResponseStructure<Map<String, dynamic>>? _data;
   // Services
   final CreatePersonalService _createPersonalService = CreatePersonalService();
 
   // Getters
   bool get isLoading => _isLoading;
   String? get error => _error;
-  // ResponseStructure<Map<String, dynamic>>? get data => _data;
   ResponseStructure<Map<String, dynamic>>? get dataSetup => _dataSetup;
+  ResponseStructure<Map<String, dynamic>>? get data=>_data;
   // Setters
 
   // Initialize
- CreateRelativeProvider() {
-    getHome();
+  UpdateUserFamilyProvider(
+    {
+      required String userId,
+      required String familyId
+    }
+  ) {
+    getHome(
+      userId: userId,
+      familyId: familyId
+    );
   }
 
   // Functions
-  Future<void> getHome() async {
+  Future<void> getHome({String? familyId, String? userId}) async {
     _isLoading = true;
     notifyListeners();
     try {
-      final res = await _createPersonalService.dataSetup();
-      _dataSetup = res;
-      // _data = res;
+      final resSetUp = await _createPersonalService.dataSetup();
+      final res  = await _createPersonalService.getUserFamilyById(
+          familyId: familyId!, userId: userId!);
+      _dataSetup = resSetUp;
+
+      _data = res;
     } catch (e) {
       _error = "Invalid Credential.";
     } finally {

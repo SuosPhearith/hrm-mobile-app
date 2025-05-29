@@ -1,26 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_app/models/response_structure_model.dart';
-import 'package:mobile_app/services/personal_info/create_personalinfo_service.dart';
+
+import 'package:mobile_app/services/work/create_work_service.dart';
 
 
-class CreateEducationProvider extends ChangeNotifier {
+class CreateWorkProvider extends ChangeNotifier {
   // Feilds
   bool _isLoading = false;
   String? _error;
-  ResponseStructure<Map<String, dynamic>>? _data;
+  ResponseStructure<Map<String, dynamic>>? _dataSetup;
 
   // Services
-    final CreatePersonalService _createPersonalService = CreatePersonalService();
+    final CreateWorkService _service = CreateWorkService();
 
   // Getters
   bool get isLoading => _isLoading;
   String? get error => _error;
-  ResponseStructure<Map<String, dynamic>>? get data => _data;
+  ResponseStructure<Map<String, dynamic>>? get dataSetup => _dataSetup;
 
   // Setters
 
   // Initialize
-  CreateEducationProvider() {
+  CreateWorkProvider() {
     getHome();
   }
 
@@ -29,8 +30,8 @@ class CreateEducationProvider extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
     try {
-      final res = await _createPersonalService.dataSetup();
-      _data = res;
+      final res = await _service.dataSetup();
+      _dataSetup = res;
     } catch (e) {
       _error = "Invalid Credential.";
     } finally {

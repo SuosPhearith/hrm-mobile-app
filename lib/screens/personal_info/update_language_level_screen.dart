@@ -3,23 +3,29 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile_app/app_lang.dart';
 import 'package:mobile_app/providers/global/setting_provider.dart';
-import 'package:mobile_app/providers/local/personalinfo/create_education_provider.dart';
+
+import 'package:mobile_app/providers/local/personalinfo/update_language_provider.dart';
 import 'package:mobile_app/services/personal_info/create_personalinfo_service.dart';
 import 'package:mobile_app/utils/help_util.dart';
 import 'package:mobile_app/widgets/helper.dart';
 import 'package:provider/provider.dart';
 
-class CreateLanguageLevel extends StatefulWidget {
-  const CreateLanguageLevel({super.key, this.id});
+class UpdateLanguageLevelScreen extends StatefulWidget {
+  const UpdateLanguageLevelScreen({super.key, this.id, required this.userLanguageId});
   final String? id;
+  final String userLanguageId;
   @override
-  State<CreateLanguageLevel> createState() => _CreateLanguageLevelState();
+  State<UpdateLanguageLevelScreen> createState() => _UpdateLanguageLevelScreenState();
 }
 
-class _CreateLanguageLevelState extends State<CreateLanguageLevel> {
+class _UpdateLanguageLevelScreenState extends State<UpdateLanguageLevelScreen> {
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
       GlobalKey<RefreshIndicatorState>();
-  Future<void> _refreshData(CreateEducationProvider provider) async {
+  
+  // Add this missing variable
+  bool _isDataLoaded = false;
+  
+  Future<void> _refreshData(UpdateLanguageProvider provider) async {
     return await provider.getHome();
   }
 
@@ -64,46 +70,98 @@ class _CreateLanguageLevelState extends State<CreateLanguageLevel> {
       selectedListeningLevelId = null;
     });
   }
-  void _handleSubmit() async {
-    if (!_formKey.currentState!.validate()) return;
 
-    // Validate required fields
-    if (selectedLanguageId == null ||
-        selectedSpeakingLevelId == null ||
-        selectedReadingLevelId == null ||
-        selectedWritingLevelId == null ||
-        selectedListeningLevelId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('សូមបំពេញព័ត៌មានចាំបាច់')),
-      );
-      return;
-    }
+  // Corrected method to load existing language data
+  void _loadExistingData(UpdateLanguageProvider provider, SettingProvider settingProvider) {
+    if (_isDataLoaded || provider.data == null) return;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+
+      final languageData = provider.data?.data;
+      if (languageData == null) return;
+
+      setState(() {
+        final currentLang = settingProvider.lang ?? 'kh';
+        
+        // Set language field
+        _langauge.text = currentLang == 'kh' 
+            ? (languageData['language']?['name_kh'] ?? languageData['language']?['name_en'] ?? '')
+            : (languageData['language']?['name_en'] ?? languageData['language']?['name_kh'] ?? '');
+        
+        // Set speaking level
+        _speakingLevel.text = currentLang == 'kh'
+            ? (languageData['speaking_level']?['name_kh'] ?? languageData['speaking_level']?['name_en'] ?? '')
+            : (languageData['speaking_level']?['name_en'] ?? languageData['speaking_level']?['name_kh'] ?? '');
+            
+        // Set reading level
+        _readingLevel.text = currentLang == 'kh'
+            ? (languageData['reading_level']?['name_kh'] ?? languageData['reading_level']?['name_en'] ?? '')
+            : (languageData['reading_level']?['name_en'] ?? languageData['reading_level']?['name_kh'] ?? '');
+            
+        // Set writing level
+        _writtingLevel.text = currentLang == 'kh'
+            ? (languageData['writing_level']?['name_kh'] ?? languageData['writing_level']?['name_en'] ?? '')
+            : (languageData['writing_level']?['name_en'] ?? languageData['writing_level']?['name_kh'] ?? '');
+            
+        // Set listening level
+        _listeningLevel.text = currentLang == 'kh'
+            ? (languageData['listening_level']?['name_kh'] ?? languageData['listening_level']?['name_en'] ?? '')
+            : (languageData['listening_level']?['name_en'] ?? languageData['listening_level']?['name_kh'] ?? '');
+
+        // Set selected IDs
+        selectedLanguageId = languageData['language_id']?.toString();
+        selectedSpeakingLevelId = languageData['speaking_level_id']?.toString();
+        selectedReadingLevelId = languageData['reading_level_id']?.toString();
+        selectedWritingLevelId = languageData['writing_level_id']?.toString();
+        selectedListeningLevelId = languageData['listening_level_id']?.toString();
+
+        _isDataLoaded = true;
+      });
+    });
+  }
+
+  void _handleSubmit() async {
+    // if (!_formKey.currentState!.validate()) return;
+
+    // // Validate required fields
+    // if (selectedLanguageId == null ||
+    //     selectedSpeakingLevelId == null ||
+    //     selectedReadingLevelId == null ||
+    //     selectedWritingLevelId == null ||
+    //     selectedListeningLevelId == null) {
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //     const SnackBar(content: Text('សូមបំពេញព័ត៌មានចាំបាច់')),
+    //   );
+    //   return;
+    // }
 
     showConfirmDialogWithNavigation(
         context,
         AppLang.translate(
             lang: Provider.of<SettingProvider>(context, listen: false).lang ??
                 'kh',
-            key: 'create'),
+            key: 'update'), // 'update'
         AppLang.translate(
             lang: Provider.of<SettingProvider>(context, listen: false).lang ??
                 'kh',
-            key: 'Are you sure to create'),
+            key: 'Are you sure to update'), // 'update'
         DialogType.primary, () async {
       try {
-        await _service.createUserLanguage(
+        await _service.updateUserLanguage(
           userId: widget.id ?? '',
+          userLanguageId: widget.userLanguageId,
           languageId: selectedLanguageId!,
           speakingLevelId: selectedSpeakingLevelId!,
           writingLevelId: selectedWritingLevelId!,
           listeningLevelId: selectedListeningLevelId!,
           readingLevelId: selectedReadingLevelId!,
         );
+        _clearAllControllers();
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('ការស្នើសុំត្រូវបានបញ្ជូនដោយជោគជ័យ')),
+            const SnackBar(content: Text('ការកែប្រែត្រូវបានរក្សាទុកដោយជោគជ័យ')), // Changed message
           );
-          _clearAllControllers();
           context.pop();
         }
       } catch (e) {
@@ -123,22 +181,26 @@ class _CreateLanguageLevelState extends State<CreateLanguageLevel> {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-        create: (_) => CreateEducationProvider(),
-        child: Consumer2<CreateEducationProvider, SettingProvider>(
+        create: (_) => UpdateLanguageProvider(userId: widget.id!, languageId:widget.userLanguageId), // Load existing data
+        child: Consumer2<UpdateLanguageProvider, SettingProvider>(
             builder: (context, provider, settingProvider, child) {
+          
+          // Load existing data when provider data is available
+          _loadExistingData(provider, settingProvider);
+          
           final languages = _buildEducationSelectionMap(
-              apiData: provider.data,
+              apiData: provider.dataSetup,
               dataKey: 'languages',
               settingProvider: settingProvider);
           final proficiencyLevels = _buildEducationSelectionMap(
-              apiData: provider.data,
+              apiData: provider.dataSetup,
               dataKey: 'language_levels',
               settingProvider: settingProvider);
           return Scaffold(
             backgroundColor: Colors.grey[100],
             appBar: AppBar(
               title: Text(
-                  AppLang.translate(lang: 'kh', key: 'user_info_language_add')),
+                  AppLang.translate(lang: settingProvider.lang?? 'kh', key: 'user_info_language_update')), 
               centerTitle: true,
             ),
             body: RefreshIndicator(
@@ -276,7 +338,7 @@ class _CreateLanguageLevelState extends State<CreateLanguageLevel> {
                   },
                   child: Text(
                     AppLang.translate(
-                        lang: settingProvider.lang ?? 'kh', key: 'create'),
+                        lang: settingProvider.lang ?? 'kh', key: 'update'), // Changed from 'create'
                     style: const TextStyle(fontSize: 16, color: Colors.white),
                   ),
                 ),
@@ -335,7 +397,6 @@ class _CreateLanguageLevelState extends State<CreateLanguageLevel> {
           title: label,
           items: items,
           onSelected: onSelected,
-          //  selectedId: selectedEducationTypeId, // Pass current selection
           selectedId: selectedId, // Pass current selection
         );
       },
@@ -388,10 +449,6 @@ class _CreateLanguageLevelState extends State<CreateLanguageLevel> {
                       ),
                     ),
                   ),
-                  // IconButton(
-                  //   icon: const Icon(Icons.close),
-                  //   onPressed: () => Navigator.pop(context),
-                  // ),
                 ],
               ),
             ),
