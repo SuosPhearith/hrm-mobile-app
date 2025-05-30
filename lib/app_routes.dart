@@ -26,5 +26,6 @@ class AppRoutes {
   static const String updateLanguageLevel = '/update-langauge-level';
   static const String updateWorkHistory = '/update-work-history';
   static const String updateUserMedal = '/update-user-medal';
+  static const String updateUserWork = '/update-user-work';
   static const String salary = '/salary';
 }

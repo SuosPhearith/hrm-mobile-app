@@ -218,4 +218,98 @@ class CreateWorkService {
     }
   }
 
+  //get user work history by id
+  Future<ResponseStructure<Map<String, dynamic>>> getUserWorkById({
+    required String workId,
+    required String userId
+  }) async {
+    try {
+      final response =
+          await DioClient.dio.get("/account/profile/$userId/user_work/$workId");
+      return ResponseStructure<Map<String, dynamic>>.fromJson(
+        response.data as Map<String, dynamic>,
+        dataFromJson: (json) => json,
+      );
+    } on DioException catch (dioError) {
+      if (dioError.response != null) {
+        printError(
+          errorMessage: ErrorType.requestError,
+          statusCode: dioError.response!.statusCode,
+        );
+        throw Exception(ErrorType.requestError);
+      } else {
+        printError(errorMessage: ErrorType.networkError, statusCode: null);
+        throw Exception(ErrorType.networkError);
+      }
+    } catch (e) {
+      printError(errorMessage: 'Something went wrong.', statusCode: 500);
+      throw Exception(ErrorType.unexpectedError);
+    }
+  }
+  //update work 
+Future<Map<String, dynamic>> updateUserWork({
+  required String userId,
+  required String workId,
+  required String idNumber,
+  required String staffCardNumber,
+  required String? staffTypeId,
+  required String organizationId,
+  required String departmentId,
+  required String? generalDepartmentId,
+  required String? officeId,
+  required String? positionId,
+  required String? rankPositionId,
+  required String? startWorkingAt,
+  required String? appointedAt,
+  required String? frameworkCategoryId,
+  required String? salaryRankTypeId,
+  required String? salaryRankGroupId,
+  required String? certificateTypeId,
+  required String? majorId,
+  required String? upgradedSalaryRankAt,
+  required String? graduatedAt,
+  required String? prakasNumber,
+  required String? prakasAt,
+  required String? note,
+  required String? attachmentId,
+  required int sort,
+}) async {
+  try {
+    final response = await DioClient.dio.put(
+      "/account/profile/$userId/user_work/$workId",
+      data: {
+        "id_number": idNumber,
+        "staff_card_number": staffCardNumber,
+        "organization_id": organizationId,
+        "department_id": departmentId,
+        "general_department_id": generalDepartmentId,
+        "office_id": officeId,
+        "position_id": positionId,
+        "rank_position_id": rankPositionId,
+        "start_working_at": startWorkingAt?.toString(),
+        "staff_type_id": staffTypeId,
+        "appointed_at": appointedAt?.toString(),
+        "framework_category_id": frameworkCategoryId,
+        "salary_rank_type_id": salaryRankTypeId,
+        "salary_rank_group_id": salaryRankGroupId,
+        "certificate_type_id": certificateTypeId,
+        "major_id": majorId,
+        "upgraded_salary_rank_at": upgradedSalaryRankAt?.toString(),
+        "graduated_at": graduatedAt?.toString(),
+        "prakas_number": prakasNumber,
+        "prakas_at": prakasAt?.toString(),
+        "note_": note,
+        "attachment_id": attachmentId,
+        "sort": sort,
+      },
+    );
+
+    return response.data;
+  } on DioException catch (_) {
+    rethrow;
+  } catch (e) {
+    rethrow;
+  }
+}
+
 }

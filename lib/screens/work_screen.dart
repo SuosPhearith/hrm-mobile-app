@@ -104,7 +104,7 @@ class _WorkScreenState extends State<WorkScreen> {
                                   lang: settingProvider.lang ?? 'kh'),
                               onEditTap: () => {
                                 context.push(
-                                    '/update-personal-info/${user['id']}'),
+                                    '/update-user-work/${user['id']}/${user['user_work']['id']}'),
                               },
                             ),
 
@@ -158,7 +158,7 @@ class _WorkScreenState extends State<WorkScreen> {
                               name: getSafeString(
                                   value: AppLang.translate(
                                       data: user?['user_work']
-                                          ['general_department'],
+                                          ['department'],
                                       lang: settingProvider.lang ?? 'kh')),
                               description: AppLang.translate(
                                   key: 'department',

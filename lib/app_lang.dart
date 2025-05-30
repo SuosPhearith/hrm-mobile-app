@@ -143,6 +143,7 @@ class AppLang {
     'medals_add':'Add Medal',
     'medals':'Medal',
     'work_experience_update':'Update Work History',
+    'update_user_work': 'Update Work',
     // create work history 
     'Please select institution':'Please select institution',
     'Please select department':'Please select department',
@@ -300,7 +301,7 @@ class AppLang {
     'medals_add':'បន្ថែមឥស្សរយស',
     'medals':'ឥស្សរយស',
     'work_experience_update':'កែប្រែប្រវត្តិការងារ',
-
+    'update_user_work': 'កែប្រែព័ត៌មានការងារ',
     //create user work
     'start_date':'ថ្ងៃចាប់ផ្ដើម',
     'end_date':'ថ្ងៃបញ្ចប់',

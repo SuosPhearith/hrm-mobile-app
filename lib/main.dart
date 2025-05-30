@@ -25,6 +25,7 @@ import 'package:mobile_app/screens/welcome_screen.dart';
 import 'package:mobile_app/screens/work/create_user_medal_screen.dart';
 import 'package:mobile_app/screens/work/create_work_history_screen.dart';
 import 'package:mobile_app/screens/work/update_user_medal_screen.dart';
+import 'package:mobile_app/screens/work/update_user_work_screen.dart';
 import 'package:mobile_app/screens/work/update_work_history_screen.dart';
 import 'package:mobile_app/screens/work_screen.dart';
 import 'package:provider/provider.dart';
@@ -307,6 +308,17 @@ final GoRouter _router = GoRouter(
         return UpdateUserMedalScreen(
           id: userId,
          userMedalId: medalId,
+        );
+      },
+    ),
+    GoRoute(
+      path: '${AppRoutes.updateUserWork}/:userId/:workId',
+      builder: (context, state) {
+        final String userId = state.pathParameters['userId']!;
+        final String workId = state.pathParameters['workId']!;
+        return UpdateUserWorkScreen(
+          id: userId,
+          workId: workId,
         );
       },
     ),
