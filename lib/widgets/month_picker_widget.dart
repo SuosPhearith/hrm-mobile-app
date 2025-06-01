@@ -171,7 +171,7 @@ class _MonthPickerWidgetState extends State<MonthPickerWidget>
                 'ជ្រើសរើសខែ និងឆ្នាំ',
                 style: TextStyle(
                   fontSize: 20.0,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w500,
                   color: primaryColor,
                 ),
               ),

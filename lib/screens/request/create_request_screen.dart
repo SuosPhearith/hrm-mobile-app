@@ -1,6 +1,10 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
+import 'dart:typed_data';
 
+import 'package:dio/dio.dart' as dio;
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -10,7 +14,11 @@ import 'package:mobile_app/app_lang.dart';
 import 'package:mobile_app/providers/global/setting_provider.dart';
 import 'package:mobile_app/providers/local/request/create_request_provider.dart';
 import 'package:mobile_app/services/request/create_request_service.dart';
+import 'package:mobile_app/shared/color/colors.dart';
+import 'package:mobile_app/shared/component/bottom_appbar.dart';
+// import 'package:mobile_app/shared/component/show_confirm_dialog.dart';
 import 'package:mobile_app/utils/help_util.dart';
+
 import 'package:mobile_app/widgets/helper.dart';
 import 'package:provider/provider.dart';
 
@@ -31,30 +39,68 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
 
   // Variables to store form field values
   int? _selectedTypeId;
-  String? _selectedTypeNameKh;
+  // int isCheckId = 0;
+  // String? _selectedTypeNameKh;
+  // final TextEditingController _type = TextEditingController(); //
   DateTime? _startDate;
   DateTime? _endDate;
   String? _description;
-
-  File? _image; // Store the selected image
-  final ImagePicker _picker = ImagePicker();
+  bool isClick = false;
+  // File? _image; // Store the selected image
+  // final ImagePicker _picker = ImagePicker();
   String? _imageBase64;
+  final List<PlatformFile> _selectedFiles = [];
+  int selectedThumbnail = 0; // Now it can never be null
 
-  Future<void> _pickImage(ImageSource source) async {
-    final XFile? pickedFile = await _picker.pickImage(source: source);
+  // Future<void> _pickImage(ImageSource source) async {
+  //   final XFile? pickedFile = await _picker.pickImage(source: source);
 
-    if (pickedFile != null) {
-      // First create the File from the picked image
-      final File imageFile = File(pickedFile.path);
+  //   if (pickedFile != null) {
+  //     // First create the File from the picked image
+  //     final File imageFile = File(pickedFile.path);
 
-      // Then read the bytes
-      final bytes = await imageFile.readAsBytes();
-      final base64Image = base64Encode(bytes);
+  //     // Then read the bytes
+  //     final bytes = await imageFile.readAsBytes();
+  //     final base64Image = base64Encode(bytes);
+
+  //     setState(() {
+  //       _image = imageFile;
+  //       _imageBase64 = base64Image;
+  //     });
+  //   }
+  // }
+
+  List<dio.MultipartFile>? _selectedMultipartFiles; // Add this variable
+  Future<PlatformFile> _convertXFileToPlatformFile(XFile xFile) async {
+    final bytes = await xFile.readAsBytes(); // Better to use async read
+    final name = xFile.name;
+    final size = bytes.length;
+
+    return PlatformFile(name: name, path: xFile.path, size: size, bytes: bytes);
+  }
+
+  Future<void> _addImagesToSelectedFiles(List<XFile> images) async {
+    try {
+      final converted = await Future.wait(
+        images.map((xFile) => _convertXFileToPlatformFile(xFile)),
+      );
+
+      final multipartFiles = converted.map((pf) {
+        return dio.MultipartFile.fromBytes(pf.bytes!, filename: pf.name);
+      }).toList();
 
       setState(() {
-        _image = imageFile;
-        _imageBase64 = base64Image;
+        _selectedFiles.addAll(converted);
+        _selectedMultipartFiles ??= [];
+        _selectedMultipartFiles!.addAll(multipartFiles);
       });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to add files: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
@@ -143,19 +189,16 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
       create: (_) => CreateRequestProvider(),
       child: Consumer2<CreateRequestProvider, SettingProvider>(
         builder: (context, createRequestProvider, settingProvider, child) {
-          final List<dynamic>? requestCategories =
-              createRequestProvider.data?.data['request_categories']
-                  as List<dynamic>?;
+          final List<dynamic>? requestCategories = createRequestProvider
+              .data?.data['request_categories'] as List<dynamic>?;
 
           Map<String, dynamic>? data;
           if (requestCategories != null) {
             try {
-              data =
-                  requestCategories.firstWhere(
-                        (item) => item['id'] == int.parse(widget.id!),
-                        orElse: () => <String, dynamic>{},
-                      )
-                      as Map<String, dynamic>;
+              data = requestCategories.firstWhere(
+                (item) => item['id'] == int.parse(widget.id!),
+                orElse: () => <String, dynamic>{},
+              ) as Map<String, dynamic>;
 
               // If we got an empty map from orElse, set data to null
               if (data.isEmpty) {
@@ -166,10 +209,12 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
             }
           }
           return Scaffold(
-            backgroundColor: Colors.grey[100],
+            // backgroundColor: Colors.grey[100],
+            backgroundColor: Colors.white,
             appBar: AppBar(
               title: Text('ស្នើសុំច្បាប់'),
               centerTitle: true,
+              bottom: CustomHeader(),
               actions: [
                 GestureDetector(
                   onTap: () {
@@ -182,6 +227,17 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
                         _validateAndSubmit();
                       },
                     );
+                    // ConfirmationDialog.show(
+                    //   context: context,
+                    //   title: 'Confirm Create',
+                    //   message: 'Are you sure to create request?',
+                    //   confirmText: 'រួចរាល់',
+                    //   cancelText: 'បិត',
+                    //   onCancel: () {},
+                    //   onConfirm: () {
+                    //     _validateAndSubmit();
+                    //   },
+                    // );
                   },
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -203,87 +259,134 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
             ),
             body: GestureDetector(
               onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-              child: Column(
-                children: [
-                  Expanded(
-                    child: RefreshIndicator(
-                      key: _refreshIndicatorKey,
-                      color: Colors.blue[800],
-                      backgroundColor: Colors.white,
-                      onRefresh: () => _refreshData(createRequestProvider),
-                      child:
-                          createRequestProvider.isLoading
-                              ? const Center(child: Text('Loading...'))
-                              : SingleChildScrollView(
-                                physics: const AlwaysScrollableScrollPhysics(),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(16.0),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Wrap(
-                                        spacing: 10,
-                                        runSpacing: 10,
-                                        children:
-                                            (data!['request_types'] as List).map((
-                                              record,
-                                            ) {
-                                              return Container(
-                                                margin: EdgeInsets.zero,
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                      vertical: 4,
-                                                      horizontal: 8,
-                                                    ),
-                                                decoration: BoxDecoration(
-                                                  color: const Color.fromRGBO(
-                                                    33,
-                                                    150,
-                                                    243,
-                                                    0.1,
-                                                  ),
-                                                  borderRadius:
-                                                      const BorderRadius.all(
-                                                        Radius.circular(16),
-                                                      ),
-                                                ),
-                                                child: Text(
-                                                  '${getSafeString(value: AppLang.translate(data: record, lang: settingProvider.lang ?? 'kh'))} ${getSafeInteger(value: record['max_per_year'])}',
-                                                  style: TextStyle(
-                                                    color: Colors.blue[800],
-                                                  ),
-                                                ),
-                                              );
-                                            }).toList(),
-                                      ),
-                                      const SizedBox(height: 16),
-                                      MyDropdown(
-                                        items:
-                                            (data['request_types'] as List)
-                                                .map(
-                                                  (item) =>
-                                                      item
-                                                          as Map<
-                                                            String,
-                                                            dynamic
-                                                          >,
-                                                )
-                                                .toList(),
-                                        label: 'ប្រភេទច្បាប់',
-                                        displayKey: 'name_kh',
-                                        onChanged: (item) {
+              child: RefreshIndicator(
+                key: _refreshIndicatorKey,
+                color: Colors.blue[800],
+                backgroundColor: Colors.white,
+                onRefresh: () => _refreshData(createRequestProvider),
+                child: createRequestProvider.isLoading
+                    ? const Center(
+                        child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text('Loading...'),
+                        ],
+                      ))
+                    : ListView(
+                        shrinkWrap: true,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // SingleChildScrollView(
+                                //   scrollDirection: Axis.horizontal,
+                                //   child: Wrap(
+                                //     spacing: 10,
+                                //     runSpacing: 10,
+                                //     children:
+                                //         (data!['request_types'] as List).map((
+                                //       record,
+                                //     ) {
+                                //       return Container(
+                                //         margin: EdgeInsets.zero,
+                                //         padding: const EdgeInsets.symmetric(
+                                //           vertical: 4,
+                                //           horizontal: 8,
+                                //         ),
+                                //         decoration: BoxDecoration(
+                                //           color: const Color.fromRGBO(
+                                //             33,
+                                //             150,
+                                //             243,
+                                //             0.1,
+                                //           ),
+                                //           borderRadius: const BorderRadius.all(
+                                //             Radius.circular(16),
+                                //           ),
+                                //         ),
+                                //         child: Text(
+                                //           '${getSafeString(value: AppLang.translate(data: record, lang: settingProvider.lang ?? 'kh'))} ${getSafeInteger(value: record['max_per_year'])}',
+                                //           style: TextStyle(
+                                //             color: Colors.blue[800],
+                                //           ),
+                                //         ),
+                                //       );
+                                //     }).toList(),
+                                //   ),
+                                // ),
+                                SingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  child: Wrap(
+                                    spacing: 10,
+                                    runSpacing: 10,
+                                    children:
+                                        (data!['request_types'] as List).map((
+                                      record,
+                                    ) {
+                                      return InkWell(
+                                        onTap: () {
                                           setState(() {
-                                            _selectedTypeId = item['id'];
-                                            _selectedTypeNameKh =
-                                                item['name_kh'];
+                                            _selectedTypeId = record['id'];
                                           });
+                                          // print(_selectedTypeId);
                                         },
-                                        selectedValue: _selectedTypeNameKh,
-                                      ),
-                                      const SizedBox(height: 16),
-                                      DateInputField(
-                                        label: 'កាលបរិច្ឆេទចាប់ផ្តើម',
+                                        child: Container(
+                                          margin: EdgeInsets.zero,
+                                          padding: const EdgeInsets.symmetric(
+                                            vertical: 5,
+                                            horizontal: 8,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: const Color.fromRGBO(
+                                              33,
+                                              150,
+                                              243,
+                                              0.1,
+                                            ),
+                                            borderRadius:
+                                                const BorderRadius.all(
+                                              Radius.circular(5),
+                                            ),
+                                            border: Border.all(
+                                              color: HColors.darkgrey
+                                                  .withOpacity(0.1),
+                                            ),
+                                          ),
+                                          child: Row(
+                                            children: [
+                                              Text(
+                                                '${getSafeString(value: AppLang.translate(data: record, lang: settingProvider.lang ?? 'kh'))} ',
+                                                style: TextStyle(
+                                                  color: _selectedTypeId ==
+                                                          record['id']
+                                                      ? Colors.blue[800]
+                                                      : HColors.darkgrey,
+                                                ),
+                                              ),
+                                              _selectedTypeId == record['id']
+                                                  ? Icon(
+                                                      Icons.check,
+                                                      size: 16,
+                                                      color: Colors.blue[800],
+                                                    )
+                                                  : SizedBox(),
+                                            ],
+                                          ),
+                                        ),
+                                      );
+                                    }).toList(),
+                                  ),
+                                ),
+
+                                const SizedBox(height: 16),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: DateInputField(
+                                        label: 'ថ្ងៃចាប់ផ្តើម',
                                         initialDate: DateTime.now(),
                                         selectedDate: _startDate,
                                         onDateSelected: (date) {
@@ -292,9 +395,13 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
                                           });
                                         },
                                       ),
-                                      const SizedBox(height: 16),
-                                      DateInputField(
-                                        label: 'កាលបរិច្ឆេទបញ្ចប់',
+                                    ),
+                                    SizedBox(
+                                      width: 16,
+                                    ),
+                                    Expanded(
+                                      child: DateInputField(
+                                        label: 'ថ្ងៃបញ្ចប់',
                                         initialDate: DateTime.now(),
                                         selectedDate: _endDate,
                                         onDateSelected: (date) {
@@ -303,100 +410,117 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
                                           });
                                         },
                                       ),
-                                      const SizedBox(height: 16),
-                                      DescriptionTextField(
-                                        controller: _descriptionController,
-                                        onChanged: (value) {
-                                          _description = value;
-                                        },
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 16),
+                                DescriptionTextField(
+                                  controller: _descriptionController,
+                                  onChanged: (value) {
+                                    _description = value;
+                                  },
+                                ),
+                                const SizedBox(height: 16),
+                                // Center(
+                                //   child: Column(
+                                //     mainAxisAlignment: MainAxisAlignment.center,
+                                //     children: [
+                                //       // Display selected image or placeholder
+                                //       _image == null
+                                //           ? Text('រូបភាព')
+                                //           : Image.file(
+                                //               _image!,
+                                //               height: 200,
+                                //             ),
+                                //       SizedBox(height: 20),
+                                //       // Button to pick image from gallery
+                                //       ElevatedButton(
+                                //         onPressed: () => _pickImage(
+                                //           ImageSource.gallery,
+                                //         ),
+                                //         child: Text(
+                                //           'Pick Image from Gallery',
+                                //         ),
+                                //       ),
+                                //       // Button to pick image from camera
+                                //       // ElevatedButton(
+                                //       //   onPressed: () =>
+                                //       //       _pickImage(ImageSource.camera),
+                                //       //   child: Text('Take Photo'),
+                                //       // ),
+                                //       // Button to upload image
+                                //       // ElevatedButton(
+                                //       //   onPressed: _image == null ? null : _uploadImage,
+                                //       //   child: Text('Upload Image'),
+                                //       // ),
+                                //     ],
+                                //   ),
+                                // ),
+                                Container(
+                                  padding: EdgeInsets.all(15),
+                                  decoration: BoxDecoration(
+                                      border: Border.all(
+                                        color:
+                                            HColors.darkgrey.withOpacity(0.1),
+                                        width: 1,
                                       ),
-                                      const SizedBox(height: 16),
-                                      Center(
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            // Display selected image or placeholder
-                                            _image == null
-                                                ? Text('No image selected.')
-                                                : Image.file(
-                                                  _image!,
-                                                  height: 200,
-                                                ),
-                                            SizedBox(height: 20),
-                                            // Button to pick image from gallery
-                                            ElevatedButton(
-                                              onPressed:
-                                                  () => _pickImage(
-                                                    ImageSource.gallery,
-                                                  ),
-                                              child: Text(
-                                                'Pick Image from Gallery',
-                                              ),
+                                      borderRadius: BorderRadius.circular(8)),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Icon(Icons.image,
+                                              color: HColors.darkgrey),
+                                          SizedBox(width: 8),
+                                          Text("រូបភាព")
+                                          // EText(text: "រូបភាព", size: EFontSize.content),
+                                        ],
+                                      ),
+                                      Row(
+                                        children: [
+                                          InkWell(
+                                            onTap: () {
+                                              _showBottomSheetFile(context);
+                                            },
+                                            child: Icon(
+                                              Icons.file_copy,
+                                              color: HColors.darkgrey,
                                             ),
-                                            // Button to pick image from camera
-                                            // ElevatedButton(
-                                            //   onPressed: () =>
-                                            //       _pickImage(ImageSource.camera),
-                                            //   child: Text('Take Photo'),
-                                            // ),
-                                            // Button to upload image
-                                            // ElevatedButton(
-                                            //   onPressed: _image == null ? null : _uploadImage,
-                                            //   child: Text('Upload Image'),
-                                            // ),
-                                          ],
-                                        ),
+                                          ),
+                                          SizedBox(width: 15),
+                                          InkWell(
+                                            onTap: () {
+                                              setState(() {
+                                                isClick = !isClick;
+                                              });
+                                            },
+                                            child: isClick
+                                                ? Icon(
+                                                    Icons.menu,
+                                                    color: HColors.darkgrey,
+                                                  )
+                                                : Icon(
+                                                    Icons.grid_view,
+                                                    color: HColors.darkgrey,
+                                                  ),
+                                          ),
+                                        ],
                                       ),
                                     ],
                                   ),
                                 ),
-                              ),
-                    ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.all(16.0),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black12,
-                          blurRadius: 8,
-                          offset: const Offset(0, -2),
-                        ),
-                      ],
-                    ),
-                    child: ElevatedButton(
-                      onPressed: () {
-                        showConfirmDialog(
-                          context,
-                          'Confirm Create',
-                          'Are you sure to create request?',
-                          DialogType.primary,
-                          () {
-                            _validateAndSubmit();
-                          },
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue[800],
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 16,
-                          horizontal: 32,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        minimumSize: const Size(double.infinity, 50),
+                                if (_selectedFiles.isNotEmpty)
+                                  Row(children: [
+                                    Expanded(child: _buildFileDisplay(isClick))
+                                  ]),
+                                SizedBox(height: 100),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
-                      child: const Text(
-                        'បញ្ជូនសំណើ',
-                        style: TextStyle(fontSize: 16),
-                      ),
-                    ),
-                  ),
-                ],
               ),
             ),
           );
@@ -404,23 +528,409 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
       ),
     );
   }
+
+  
+  // File display widget
+  Widget _buildFileDisplay(bool isGrid) {
+    if (_selectedFiles.isEmpty) return SizedBox.shrink();
+
+    return isGrid
+        ? GridView.builder(
+            shrinkWrap: true,
+            physics: NeverScrollableScrollPhysics(),
+            itemCount: _selectedFiles.length,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              childAspectRatio: 1.5,
+              crossAxisSpacing: 5,
+              mainAxisSpacing: 5,
+            ),
+            itemBuilder: (context, index) {
+              final file = _selectedFiles[index];
+              return _buildGridFileItem(file, index);
+            },
+          )
+        : ListView.builder(
+            shrinkWrap: true,
+            physics: NeverScrollableScrollPhysics(),
+            itemCount: _selectedFiles.length,
+            itemBuilder: (context, index) {
+              final file = _selectedFiles[index];
+              return _buildListFileItem(file, index);
+            },
+          );
+  }
+
+  Widget _buildGridFileItem(PlatformFile file, int index) {
+    // Check if the file is an image by its extension
+    final imageExtensions = ['.jpg', '.jpeg', '.png', '.gif'];
+    final isImage = file.path != null &&
+        imageExtensions.any((ext) => file.path!.toLowerCase().endsWith(ext));
+
+    if (!isImage) {
+      return _buildGenericFileItem(file, index);
+    }
+
+    return Padding(
+      padding: const EdgeInsets.all(4.0),
+      child: GestureDetector(
+        onTap: () => _showFullscreenImage(file, index),
+        child: Column(
+          children: [
+            Expanded(
+              child: Stack(
+                children: [
+                  Hero(
+                    tag: 'imageHero_$index',
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: AspectRatio(
+                        aspectRatio: 16 / 9,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(15),
+                            image: DecorationImage(
+                              image: FileImage(File(file.path!)),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  // Positioned(
+                  //   top: 0,
+                  //   right: 0,
+                  //   child: IconButton(
+                  //     icon: Icon(
+                  //       selectedThumbnail == index ? Icons.star : Icons.star,
+                  //       color: selectedThumbnail == index
+                  //           ? Colors.amber
+                  //           : HColors.darkgrey,
+                  //       size: 30,
+                  //     ),
+                  //     onPressed: () {
+                  //       setState(() {
+                  //         // Toggle selection - if already selected, deselect; otherwise select this one
+                  //         selectedThumbnail =
+                  //             selectedThumbnail == index ? 0 : index;
+                  //       });
+                  //     },
+                  //   ),
+                  // ),
+                ],
+              ),
+            ),
+            SizedBox(height: 4), // Add some spacing
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    file.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontFamily: 'Kantumruy Pro',
+                    ),
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () {
+                    _showBottomSheet(context, file, index);
+                  },
+                  child: Icon(Icons.more_vert, color: HColors.darkgrey),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGenericFileItem(PlatformFile file, int index) {
+    return Padding(
+      padding: const EdgeInsets.all(4.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.insert_drive_file, size: 40),
+          SizedBox(height: 4),
+          Text(
+            file.name,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+            style: TextStyle(fontFamily: 'Kantumruy Pro'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildListFileItem(PlatformFile file, int index) {
+    final imageExtensions = ['.jpg', '.jpeg', '.png', '.gif'];
+    final isImage = file.path != null &&
+        imageExtensions.any((ext) => file.path!.toLowerCase().endsWith(ext));
+
+    return ListTile(
+      leading: Icon(
+        isImage ? Icons.image : Icons.insert_drive_file,
+        color: HColors.darkgrey,
+      ),
+      // title: EText(
+      //   text: file.name,
+      //   size: EFontSize.small,
+      //   maxLines: 1,
+      //   textOverflow: TextOverflow.ellipsis,
+      // ),
+      title: Text(file.name),
+      subtitle: Text(formatFileSize(file.size), style: TextStyle(fontSize: 12)),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+            icon: Icon(
+              selectedThumbnail == index ? Icons.star : Icons.star_border,
+              color:
+                  selectedThumbnail == index ? Colors.amber : HColors.darkgrey,
+            ),
+            onPressed: () {
+              setState(() {
+                selectedThumbnail = selectedThumbnail == index ? 0 : index;
+              });
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.more_vert, color: HColors.darkgrey),
+            onPressed: () => _showBottomSheet(context, file, index),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showBottomSheet(BuildContext context, PlatformFile file, int index) {
+    showModalBottomSheet(
+      context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
+      ),
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Wrap(
+            children: [
+              ListTile(
+                leading: Icon(Icons.remove_red_eye, color: HColors.darkgrey),
+                title: Text('មើល'),
+                onTap: () {
+                  // Get.to(
+                  //   () => FullscreenImage(
+                  //     imageBytes: File(file.path!).readAsBytesSync(),
+                  //     tag: 'imageHero_$index',
+                  //   ),
+                  // );
+                },
+              ),
+              // ListTile(
+              //   leading: Icon(
+              //     Icons.folder_open_outlined,
+              //     color: HColors.darkgrey,
+              //   ),
+              //   title: EText(text: "ឯកសារអង្គភាព"),
+              //   onTap: () {
+              //     // Handle folder picking (if needed)
+              //     Navigator.pop(context);
+              //   },
+              // ),
+              ListTile(
+                leading: Icon(Icons.delete, color: HColors.danger),
+                title: Text("លុប"),
+                onTap: () {
+                  // Handle recent files selection
+                  _removeFileAtIndex(index);
+                  // Get.back();
+                },
+              ),
+              // ListTile(
+              //   leading: Icon(NewsIcon.mdi_light__tag, color: HColors.darkgrey),
+
+              //   title: EText(text: "tag".tr, size: EFontSize.footer),
+              //   onTap: () {
+              //     // Handle recent files selection
+              //     Navigator.pop(context);
+              //   },
+              // ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showFullscreenImage(PlatformFile file, int index) {
+    if (file.path == null) return;
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => FullscreenImage(
+          imageBytes: File(file.path!).readAsBytesSync(),
+          tag: 'imageHero_$index',
+        ),
+      ),
+    );
+  }
+
+  void _removeFileAtIndex(int index) {
+    setState(() {
+      _selectedFiles.removeAt(index);
+      _selectedMultipartFiles?.removeAt(index);
+
+      context.pop();
+    });
+  }
+
+  String formatFileSize(int bytes) {
+    const kb = 1024;
+    const mb = kb * 1024;
+    if (bytes < kb) {
+      return "$bytes B";
+    } else if (bytes < mb) {
+      return "${(bytes / kb).round()} KB";
+    } else {
+      return "${(bytes / mb).toStringAsFixed(2)} MB";
+    }
+  }
+
+  void _showBottomSheetFile(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return Wrap(
+          children: [
+            // ListTile(
+            //   leading: Icon(
+            //     Icons.camera_alt,
+            //     color: HColors.darkgrey,
+            //   ),
+            //   title: EText(text: "កាមេរ៉ា"),
+            //   onTap: () {
+            //     // Handle camera usage here (use image_picker package)
+            //     Navigator.pop(context);
+            //   },
+            // ),
+            ListTile(
+              leading: Icon(
+                Icons.abc,
+                color: HColors.darkgrey,
+              ),
+              title: Text('ជ្រើសរើសពីម៉ាសុីន'),
+              onTap: () async {
+                final picker = ImagePicker();
+                final List<XFile> pickedImages = await picker.pickMultiImage();
+
+                if (pickedImages.isNotEmpty) {
+                  _addImagesToSelectedFiles(pickedImages);
+                }
+
+                Navigator.pop(context); // Close bottom sheet
+              },
+            ),
+            // ListTile(
+            //   leading: Icon(
+            //     Icons.folder_open_outlined,
+            //     color: HColors.darkgrey,
+            //   ),
+            //   title: EText(text: "ឯកសារអង្គភាព"),
+            //   onTap: () {
+            //     // Handle folder picking (if needed)
+            //     Navigator.pop(context);
+            //   },
+            // ),
+            ListTile(
+              leading: Icon(Icons.folder_open, color: HColors.darkgrey),
+              title: Text("ជ្រើសរើសរូបពីឯកសារខ្ញុំ"),
+              onTap: () async {
+                // Use FilePicker to pick files
+                final result = await FilePicker.platform.pickFiles(
+                  allowMultiple: true, // Allow multiple file selection
+                );
+                if (result != null) {
+                  setState(() {
+                    // Assuming _selectedFiles is a List of PlatformFile
+                    _selectedFiles.addAll(result.files);
+                  });
+                }
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 }
 
-class MyDropdown extends StatelessWidget {
+class BuildSelectionField extends StatefulWidget {
   final List<Map<String, dynamic>> items;
   final String label;
   final String displayKey;
   final Function(Map<String, dynamic>) onChanged;
   final String? selectedValue;
+  final String? hintText;
+  final bool readOnly;
+  final TextInputType? keyboardType;
+  final int? maxLines;
 
-  const MyDropdown({
+  const BuildSelectionField({
     super.key,
     required this.items,
     required this.label,
     required this.displayKey,
     required this.onChanged,
     this.selectedValue,
+    this.hintText,
+    this.readOnly = false,
+    this.keyboardType,
+    this.maxLines = 1,
   });
+
+  @override
+  State<BuildSelectionField> createState() => _BuildSelectionFieldState();
+}
+
+class _BuildSelectionFieldState extends State<BuildSelectionField> {
+  late TextEditingController _controller;
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.selectedValue ?? '');
+  }
+
+  @override
+  void didUpdateWidget(BuildSelectionField oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Update controller text when selectedValue changes
+    if (oldWidget.selectedValue != widget.selectedValue) {
+      _controller.text = widget.selectedValue ?? '';
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+  
+
 
   void _openBottomSheet(BuildContext context) {
     showModalBottomSheet(
@@ -434,27 +944,60 @@ class MyDropdown extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                'ជ្រើសរើស$label',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blue[800],
+              Container(
+                width: 50,
+                height: 4,
+                margin: const EdgeInsets.only(bottom: 16),
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(2),
                 ),
               ),
-              const SizedBox(height: 16),
-              ...items.map((item) {
-                return ListTile(
-                  title: Text(
-                    item[displayKey],
-                    style: const TextStyle(fontSize: 16),
+              Row(
+                children: [
+                  Text(
+                    'ជ្រើសរើស${widget.label}',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.blue[800],
+                    ),
                   ),
-                  onTap: () {
-                    onChanged(item);
-                    Navigator.pop(context);
+                ],
+              ),
+              const SizedBox(height: 16),
+              Flexible(
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: widget.items.length,
+                  itemBuilder: (context, index) {
+                    final item = widget.items[index];
+                    final isSelected =
+                        widget.selectedValue == item[widget.displayKey];
+
+                    return ListTile(
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 4),
+                      title: Text(
+                        item[widget.displayKey] ?? '',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: isSelected ? Colors.blue[800] : Colors.black87,
+                          fontWeight:
+                              isSelected ? FontWeight.w500 : FontWeight.normal,
+                        ),
+                      ),
+                      trailing: isSelected
+                          ? Icon(Icons.check, color: Colors.blue[800], size: 20)
+                          : null,
+                      onTap: () {
+                        widget.onChanged(item);
+                        Navigator.pop(context);
+                      },
+                    );
                   },
-                );
-              }),
+                ),
+              ),
             ],
           ),
         );
@@ -467,49 +1010,79 @@ class MyDropdown extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: Colors.blue[800],
-          ),
-        ),
+        // Text(
+        //   widget.label,
+        //   style: TextStyle(
+        //     fontSize: 16,
+        //     fontWeight: FontWeight.w500,
+        //     color: Colors.blue[800],
+        //   ),
+        // ),
         const SizedBox(height: 8),
-        GestureDetector(
-          onTap: () => _openBottomSheet(context),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-            decoration: BoxDecoration(
-              color: Colors.white,
+        TextField(
+          controller: _controller,
+          readOnly: widget.readOnly,
+          keyboardType: widget.keyboardType,
+          maxLines: widget.maxLines,
+          onTap: widget.readOnly ? () => _openBottomSheet(context) : null,
+          decoration: InputDecoration(
+            hintText: widget.hintText ?? 'សូមជ្រើសរើស${widget.label}',
+            hintStyle: TextStyle(
+              color: HColors.darkgrey,
+              fontSize: 16,
+            ),
+            filled: true,
+            fillColor: Colors.white,
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 16,
+            ),
+            border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black12,
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ],
+              borderSide: BorderSide.none,
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  selectedValue ?? 'សូមជ្រើសរើស$label',
-                  style: TextStyle(
-                    color:
-                        selectedValue != null
-                            ? Colors.black87
-                            : Colors.grey[600],
-                    fontSize: 16,
-                  ),
-                ),
-                Icon(Icons.arrow_drop_down, color: Colors.blue[800]),
-              ],
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(color: Colors.grey[300]!, width: 1),
             ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: const BorderSide(color: HColors.darkgrey, width: 1),
+            ),
+            suffixIcon: widget.readOnly && widget.items.isNotEmpty
+                ? const Icon(Icons.arrow_drop_down, color: Colors.grey)
+                : null,
+          ),
+          style: const TextStyle(
+            color: Colors.black87,
+            fontSize: 16,
           ),
         ),
       ],
+    );
+  }
+}
+
+class FullscreenImage extends StatelessWidget {
+  final Uint8List imageBytes;
+  final String tag;
+
+  const FullscreenImage({Key? key, required this.imageBytes, required this.tag})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: GestureDetector(
+        onTap: () => Navigator.pop(context),
+        child: Center(
+          child: Hero(
+            tag: tag,
+            child: Image.memory(imageBytes, fit: BoxFit.contain),
+          ),
+        ),
+      ),
     );
   }
 }
@@ -543,20 +1116,18 @@ class KhmerDateFormatter {
       9: '៩',
     };
 
-    String day =
-        date.day
-            .toString()
-            .padLeft(2, '0')
-            .split('')
-            .map((d) => khmerDigits[int.parse(d)]!)
-            .join();
+    String day = date.day
+        .toString()
+        .padLeft(2, '0')
+        .split('')
+        .map((d) => khmerDigits[int.parse(d)]!)
+        .join();
     String month = khmerMonths[date.month]!;
-    String year =
-        date.year
-            .toString()
-            .split('')
-            .map((d) => khmerDigits[int.parse(d)]!)
-            .join();
+    String year = date.year
+        .toString()
+        .split('')
+        .map((d) => khmerDigits[int.parse(d)]!)
+        .join();
 
     return '$day $month $year';
   }
@@ -575,6 +1146,7 @@ class DateInputField extends StatelessWidget {
     required this.onDateSelected,
     this.selectedDate,
   });
+  
 
   void _openDatePickerBottomSheet(BuildContext context) {
     DateTime tempDate = selectedDate ?? initialDate;
@@ -593,8 +1165,8 @@ class DateInputField extends StatelessWidget {
                 label,
                 style: TextStyle(
                   fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blue[800],
+                  fontWeight: FontWeight.w500,
+                  color: HColors.darkgrey,
                 ),
               ),
               const SizedBox(height: 16),
@@ -616,7 +1188,7 @@ class DateInputField extends StatelessWidget {
                   Navigator.pop(context);
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue[800],
+                  backgroundColor: HColors.darkgrey,
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
@@ -633,54 +1205,43 @@ class DateInputField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: Colors.blue[800],
-          ),
+    return TextField(
+      readOnly: true,
+      onTap: () => _openDatePickerBottomSheet(context),
+      controller: TextEditingController(
+        text: selectedDate != null
+            ? KhmerDateFormatter.format(selectedDate!)
+            : '',
+      ),
+      decoration: InputDecoration(
+        labelText: label,
+        hintText: 'សូមជ្រើសរើសកាលបរិច្ឆេទ',
+        suffixIcon: Icon(Icons.calendar_today, color: HColors.darkgrey),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
         ),
-        const SizedBox(height: 8),
-        GestureDetector(
-          onTap: () => _openDatePickerBottomSheet(context),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(10),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black12,
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  selectedDate != null
-                      ? KhmerDateFormatter.format(selectedDate!)
-                      : 'សូមជ្រើសរើសកាលបរិច្ឆេទ',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color:
-                        selectedDate != null
-                            ? Colors.black87
-                            : Colors.grey[600],
-                  ),
-                ),
-                Icon(Icons.calendar_today, color: Colors.blue[800]),
-              ],
-            ),
-          ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(color: HColors.darkgrey, width: 1),
         ),
-      ],
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(color: Colors.grey[300]!, width: 1),
+        ),
+        filled: true,
+        fillColor: Colors.white,
+        labelStyle: TextStyle(
+          color: HColors.darkgrey,
+          fontWeight: FontWeight.w500,
+        ),
+        hintStyle: TextStyle(
+          color: HColors.darkgrey,
+        ),
+      ),
+      style: const TextStyle(
+        fontSize: 16,
+        // color: Colors.black87,
+      ),
     );
   }
 }
@@ -700,30 +1261,41 @@ class DescriptionTextField extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'ហេតុផល (ស្រេចចិត្ត)',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: Colors.blue[800],
-          ),
-        ),
-        const SizedBox(height: 8),
+        // Text(
+        //   'ហេតុផល (ស្រេចចិត្ត)',
+        //   style: TextStyle(
+        //     fontSize: 16,
+        //     fontWeight: FontWeight.w500,
+        //     color: Colors.blue[800],
+        //   ),
+        // ),
+
         TextField(
           controller: controller,
-          maxLines: 4,
+          maxLines: null,
           onChanged: onChanged,
           decoration: InputDecoration(
-            hintText: 'បញ្ចូលហេតុផលសម្រាប់ការស្នើសុំ...',
-            filled: true,
-            fillColor: Colors.white,
+            label: Text("មូលហេតុ"),
+            hintText: 'បញ្ចូលហេតុផល',
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide.none,
             ),
-            contentPadding: const EdgeInsets.symmetric(
-              vertical: 16,
-              horizontal: 16,
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(color: HColors.darkgrey, width: 1),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(color: Colors.grey[300]!, width: 1),
+            ),
+            filled: true,
+            fillColor: Colors.white,
+            labelStyle: TextStyle(
+              color: HColors.darkgrey,
+              fontWeight: FontWeight.w500,
+            ),
+            hintStyle: TextStyle(
+              color: HColors.darkgrey,
             ),
           ),
           style: const TextStyle(fontSize: 16),

@@ -25,7 +25,7 @@ class AboutScreen extends StatelessWidget {
               title: Text(
                 AppLang.translate(key: 'about_system', lang: lang ?? 'kh'),
                 style: const TextStyle(
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w500,
                   color: Colors.black,
                 ),
               ),
@@ -146,7 +146,7 @@ class AboutScreen extends StatelessWidget {
           title,
           style: TextStyle(
             fontSize: Theme.of(context).textTheme.bodyLarge!.fontSize,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w500,
             color: Colors.black,
           ),
         ),

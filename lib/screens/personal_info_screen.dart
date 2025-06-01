@@ -539,7 +539,7 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
   //             //   'បន្ថែមសំណើថ្មី',
   //             //   style: TextStyle(
   //             //     fontSize: 20.0,
-  //             //     fontWeight: FontWeight.bold,
+  //             //     fontWeight: FontWeight.w500,
   //             //     color: Colors.blue[900],
   //             //   ),
   //             // ),

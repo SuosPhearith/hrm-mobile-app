@@ -5,11 +5,12 @@ import 'package:mobile_app/app_lang.dart';
 import 'package:mobile_app/providers/global/setting_provider.dart';
 import 'package:mobile_app/providers/local/personalinfo/update_personal_info_provider.dart';
 import 'package:mobile_app/services/personal_info/update_personal_info_service.dart';
-
+import 'package:mobile_app/shared/color/colors.dart';
 
 import 'package:mobile_app/utils/help_util.dart';
 import 'package:mobile_app/widgets/custom_header.dart';
 import 'package:mobile_app/widgets/helper.dart';
+import 'package:mobile_app/widgets/skeleton.dart';
 import 'package:provider/provider.dart';
 
 class UpdatePersonalInfoScreen extends StatefulWidget {
@@ -327,10 +328,25 @@ class _UpdatePersonalInfoScreenState extends State<UpdatePersonalInfoScreen> {
           return Scaffold(
             // backgroundColor: Colors.grey[100],
             backgroundColor: Colors.white,
+            // backgroundColor: HColors.darkgrey.withOpacity(0.1),
             appBar: AppBar(
               title:
                   Text(AppLang.translate(key: 'user_info_update', lang: 'kh')),
               centerTitle: true,
+              actions: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: GestureDetector(
+                    onTap: () {
+                      _handleSubmit();
+                    },
+                    child: Icon(
+                      Icons.check,
+                      color: Colors.blue,
+                    ),
+                  ),
+                )
+              ],
               bottom: CustomHeader(),
             ),
             body: RefreshIndicator(
@@ -339,541 +355,549 @@ class _UpdatePersonalInfoScreenState extends State<UpdatePersonalInfoScreen> {
               backgroundColor: Colors.white,
               onRefresh: () => _refreshData(updatePersonalProvider),
               child: updatePersonalProvider.isLoading
-                  ? Center(child: Text('Loading...'))
-                  : SingleChildScrollView(
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // TextFormField(
-                            //   controller: txtSalute,
-                            //   decoration: InputDecoration(
-                            //     labelText: AppLang.translate(
-                            //         key: "user_info_salute",
-                            //         lang: settingProvider.lang ?? 'kh'),
-                            //     border: OutlineInputBorder(
-                            //       borderRadius:
-                            //           BorderRadius.all(Radius.circular(12.0)),
-                            //     ),
-                            //   ),
-                            // ),
-                            // Relative Type Selection
-                            _buildSelectionField(
-                              controller: txtSalute,
-                              label: AppLang.translate(
-                                  lang: settingProvider.lang ?? 'kh',
-                                  key: 'user_info_salute'),
-                              items: salutes,
-                              onSelected: (id, value) {
-                                setState(() {
-                                  selectedSaluteId = id;
-                                  txtSalute.text = value;
-                                });
-                              },
-                            ),
-                            const SizedBox(height: 16),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: _buildTextField(
-                                    controller: txtKhName,
-                                    label:
-                                        "${AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'user_info_kh_name')} *",
-                                  ),
-                                ),
-                                const SizedBox(width: 16),
-                                Expanded(
-                                  child: _buildTextField(
-                                    controller: txtEnName,
-                                    label:
-                                        "${AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'user_info_en_name')} *",
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 16),
-                            Row(
-                              children: genderList.map((gender) {
-                                return Expanded(
-                                  child: RadioListTile<int>(
-                                    title: Text(gender['name_kh']),
-                                    value: gender['id'],
-                                    groupValue: selectedGenderId,
-                                    onChanged: (int? value) {
-                                      setState(() {
-                                        selectedGenderId = value;
-                                      });
-                                    },
-                                  ),
-                                );
-                              }).toList(),
-                            ),
-                            const SizedBox(height: 16),
-                            // TextFormField(
-                            //   controller: txtPhone,
-                            //   decoration: InputDecoration(
-                            //     labelText: AppLang.translate(
-                            //         key: "user_info_phone", lang: 'kh'),
-                            //     border: const OutlineInputBorder(
-                            //       borderRadius:
-                            //           BorderRadius.all(Radius.circular(12.0)),
-                            //     ),
-                            //   ),
-                            //   keyboardType: TextInputType.phone,
-                            // ),
-                            _buildTextField(
-                              controller: txtPhone,
-                              label: AppLang.translate(
-                                  lang: settingProvider.lang ?? 'kh',
-                                  key: 'user_info_phone'),
-                              keyboardType: TextInputType.phone,
-                            ),
-                            const SizedBox(height: 16),
-                            // TextFormField(
-                            //   controller: txtEmail,
-                            //   decoration: InputDecoration(
-                            //     labelText: AppLang.translate(
-                            //         key: "user_info_email", lang: 'kh'),
-                            //     border: const OutlineInputBorder(
-                            //       borderRadius:
-                            //           BorderRadius.all(Radius.circular(12.0)),
-                            //     ),
-                            //   ),
-                            //   keyboardType: TextInputType.emailAddress,
-                            // ),
-                            _buildTextField(
-                              controller: txtEmail,
-                              label: AppLang.translate(
-                                  lang: settingProvider.lang ?? 'kh',
-                                  key: 'user_info_email'),
-                              keyboardType: TextInputType.emailAddress,
-                            ),
-                            const SizedBox(height: 16),
-                            // TextFormField(
-                            //   controller: txtIdentity,
-                            //   decoration: InputDecoration(
-                            //     labelText: AppLang.translate(
-                            //         key: "user_info_card_id", lang: 'kh'),
-                            //     border: const OutlineInputBorder(
-                            //       borderRadius:
-                            //           BorderRadius.all(Radius.circular(12.0)),
-                            //     ),
-                            //   ),
-                            // ),
-                            _buildTextField(
-                              controller: txtIdentity,
-                              label: AppLang.translate(
-                                lang: settingProvider.lang ?? 'kh',
-                                key: 'user_info_card_id',
+                  // ? Center(child: Text('Loading...'))
+                  ? Skeleton()
+                  : GestureDetector(
+                      onTap: () =>
+                          FocusManager.instance.primaryFocus?.unfocus(),
+                      child: SingleChildScrollView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // TextFormField(
+                              //   controller: txtSalute,
+                              //   decoration: InputDecoration(
+                              //     labelText: AppLang.translate(
+                              //         key: "user_info_salute",
+                              //         lang: settingProvider.lang ?? 'kh'),
+                              //     border: OutlineInputBorder(
+                              //       borderRadius:
+                              //           BorderRadius.all(Radius.circular(12.0)),
+                              //     ),
+                              //   ),
+                              // ),
+                              // Relative Type Selection
+                              _buildSelectionField(
+                                controller: txtSalute,
+                                label: AppLang.translate(
+                                    lang: settingProvider.lang ?? 'kh',
+                                    key: 'user_info_salute'),
+                                items: salutes,
+                                onSelected: (id, value) {
+                                  setState(() {
+                                    selectedSaluteId = id;
+                                    txtSalute.text = value;
+                                  });
+                                },
                               ),
-                              keyboardType: TextInputType.number,
-                            ),
-                            const SizedBox(height: 16),
+                              const SizedBox(height: 24),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: _buildTextField(
+                                      controller: txtKhName,
+                                      label:
+                                          "${AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'user_info_kh_name')} *",
+                                    ),
+                                  ),
+                                  const SizedBox(width: 16),
+                                  Expanded(
+                                    child: _buildTextField(
+                                      controller: txtEnName,
+                                      label:
+                                          "${AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'user_info_en_name')} *",
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 24),
+                              Row(
+                                children: genderList.map((gender) {
+                                  return Expanded(
+                                    child: RadioListTile<int>(
+                                      title: Text(gender['name_kh']),
+                                      value: gender['id'],
+                                      groupValue: selectedGenderId,
+                                      onChanged: (int? value) {
+                                        setState(() {
+                                          selectedGenderId = value;
+                                        });
+                                      },
+                                    ),
+                                  );
+                                }).toList(),
+                              ),
+                              const SizedBox(height: 24),
+                              // TextFormField(
+                              //   controller: txtPhone,
+                              //   decoration: InputDecoration(
+                              //     labelText: AppLang.translate(
+                              //         key: "user_info_phone", lang: 'kh'),
+                              //     border: const OutlineInputBorder(
+                              //       borderRadius:
+                              //           BorderRadius.all(Radius.circular(12.0)),
+                              //     ),
+                              //   ),
+                              //   keyboardType: TextInputType.phone,
+                              // ),
+                              _buildTextField(
+                                controller: txtPhone,
+                                label: AppLang.translate(
+                                    lang: settingProvider.lang ?? 'kh',
+                                    key: 'user_info_phone'),
+                                keyboardType: TextInputType.phone,
+                              ),
+                              const SizedBox(height: 24),
+                              // TextFormField(
+                              //   controller: txtEmail,
+                              //   decoration: InputDecoration(
+                              //     labelText: AppLang.translate(
+                              //         key: "user_info_email", lang: 'kh'),
+                              //     border: const OutlineInputBorder(
+                              //       borderRadius:
+                              //           BorderRadius.all(Radius.circular(12.0)),
+                              //     ),
+                              //   ),
+                              //   keyboardType: TextInputType.emailAddress,
+                              // ),
+                              _buildTextField(
+                                controller: txtEmail,
+                                label: AppLang.translate(
+                                    lang: settingProvider.lang ?? 'kh',
+                                    key: 'user_info_email'),
+                                keyboardType: TextInputType.emailAddress,
+                              ),
+                              const SizedBox(height: 24),
+                              // TextFormField(
+                              //   controller: txtIdentity,
+                              //   decoration: InputDecoration(
+                              //     labelText: AppLang.translate(
+                              //         key: "user_info_card_id", lang: 'kh'),
+                              //     border: const OutlineInputBorder(
+                              //       borderRadius:
+                              //           BorderRadius.all(Radius.circular(12.0)),
+                              //     ),
+                              //   ),
+                              // ),
+                              _buildTextField(
+                                controller: txtIdentity,
+                                label: AppLang.translate(
+                                  lang: settingProvider.lang ?? 'kh',
+                                  key: 'user_info_card_id',
+                                ),
+                                keyboardType: TextInputType.number,
+                              ),
+                              const SizedBox(height: 24),
 
-                            // Date of Birth
-                            _buildTextField(
-                              controller: txtDob,
-                              label: AppLang.translate(
+                              // Date of Birth
+                              _buildTextField(
+                                controller: txtDob,
+                                label: AppLang.translate(
+                                    lang: settingProvider.lang ?? 'kh',
+                                    key: 'user_info_date_of_birth'),
+                                readOnly: true,
+                                onTap: _selectDate,
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    Icons.calendar_today_rounded,
+                                    color: Colors.grey,
+                                  ),
+                                  onPressed: _selectDate,
+                                ),
+                              ),
+                              const SizedBox(height: 24),
+                              // TextFormField(
+                              //   controller: txtNote,
+                              //   maxLines: null,
+                              //   decoration: InputDecoration(
+                              //     labelText: AppLang.translate(
+                              //         key: "user_info_note", lang: 'kh'),
+                              //     border: const OutlineInputBorder(
+                              //       borderRadius:
+                              //           BorderRadius.all(Radius.circular(12.0)),
+                              //     ),
+                              //   ),
+                              // ),
+                              _buildTextField(
+                                controller: txtNote,
+                                label: AppLang.translate(
                                   lang: settingProvider.lang ?? 'kh',
-                                  key: 'user_info_date_of_birth'),
-                              readOnly: true,
-                              onTap: _selectDate,
-                              suffixIcon: IconButton(
-                                icon: Icon(
-                                  Icons.calendar_today_rounded,
-                                  color: Colors.grey,
+                                  key: 'user_info_note',
                                 ),
-                                onPressed: _selectDate,
+                                // keyboardType: TextInputType.number,
                               ),
-                            ),
-                            const SizedBox(height: 16),
-                            // TextFormField(
-                            //   controller: txtNote,
-                            //   maxLines: null,
-                            //   decoration: InputDecoration(
-                            //     labelText: AppLang.translate(
-                            //         key: "user_info_note", lang: 'kh'),
-                            //     border: const OutlineInputBorder(
-                            //       borderRadius:
-                            //           BorderRadius.all(Radius.circular(12.0)),
-                            //     ),
-                            //   ),
-                            // ),
-                            _buildTextField(
-                              controller: txtNote,
-                              label: AppLang.translate(
-                                lang: settingProvider.lang ?? 'kh',
-                                key: 'user_info_note',
+                              const SizedBox(height: 24),
+                              Container(
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: Colors.grey.shade100,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.location_on_outlined,
+                                      color: Colors.grey,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text(AppLang.translate(
+                                        key: "user_info_place_of_birth",
+                                        lang: 'kh')),
+                                  ],
+                                ),
                               ),
-                              // keyboardType: TextInputType.number,
-                            ),
-                            const SizedBox(height: 16),
-                            Container(
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                color: Colors.grey.shade100,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Row(
+                              const SizedBox(height: 24),
+                              Row(
                                 children: [
-                                  Icon(
-                                    Icons.location_on_outlined,
-                                    color: Colors.grey,
+                                  Expanded(
+                                    // child: TextFormField(
+                                    //   controller: txtDobProvince,
+                                    //   decoration: InputDecoration(
+                                    //     labelText: AppLang.translate(
+                                    //         key: "user_info_province",
+                                    //         lang: 'kh'),
+                                    //     border: const OutlineInputBorder(
+                                    //       borderRadius: BorderRadius.all(
+                                    //           Radius.circular(12.0)),
+                                    //     ),
+                                    //   ),
+                                    // ),
+                                    child: _buildTextField(
+                                      controller: txtDobProvince,
+                                      label: AppLang.translate(
+                                        lang: settingProvider.lang ?? 'kh',
+                                        key: 'user_info_province',
+                                      ),
+                                      // keyboardType: TextInputType.number,
+                                    ),
                                   ),
                                   const SizedBox(width: 8),
-                                  Text(AppLang.translate(
-                                      key: "user_info_place_of_birth",
-                                      lang: 'kh')),
+                                  Expanded(
+                                    // child: TextFormField(
+                                    //   controller: txtDobDistrict,
+                                    //   decoration: InputDecoration(
+                                    //     labelText: AppLang.translate(
+                                    //         key: "user_info_district",
+                                    //         lang: 'kh'),
+                                    //     border: const OutlineInputBorder(
+                                    //       borderRadius: BorderRadius.all(
+                                    //           Radius.circular(12.0)),
+                                    //     ),
+                                    //   ),
+                                    // ),
+                                    child: _buildTextField(
+                                      controller: txtDobDistrict,
+                                      label: AppLang.translate(
+                                        lang: settingProvider.lang ?? 'kh',
+                                        key: 'user_info_district',
+                                      ),
+                                      // keyboardType: TextInputType.number,
+                                    ),
+                                  ),
                                 ],
                               ),
-                            ),
-                            const SizedBox(height: 16),
-                            Row(
-                              children: [
-                                Expanded(
-                                  // child: TextFormField(
-                                  //   controller: txtDobProvince,
-                                  //   decoration: InputDecoration(
-                                  //     labelText: AppLang.translate(
-                                  //         key: "user_info_province",
-                                  //         lang: 'kh'),
-                                  //     border: const OutlineInputBorder(
-                                  //       borderRadius: BorderRadius.all(
-                                  //           Radius.circular(12.0)),
-                                  //     ),
-                                  //   ),
-                                  // ),
-                                  child: _buildTextField(
-                                    controller: txtDobProvince,
-                                    label: AppLang.translate(
-                                      lang: settingProvider.lang ?? 'kh',
-                                      key: 'user_info_province',
-                                    ),
-                                    // keyboardType: TextInputType.number,
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  // child: TextFormField(
-                                  //   controller: txtDobDistrict,
-                                  //   decoration: InputDecoration(
-                                  //     labelText: AppLang.translate(
-                                  //         key: "user_info_district",
-                                  //         lang: 'kh'),
-                                  //     border: const OutlineInputBorder(
-                                  //       borderRadius: BorderRadius.all(
-                                  //           Radius.circular(12.0)),
-                                  //     ),
-                                  //   ),
-                                  // ),
-                                  child: _buildTextField(
-                                    controller: txtDobDistrict,
-                                    label: AppLang.translate(
-                                      lang: settingProvider.lang ?? 'kh',
-                                      key: 'user_info_district',
-                                    ),
-                                    // keyboardType: TextInputType.number,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 15),
-                            Row(
-                              children: [
-                                Expanded(
-                                  // child: TextFormField(
-                                  //   controller: txtDobCommune,
-                                  //   decoration: InputDecoration(
-                                  //     labelText: AppLang.translate(
-                                  //         key: "user_info_commune", lang: 'kh'),
-                                  //     border: const OutlineInputBorder(
-                                  //       borderRadius: BorderRadius.all(
-                                  //           Radius.circular(12.0)),
-                                  //     ),
-                                  //   ),
-                                  // ),
-                                  child: _buildTextField(
-                                    controller: txtDobCommune,
-                                    label: AppLang.translate(
-                                      lang: settingProvider.lang ?? 'kh',
-                                      key: 'user_info_commune',
-                                    ),
-                                    // keyboardType: TextInputType.number,
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  // child: TextFormField(
-                                  //   controller: txtDobVillage,
-                                  //   decoration: InputDecoration(
-                                  //     labelText: AppLang.translate(
-                                  //         key: "user_info_village", lang: 'kh'),
-                                  //     border: const OutlineInputBorder(
-                                  //       borderRadius: BorderRadius.all(
-                                  //           Radius.circular(12.0)),
-                                  //     ),
-                                  //   ),
-                                  // ),
-                                  child: _buildTextField(
-                                    controller: txtDobVillage,
-                                    label: AppLang.translate(
-                                      lang: settingProvider.lang ?? 'kh',
-                                      key: 'user_info_village',
-                                    ),
-                                    // keyboardType: TextInputType.number,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 15),
-                            Row(
-                              children: [
-                                Expanded(
-                                  // child: TextFormField(
-                                  //   controller: txtDobStreetNumber,
-                                  //   decoration: InputDecoration(
-                                  //     labelText: AppLang.translate(
-                                  //         key: "user_info_street", lang: 'kh'),
-                                  //     border: const OutlineInputBorder(
-                                  //       borderRadius: BorderRadius.all(
-                                  //           Radius.circular(12.0)),
-                                  //     ),
-                                  //   ),
-                                  // ),
-                                  child: _buildTextField(
-                                    controller: txtDobStreetNumber,
-                                    label: AppLang.translate(
-                                      lang: settingProvider.lang ?? 'kh',
-                                      key: 'user_info_street',
-                                    ),
-                                    // keyboardType: TextInputType.number,
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  // child: TextFormField(
-                                  //   controller: txtDobHomeNumber,
-                                  //   decoration: InputDecoration(
-                                  //     labelText: AppLang.translate(
-                                  //         key: "user_info_number", lang: 'kh'),
-                                  //     border: const OutlineInputBorder(
-                                  //       borderRadius: BorderRadius.all(
-                                  //           Radius.circular(12.0)),
-                                  //     ),
-                                  //   ),
-                                  // ),
-                                  child: _buildTextField(
-                                    controller: txtDobHomeNumber,
-                                    label: AppLang.translate(
-                                      lang: settingProvider.lang ?? 'kh',
-                                      key: 'user_info_number',
-                                    ),
-                                    // keyboardType: TextInputType.number,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 24),
-                            Container(
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                color: Colors.grey.shade100,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Row(
+                              const SizedBox(height: 24),
+                              Row(
                                 children: [
-                                  Icon(
-                                    Icons.location_on_outlined,
-                                    color: Colors.grey,
+                                  Expanded(
+                                    // child: TextFormField(
+                                    //   controller: txtDobCommune,
+                                    //   decoration: InputDecoration(
+                                    //     labelText: AppLang.translate(
+                                    //         key: "user_info_commune", lang: 'kh'),
+                                    //     border: const OutlineInputBorder(
+                                    //       borderRadius: BorderRadius.all(
+                                    //           Radius.circular(12.0)),
+                                    //     ),
+                                    //   ),
+                                    // ),
+                                    child: _buildTextField(
+                                      controller: txtDobCommune,
+                                      label: AppLang.translate(
+                                        lang: settingProvider.lang ?? 'kh',
+                                        key: 'user_info_commune',
+                                      ),
+                                      // keyboardType: TextInputType.number,
+                                    ),
                                   ),
                                   const SizedBox(width: 8),
-                                  Text(AppLang.translate(
-                                      key: "user_info_current_address",
-                                      lang: 'kh')),
+                                  Expanded(
+                                    // child: TextFormField(
+                                    //   controller: txtDobVillage,
+                                    //   decoration: InputDecoration(
+                                    //     labelText: AppLang.translate(
+                                    //         key: "user_info_village", lang: 'kh'),
+                                    //     border: const OutlineInputBorder(
+                                    //       borderRadius: BorderRadius.all(
+                                    //           Radius.circular(12.0)),
+                                    //     ),
+                                    //   ),
+                                    // ),
+                                    child: _buildTextField(
+                                      controller: txtDobVillage,
+                                      label: AppLang.translate(
+                                        lang: settingProvider.lang ?? 'kh',
+                                        key: 'user_info_village',
+                                      ),
+                                      // keyboardType: TextInputType.number,
+                                    ),
+                                  ),
                                 ],
                               ),
-                            ),
-                            const SizedBox(height: 15),
-                            Row(
-                              children: [
-                                Expanded(
-                                  // child: TextFormField(
-                                  //   controller: txtProvince,
-                                  //   decoration: InputDecoration(
-                                  //     labelText: AppLang.translate(
-                                  //         key: "user_info_province",
-                                  //         lang: 'kh'),
-                                  //     border: const OutlineInputBorder(
-                                  //       borderRadius: BorderRadius.all(
-                                  //           Radius.circular(12.0)),
-                                  //     ),
-                                  //   ),
-                                  // ),
-                                  child: _buildTextField(
-                                    controller: txtProvince,
-                                    label: AppLang.translate(
-                                      lang: settingProvider.lang ?? 'kh',
-                                      key: 'user_info_province',
+                              const SizedBox(height: 24),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    // child: TextFormField(
+                                    //   controller: txtDobStreetNumber,
+                                    //   decoration: InputDecoration(
+                                    //     labelText: AppLang.translate(
+                                    //         key: "user_info_street", lang: 'kh'),
+                                    //     border: const OutlineInputBorder(
+                                    //       borderRadius: BorderRadius.all(
+                                    //           Radius.circular(12.0)),
+                                    //     ),
+                                    //   ),
+                                    // ),
+                                    child: _buildTextField(
+                                      controller: txtDobStreetNumber,
+                                      label: AppLang.translate(
+                                        lang: settingProvider.lang ?? 'kh',
+                                        key: 'user_info_street',
+                                      ),
+                                      // keyboardType: TextInputType.number,
                                     ),
-                                    // keyboardType: TextInputType.number,
                                   ),
-                                ),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  // child: TextFormField(
-                                  //   controller: txtDistrict,
-                                  //   decoration: InputDecoration(
-                                  //     labelText: AppLang.translate(
-                                  //         key: "user_info_district",
-                                  //         lang: 'kh'),
-                                  //     border: const OutlineInputBorder(
-                                  //       borderRadius: BorderRadius.all(
-                                  //           Radius.circular(12.0)),
-                                  //     ),
-                                  //   ),
-                                  // ),
-                                  child: _buildTextField(
-                                    controller: txtDistrict,
-                                    label: AppLang.translate(
-                                      lang: settingProvider.lang ?? 'kh',
-                                      key: 'user_info_district',
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    // child: TextFormField(
+                                    //   controller: txtDobHomeNumber,
+                                    //   decoration: InputDecoration(
+                                    //     labelText: AppLang.translate(
+                                    //         key: "user_info_number", lang: 'kh'),
+                                    //     border: const OutlineInputBorder(
+                                    //       borderRadius: BorderRadius.all(
+                                    //           Radius.circular(12.0)),
+                                    //     ),
+                                    //   ),
+                                    // ),
+                                    child: _buildTextField(
+                                      controller: txtDobHomeNumber,
+                                      label: AppLang.translate(
+                                        lang: settingProvider.lang ?? 'kh',
+                                        key: 'user_info_number',
+                                      ),
+                                      // keyboardType: TextInputType.number,
                                     ),
-                                    // keyboardType: TextInputType.number,
                                   ),
+                                ],
+                              ),
+                              const SizedBox(height: 24),
+                              Container(
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: Colors.grey.shade100,
+                                  borderRadius: BorderRadius.circular(8),
                                 ),
-                              ],
-                            ),
-                            const SizedBox(
-                              height: 15,
-                            ),
-                            Row(
-                              children: [
-                                Expanded(
-                                  // child: TextFormField(
-                                  //   controller: txtCommune,
-                                  //   decoration: InputDecoration(
-                                  //     labelText: AppLang.translate(
-                                  //         key: "user_info_commune", lang: 'kh'),
-                                  //     border: const OutlineInputBorder(
-                                  //       borderRadius: BorderRadius.all(
-                                  //           Radius.circular(12.0)),
-                                  //     ),
-                                  //   ),
-                                  // ),
-                                  child: _buildTextField(
-                                    controller: txtCommune,
-                                    label: AppLang.translate(
-                                      lang: settingProvider.lang ?? 'kh',
-                                      key: 'user_info_commune',
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.location_on_outlined,
+                                      color: Colors.grey,
                                     ),
-                                    // keyboardType: TextInputType.number,
-                                  ),
+                                    const SizedBox(width: 8),
+                                    Text(AppLang.translate(
+                                        key: "user_info_current_address",
+                                        lang: 'kh')),
+                                  ],
                                 ),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  // child: TextFormField(
-                                  //   controller: txtVillage,
-                                  //   decoration: InputDecoration(
-                                  //     labelText: AppLang.translate(
-                                  //         key: "user_info_village", lang: 'kh'),
-                                  //     border: const OutlineInputBorder(
-                                  //       borderRadius: BorderRadius.all(
-                                  //           Radius.circular(12.0)),
-                                  //     ),
-                                  //   ),
-                                  // ),
-                                  child: _buildTextField(
-                                    controller: txtVillage,
-                                    label: AppLang.translate(
-                                      lang: settingProvider.lang ?? 'kh',
-                                      key: 'user_info_village',
+                              ),
+                              const SizedBox(height: 15),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    // child: TextFormField(
+                                    //   controller: txtProvince,
+                                    //   decoration: InputDecoration(
+                                    //     labelText: AppLang.translate(
+                                    //         key: "user_info_province",
+                                    //         lang: 'kh'),
+                                    //     border: const OutlineInputBorder(
+                                    //       borderRadius: BorderRadius.all(
+                                    //           Radius.circular(12.0)),
+                                    //     ),
+                                    //   ),
+                                    // ),
+                                    child: _buildTextField(
+                                      controller: txtProvince,
+                                      label: AppLang.translate(
+                                        lang: settingProvider.lang ?? 'kh',
+                                        key: 'user_info_province',
+                                      ),
+                                      // keyboardType: TextInputType.number,
                                     ),
-                                    // keyboardType: TextInputType.number,
                                   ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(
-                              height: 15,
-                            ),
-                            Row(
-                              children: [
-                                Expanded(
-                                  // child: TextFormField(
-                                  //   controller: txtStreetNumber,
-                                  //   decoration: InputDecoration(
-                                  //     labelText: AppLang.translate(
-                                  //         key: "user_info_street", lang: 'kh'),
-                                  //     border: const OutlineInputBorder(
-                                  //       borderRadius: BorderRadius.all(
-                                  //           Radius.circular(12.0)),
-                                  //     ),
-                                  //   ),
-                                  // ),
-                                  child: _buildTextField(
-                                    controller: txtStreetNumber,
-                                    label: AppLang.translate(
-                                      lang: settingProvider.lang ?? 'kh',
-                                      key: 'user_info_street',
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    // child: TextFormField(
+                                    //   controller: txtDistrict,
+                                    //   decoration: InputDecoration(
+                                    //     labelText: AppLang.translate(
+                                    //         key: "user_info_district",
+                                    //         lang: 'kh'),
+                                    //     border: const OutlineInputBorder(
+                                    //       borderRadius: BorderRadius.all(
+                                    //           Radius.circular(12.0)),
+                                    //     ),
+                                    //   ),
+                                    // ),
+                                    child: _buildTextField(
+                                      controller: txtDistrict,
+                                      label: AppLang.translate(
+                                        lang: settingProvider.lang ?? 'kh',
+                                        key: 'user_info_district',
+                                      ),
+                                      // keyboardType: TextInputType.number,
                                     ),
-                                    // keyboardType: TextInputType.number,
                                   ),
-                                ),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  // child: TextFormField(
-                                  //   controller: txtHomeNumber,
-                                  //   decoration: InputDecoration(
-                                  //     labelText: AppLang.translate(
-                                  //         key: "user_info_number", lang: 'kh'),
-                                  //     border: const OutlineInputBorder(
-                                  //       borderRadius: BorderRadius.all(
-                                  //           Radius.circular(12.0)),
-                                  //     ),
-                                  //   ),
-                                  // ),
-                                  child: _buildTextField(
-                                    controller: txtHomeNumber,
-                                    label: AppLang.translate(
-                                      lang: settingProvider.lang ?? 'kh',
-                                      key: 'user_info_number',
+                                ],
+                              ),
+                              const SizedBox(
+                                height: 15,
+                              ),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    // child: TextFormField(
+                                    //   controller: txtCommune,
+                                    //   decoration: InputDecoration(
+                                    //     labelText: AppLang.translate(
+                                    //         key: "user_info_commune", lang: 'kh'),
+                                    //     border: const OutlineInputBorder(
+                                    //       borderRadius: BorderRadius.all(
+                                    //           Radius.circular(12.0)),
+                                    //     ),
+                                    //   ),
+                                    // ),
+                                    child: _buildTextField(
+                                      controller: txtCommune,
+                                      label: AppLang.translate(
+                                        lang: settingProvider.lang ?? 'kh',
+                                        key: 'user_info_commune',
+                                      ),
+                                      // keyboardType: TextInputType.number,
                                     ),
-                                    // keyboardType: TextInputType.number,
                                   ),
-                                ),
-                              ],
-                            ),
-                          ],
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    // child: TextFormField(
+                                    //   controller: txtVillage,
+                                    //   decoration: InputDecoration(
+                                    //     labelText: AppLang.translate(
+                                    //         key: "user_info_village", lang: 'kh'),
+                                    //     border: const OutlineInputBorder(
+                                    //       borderRadius: BorderRadius.all(
+                                    //           Radius.circular(12.0)),
+                                    //     ),
+                                    //   ),
+                                    // ),
+                                    child: _buildTextField(
+                                      controller: txtVillage,
+                                      label: AppLang.translate(
+                                        lang: settingProvider.lang ?? 'kh',
+                                        key: 'user_info_village',
+                                      ),
+                                      // keyboardType: TextInputType.number,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(
+                                height: 15,
+                              ),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    // child: TextFormField(
+                                    //   controller: txtStreetNumber,
+                                    //   decoration: InputDecoration(
+                                    //     labelText: AppLang.translate(
+                                    //         key: "user_info_street", lang: 'kh'),
+                                    //     border: const OutlineInputBorder(
+                                    //       borderRadius: BorderRadius.all(
+                                    //           Radius.circular(12.0)),
+                                    //     ),
+                                    //   ),
+                                    // ),
+                                    child: _buildTextField(
+                                      controller: txtStreetNumber,
+                                      label: AppLang.translate(
+                                        lang: settingProvider.lang ?? 'kh',
+                                        key: 'user_info_street',
+                                      ),
+                                      // keyboardType: TextInputType.number,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    // child: TextFormField(
+                                    //   controller: txtHomeNumber,
+                                    //   decoration: InputDecoration(
+                                    //     labelText: AppLang.translate(
+                                    //         key: "user_info_number", lang: 'kh'),
+                                    //     border: const OutlineInputBorder(
+                                    //       borderRadius: BorderRadius.all(
+                                    //           Radius.circular(12.0)),
+                                    //     ),
+                                    //   ),
+                                    // ),
+                                    child: _buildTextField(
+                                      controller: txtHomeNumber,
+                                      label: AppLang.translate(
+                                        lang: settingProvider.lang ?? 'kh',
+                                        key: 'user_info_number',
+                                      ),
+                                      // keyboardType: TextInputType.number,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(
+                                height: 15,
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
             ),
-            bottomNavigationBar: // Submit Button
-                Padding(
-              padding: const EdgeInsets.all(15),
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    backgroundColor: Colors.blue[900],
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                  ),
-                  onPressed: () {
-                    _handleSubmit();
-                  },
-                  child: Text(
-                    AppLang.translate(
-                        lang: settingProvider.lang ?? 'kh', key: 'update'),
-                    style: TextStyle(fontSize: 16, color: Colors.white),
-                  ),
-                ),
-              ),
-            ),
+            // bottomNavigationBar: // Submit Button
+            //     Padding(
+            //   padding: const EdgeInsets.all(15),
+            //   child: SizedBox(
+            //     width: double.infinity,
+            //     child: ElevatedButton(
+            //       style: ElevatedButton.styleFrom(
+            //         padding: const EdgeInsets.symmetric(vertical: 15),
+            //         backgroundColor: Colors.blue[900],
+            //         shape: RoundedRectangleBorder(
+            //           borderRadius: BorderRadius.circular(30),
+            //         ),
+            //       ),
+            //       onPressed: () {
+            //         _handleSubmit();
+            //       },
+            //       child: Text(
+            //         AppLang.translate(
+            //             lang: settingProvider.lang ?? 'kh', key: 'update'),
+            //         style: TextStyle(fontSize: 16, color: Colors.white),
+            //       ),
+            //     ),
+            //   ),
+            // ),
           );
         }));
   }
@@ -929,14 +953,14 @@ class _UpdatePersonalInfoScreenState extends State<UpdatePersonalInfoScreen> {
       },
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: const TextStyle(color: Colors.blueGrey),
+        labelStyle: const TextStyle(color: HColors.darkgrey),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.0),
           borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.0),
-          borderSide: const BorderSide(color: Colors.blueGrey),
+          borderSide: const BorderSide(color: HColors.darkgrey),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.0),
@@ -1058,21 +1082,26 @@ class _UpdatePersonalInfoScreenState extends State<UpdatePersonalInfoScreen> {
       validator: validator,
       maxLines: maxLines,
       keyboardType: keyboardType,
+      style: TextStyle(
+          // color: HColors.darkgrey,
+          // fontFamily: 'KantumruyPro',
+          fontWeight: FontWeight.w400,
+          fontSize: 14),
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: const TextStyle(color: Colors.blueGrey),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.0),
-          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
-        ),
+        labelStyle: const TextStyle(color: HColors.darkgrey),
+        // border: OutlineInputBorder(
+        //   borderRadius: BorderRadius.circular(12.0),
+        //   borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
+        // ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.0),
-          borderSide: const BorderSide(color: Colors.blueGrey),
+          borderSide: const BorderSide(color: HColors.darkgrey, width: 1),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.0),
           borderSide: BorderSide(
-              color: Theme.of(context).colorScheme.primary, width: 2.0),
+              color: Theme.of(context).colorScheme.primary, width: 1.0),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.0),

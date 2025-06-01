@@ -673,7 +673,7 @@ class _UpdateEducationScreenState extends State<UpdateEducationScreen> {
                       title,
                       style: const TextStyle(
                         fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ),

@@ -61,7 +61,7 @@ class ScanScreenState extends State<ScanScreen> {
                   Text(
                     'ស្កេន',
                     style: const TextStyle(
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w500,
                       color: Colors.black,
                     ),
                   ),
@@ -246,7 +246,7 @@ class ScanScreenState extends State<ScanScreen> {
                 time,
                 style: TextStyle(
                   fontSize: 16.0,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w500,
                   color: Colors.blue[800],
                 ),
               ),

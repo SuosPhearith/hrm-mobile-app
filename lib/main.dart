@@ -28,6 +28,7 @@ import 'package:mobile_app/screens/work/update_user_medal_screen.dart';
 import 'package:mobile_app/screens/work/update_user_work_screen.dart';
 import 'package:mobile_app/screens/work/update_work_history_screen.dart';
 import 'package:mobile_app/screens/work_screen.dart';
+import 'package:mobile_app/shared/color/colors.dart';
 import 'package:provider/provider.dart';
 import 'package:mobile_app/app_routes.dart';
 import 'package:mobile_app/middlewares/auth_middleware.dart';
@@ -78,20 +79,21 @@ class MyApp extends StatelessWidget {
           secondary: Color(0xFF002458),
           surface: Colors.white,
         ),
-        textTheme: const TextTheme(
+        textTheme:  TextTheme(
           bodyLarge: TextStyle(fontSize: 16, color: Colors.black),
           bodyMedium: TextStyle(fontSize: 14, color: Colors.black),
-          bodySmall: TextStyle(fontSize: 12, color: Colors.grey),
+          bodySmall: TextStyle(fontSize: 12, color: HColors.darkgrey),
         ),
         appBarTheme: const AppBarTheme(
           // backgroundColor: Color(0xFF002458),
           // foregroundColor: Colors.white,
+          scrolledUnderElevation: 0,
           elevation: 0,
         ),
         bottomNavigationBarTheme: BottomNavigationBarThemeData(
           backgroundColor: Colors.white,
           selectedItemColor: const Color(0xFF002458),
-          unselectedItemColor: Colors.grey[600],
+          unselectedItemColor: HColors.darkgrey,
           selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600),
           unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500),
           showUnselectedLabels: true,
@@ -249,7 +251,7 @@ final GoRouter _router = GoRouter(
         return CreateWorkHistoryScreen(id: id);
       },
     ),
-     GoRoute(
+    GoRoute(
       path: '${AppRoutes.createUserMedal}/:id',
       builder: (context, state) {
         final id = state.pathParameters['id'];
@@ -285,7 +287,7 @@ final GoRouter _router = GoRouter(
         final String userLanguageId = state.pathParameters['userLanguageId']!;
         return UpdateLanguageLevelScreen(
           id: userId,
-         userLanguageId: userLanguageId,
+          userLanguageId: userLanguageId,
         );
       },
     ),
@@ -296,7 +298,7 @@ final GoRouter _router = GoRouter(
         final String userWorkId = state.pathParameters['workId']!;
         return UpdateWorkHistoryScreen(
           id: userId,
-         workId: userWorkId,
+          workId: userWorkId,
         );
       },
     ),
@@ -307,7 +309,7 @@ final GoRouter _router = GoRouter(
         final String medalId = state.pathParameters['medalId']!;
         return UpdateUserMedalScreen(
           id: userId,
-         userMedalId: medalId,
+          userMedalId: medalId,
         );
       },
     ),
@@ -358,32 +360,36 @@ class _MainLayoutState extends State<MainLayout> {
     final lang = Provider.of<SettingProvider>(context).lang;
 
     return Scaffold(
-      body: SafeArea(child: widget.navigationShell),
-      floatingActionButton: Container(
-        margin: const EdgeInsets.only(top: 20),
-        height: 64,
-        width: 64,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black26,
-              blurRadius: 8,
-              offset: const Offset(0, 3),
-            ),
-          ],
-        ),
-        child: FloatingActionButton(
-          onPressed: () {
-            _showAddRequestBottomSheet(context);
-          },
-          backgroundColor: Theme.of(context).colorScheme.secondary,
-          elevation: 0,
-          shape: const CircleBorder(),
-          child: const Icon(Icons.add, size: 32),
-        ),
+      
+      body: SafeArea(
+        top: false,
+        child: widget.navigationShell,
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      // floatingActionButton: Container(
+      //   margin: const EdgeInsets.only(top: 20),
+      //   height: 64,
+      //   width: 64,
+      //   decoration: BoxDecoration(
+      //     shape: BoxShape.circle,
+      //     boxShadow: [
+      //       BoxShadow(
+      //         color: Colors.black26,
+      //         blurRadius: 8,
+      //         offset: const Offset(0, 3),
+      //       ),
+      //     ],
+      //   ),
+      //   child: FloatingActionButton(
+      //     onPressed: () {
+      //       _showAddRequestBottomSheet(context);
+      //     },
+      //     backgroundColor: Theme.of(context).colorScheme.secondary,
+      //     elevation: 0,
+      //     shape: const CircleBorder(),
+      //     child: const Icon(Icons.add, size: 32),
+      //   ),
+      // ),
+      // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: Colors.white,
@@ -417,8 +423,8 @@ class _MainLayoutState extends State<MainLayout> {
           type: BottomNavigationBarType.fixed,
           items: [
             BottomNavigationBarItem(
-              icon: _buildNavIcon(Icons.home, 0),
-              activeIcon: _buildNavIcon(Icons.home, 0, active: true),
+              icon: _buildNavIcon(Icons.home, 0,),
+              activeIcon: _buildNavIcon(Icons.home, 0, active: true,),
               label: AppLang.translate(key: 'layout_home', lang: lang ?? 'kh'),
             ),
             BottomNavigationBarItem(
@@ -426,10 +432,30 @@ class _MainLayoutState extends State<MainLayout> {
               activeIcon: _buildNavIcon(Icons.info, 1, active: true),
               label: AppLang.translate(key: 'layout_about', lang: lang ?? 'kh'),
             ),
+            // BottomNavigationBarItem(
+            //   icon: Container(width: 24), // Empty space for FAB
+            //   label: '',
+            // ),
             BottomNavigationBarItem(
-              icon: Container(width: 24), // Empty space for FAB
-              label: '',
-            ),
+                icon: GestureDetector(
+                  onTap: () {
+                    _showAddRequestBottomSheet(context);
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(6.0),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(50),
+                      color: HColors.blue,
+                    ),
+                    child: const Icon(
+                      Icons.add,
+                      size: 28.0,
+                      color: HColors.yellow,
+                    ),
+                  ),
+                ),
+                label: '',
+              ),
             BottomNavigationBarItem(
               icon: _buildNavIcon(Icons.calendar_month, 3),
               activeIcon: _buildNavIcon(Icons.calendar_month, 3, active: true),
@@ -536,7 +562,7 @@ class _MainLayoutState extends State<MainLayout> {
         size: 28.0,
         color: isSelected || active
             ? Theme.of(context).colorScheme.secondary
-            : Colors.grey[600],
+            : HColors.darkgrey,
       ),
     );
   }

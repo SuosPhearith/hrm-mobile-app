@@ -61,7 +61,7 @@ class DailyScreenState extends State<DailyScreen> {
                   Text(
                     'ប្រចាំថ្ងៃ',
                     style: const TextStyle(
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w500,
                       color: Colors.black,
                     ),
                   ),

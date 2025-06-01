@@ -67,7 +67,7 @@ class _SampleScreenState extends State<SampleScreen> {
 //               'ថ្ងៃ', // Khmer for "Day"
 //               style: TextStyle(
 //                 fontSize: 16,
-//                 fontWeight: FontWeight.bold,
+//                 fontWeight: FontWeight.w500,
 //               ),
 //             ),
 //             const SizedBox(height: 8),
@@ -137,7 +137,7 @@ class _SampleScreenState extends State<SampleScreen> {
 //               'B',
 //               style: TextStyle(
 //                 fontSize: 18,
-//                 fontWeight: FontWeight.bold,
+//                 fontWeight: FontWeight.w500,
 //                 color: Colors.black,
 //               ),
 //             ),

@@ -83,7 +83,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       name ?? 'Guest',
                       style: const TextStyle(
                         fontSize: 20,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w500,
                         color: Colors.white,
                       ),
                     ),

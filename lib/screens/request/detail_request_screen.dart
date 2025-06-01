@@ -4,6 +4,7 @@ import 'package:mobile_app/providers/global/setting_provider.dart';
 import 'package:mobile_app/providers/local/request/detail_request_provider.dart';
 import 'package:mobile_app/services/request/detail_request_service.dart';
 import 'package:mobile_app/utils/help_util.dart';
+import 'package:mobile_app/widgets/custom_header.dart';
 import 'package:provider/provider.dart';
 
 class DetailRequestScreen extends StatefulWidget {
@@ -38,8 +39,13 @@ class _DetailRequestScreenState extends State<DetailRequestScreen> {
             backgroundColor: Color(0xFFF1F5F9),
             appBar: AppBar(
               title: Text(
-                  'ស្នើរសុំ | ${getSafeString(safeValue: '...', value: AppLang.translate(lang: settingProvider.lang ?? 'kh', data: data?['request']?['request_status']))}'),
+                'ស្នើរសុំ | ${getSafeString(safeValue: '...', value: AppLang.translate(lang: settingProvider.lang ?? 'kh', data: data?['request']?['request_status']))}',
+                style: TextStyle(
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
               centerTitle: true,
+              bottom: CustomHeader(),
             ),
             body: RefreshIndicator(
               key: _refreshIndicatorKey,
@@ -781,7 +787,7 @@ class _DetailRequestScreenState extends State<DetailRequestScreen> {
                         title,
                         style: const TextStyle(
                           fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                       IconButton(
