@@ -72,7 +72,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       routerConfig: _router,
       theme: ThemeData(
-        fontFamily: 'Kantumruy',
+        fontFamily: 'KantumruyPro',
         primaryColor: const Color(0xFF002458),
         colorScheme: const ColorScheme.light(
           primary: Color(0xFF002458),
@@ -97,7 +97,7 @@ class MyApp extends StatelessWidget {
           selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600),
           unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500),
           showUnselectedLabels: true,
-          elevation: 8,
+          elevation: 0,
         ),
       ),
     );
@@ -391,16 +391,18 @@ class _MainLayoutState extends State<MainLayout> {
       // ),
       // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: Container(
+        padding: EdgeInsets.zero,
         decoration: BoxDecoration(
           color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black12,
-              blurRadius: 10,
-              offset: const Offset(0, -2),
-            ),
-          ],
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(16.0)),
+          
+          // boxShadow: [
+          //   // BoxShadow(
+          //   //   color: Colors.black12,
+          //   //   blurRadius: 10,
+          //   //   offset: const Offset(0, -2),
+          //   // ),
+          // ],
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(0)),
         ),
         child: BottomNavigationBar(
           currentIndex: _selectedIndex,

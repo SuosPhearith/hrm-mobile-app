@@ -292,7 +292,7 @@ class _RequestScreenState extends State<RequestScreen> {
                     id,
                     style: TextStyle(
                       color: const Color(0xFF64748B),
-                      fontSize: 12,
+                      fontSize: 14,
                       // fontFamily: 'Kantumruy Pro',
                       fontWeight: FontWeight.w400,
                       height: 1.67,

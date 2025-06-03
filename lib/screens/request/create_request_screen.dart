@@ -1,11 +1,7 @@
-import 'dart:convert';
-import 'dart:developer';
-import 'dart:io';
-import 'dart:typed_data';
 
+import 'dart:io';
 import 'package:dio/dio.dart' as dio;
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
@@ -16,6 +12,9 @@ import 'package:mobile_app/providers/local/request/create_request_provider.dart'
 import 'package:mobile_app/services/request/create_request_service.dart';
 import 'package:mobile_app/shared/color/colors.dart';
 import 'package:mobile_app/shared/component/bottom_appbar.dart';
+import 'package:mobile_app/shared/date/calendar_picker.dart';
+import 'package:mobile_app/shared/date/kh_date_formmat.dart';
+import 'package:mobile_app/shared/image/full_screen.dart';
 // import 'package:mobile_app/shared/component/show_confirm_dialog.dart';
 import 'package:mobile_app/utils/help_util.dart';
 
@@ -48,7 +47,7 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
   bool isClick = false;
   // File? _image; // Store the selected image
   // final ImagePicker _picker = ImagePicker();
-  String? _imageBase64;
+  // String? _imageBase64;
   final List<PlatformFile> _selectedFiles = [];
   int selectedThumbnail = 0; // Now it can never be null
 
@@ -148,14 +147,14 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
       }
       return;
     }
-    if (_imageBase64 == null) {
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('សូមជ្រើសរើសរូប')));
-      }
-      return;
-    }
+    // if (_imageBase64 == null) {
+    //   if (mounted) {
+    //     ScaffoldMessenger.of(
+    //       context,
+    //     ).showSnackBar(const SnackBar(content: Text('សូមជ្រើសរើសរូប')));
+    //   }
+    //   return;
+    // }
 
     try {
       await _createRequestService.createRequest(
@@ -165,7 +164,7 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
             _description?.trim().isNotEmpty == true ? _description! : null,
         requestTypeId: _selectedTypeId!,
         requestCategoryId: int.parse(widget.id!),
-        attachment: _imageBase64!,
+        // attachment: _imageBase64!,
       );
 
       if (mounted) {
@@ -529,7 +528,6 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
     );
   }
 
-  
   // File display widget
   Widget _buildFileDisplay(bool isGrid) {
     if (_selectedFiles.isEmpty) return SizedBox.shrink();
@@ -879,260 +877,6 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
   }
 }
 
-class BuildSelectionField extends StatefulWidget {
-  final List<Map<String, dynamic>> items;
-  final String label;
-  final String displayKey;
-  final Function(Map<String, dynamic>) onChanged;
-  final String? selectedValue;
-  final String? hintText;
-  final bool readOnly;
-  final TextInputType? keyboardType;
-  final int? maxLines;
-
-  const BuildSelectionField({
-    super.key,
-    required this.items,
-    required this.label,
-    required this.displayKey,
-    required this.onChanged,
-    this.selectedValue,
-    this.hintText,
-    this.readOnly = false,
-    this.keyboardType,
-    this.maxLines = 1,
-  });
-
-  @override
-  State<BuildSelectionField> createState() => _BuildSelectionFieldState();
-}
-
-class _BuildSelectionFieldState extends State<BuildSelectionField> {
-  late TextEditingController _controller;
-  @override
-  void initState() {
-    super.initState();
-    _controller = TextEditingController(text: widget.selectedValue ?? '');
-  }
-
-  @override
-  void didUpdateWidget(BuildSelectionField oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    // Update controller text when selectedValue changes
-    if (oldWidget.selectedValue != widget.selectedValue) {
-      _controller.text = widget.selectedValue ?? '';
-    }
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-  
-
-
-  void _openBottomSheet(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (BuildContext context) {
-        return Container(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 50,
-                height: 4,
-                margin: const EdgeInsets.only(bottom: 16),
-                decoration: BoxDecoration(
-                  color: Colors.grey[300],
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-              Row(
-                children: [
-                  Text(
-                    'ជ្រើសរើស${widget.label}',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.blue[800],
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              Flexible(
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: widget.items.length,
-                  itemBuilder: (context, index) {
-                    final item = widget.items[index];
-                    final isSelected =
-                        widget.selectedValue == item[widget.displayKey];
-
-                    return ListTile(
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 4),
-                      title: Text(
-                        item[widget.displayKey] ?? '',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: isSelected ? Colors.blue[800] : Colors.black87,
-                          fontWeight:
-                              isSelected ? FontWeight.w500 : FontWeight.normal,
-                        ),
-                      ),
-                      trailing: isSelected
-                          ? Icon(Icons.check, color: Colors.blue[800], size: 20)
-                          : null,
-                      onTap: () {
-                        widget.onChanged(item);
-                        Navigator.pop(context);
-                      },
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Text(
-        //   widget.label,
-        //   style: TextStyle(
-        //     fontSize: 16,
-        //     fontWeight: FontWeight.w500,
-        //     color: Colors.blue[800],
-        //   ),
-        // ),
-        const SizedBox(height: 8),
-        TextField(
-          controller: _controller,
-          readOnly: widget.readOnly,
-          keyboardType: widget.keyboardType,
-          maxLines: widget.maxLines,
-          onTap: widget.readOnly ? () => _openBottomSheet(context) : null,
-          decoration: InputDecoration(
-            hintText: widget.hintText ?? 'សូមជ្រើសរើស${widget.label}',
-            hintStyle: TextStyle(
-              color: HColors.darkgrey,
-              fontSize: 16,
-            ),
-            filled: true,
-            fillColor: Colors.white,
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 16,
-            ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide.none,
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(color: Colors.grey[300]!, width: 1),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(color: HColors.darkgrey, width: 1),
-            ),
-            suffixIcon: widget.readOnly && widget.items.isNotEmpty
-                ? const Icon(Icons.arrow_drop_down, color: Colors.grey)
-                : null,
-          ),
-          style: const TextStyle(
-            color: Colors.black87,
-            fontSize: 16,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class FullscreenImage extends StatelessWidget {
-  final Uint8List imageBytes;
-  final String tag;
-
-  const FullscreenImage({Key? key, required this.imageBytes, required this.tag})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: GestureDetector(
-        onTap: () => Navigator.pop(context),
-        child: Center(
-          child: Hero(
-            tag: tag,
-            child: Image.memory(imageBytes, fit: BoxFit.contain),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class KhmerDateFormatter {
-  static String format(DateTime date) {
-    final Map<int, String> khmerMonths = {
-      1: 'មករា',
-      2: 'កុម្ភៈ',
-      3: 'មីនា',
-      4: 'មេសា',
-      5: 'ឧសភា',
-      6: 'មិថុនា',
-      7: 'កក្កដា',
-      8: 'សីហា',
-      9: 'កញ្ញា',
-      10: 'តុលា',
-      11: 'វិច្ឆិកា',
-      12: 'ធ្នូ',
-    };
-    final Map<int, String> khmerDigits = {
-      0: '០',
-      1: '១',
-      2: '២',
-      3: '៣',
-      4: '៤',
-      5: '៥',
-      6: '៦',
-      7: '៧',
-      8: '៨',
-      9: '៩',
-    };
-
-    String day = date.day
-        .toString()
-        .padLeft(2, '0')
-        .split('')
-        .map((d) => khmerDigits[int.parse(d)]!)
-        .join();
-    String month = khmerMonths[date.month]!;
-    String year = date.year
-        .toString()
-        .split('')
-        .map((d) => khmerDigits[int.parse(d)]!)
-        .join();
-
-    return '$day $month $year';
-  }
-}
-
 class DateInputField extends StatelessWidget {
   final String label;
   final DateTime initialDate;
@@ -1146,68 +890,30 @@ class DateInputField extends StatelessWidget {
     required this.onDateSelected,
     this.selectedDate,
   });
-  
-
-  void _openDatePickerBottomSheet(BuildContext context) {
-    DateTime tempDate = selectedDate ?? initialDate;
-    showModalBottomSheet(
+  void _openDatePicker(BuildContext context) async {
+    final result = await showModalBottomSheet<DateTime>(
       context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      isScrollControlled: true,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
-      builder: (BuildContext context) {
-        return Container(
-          height: 300,
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w500,
-                  color: HColors.darkgrey,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Expanded(
-                child: CupertinoDatePicker(
-                  initialDateTime: tempDate,
-                  minimumDate: DateTime(2000),
-                  maximumDate: DateTime(2100),
-                  mode: CupertinoDatePickerMode.date,
-                  onDateTimeChanged: (DateTime newDate) {
-                    tempDate = newDate;
-                  },
-                ),
-              ),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () {
-                  onDateSelected(tempDate);
-                  Navigator.pop(context);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: HColors.darkgrey,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                child: const Text('ជ្រើសរើស'),
-              ),
-            ],
-          ),
-        );
-      },
+      builder: (context) => Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: CustomSingleDatePicker(initialDate: selectedDate),
+      ),
     );
+
+    if (result != null) {
+      onDateSelected(result);
+      // print("Selected date: $result");
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return TextField(
       readOnly: true,
-      onTap: () => _openDatePickerBottomSheet(context),
+      onTap: () => _openDatePicker(context),
       controller: TextEditingController(
         text: selectedDate != null
             ? KhmerDateFormatter.format(selectedDate!)

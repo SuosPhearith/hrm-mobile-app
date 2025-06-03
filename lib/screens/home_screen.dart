@@ -758,7 +758,7 @@ class CardView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final lang = Provider.of<SettingProvider>(context).lang;
+    // final lang = Provider.of<SettingProvider>(context).lang;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
@@ -1098,8 +1098,8 @@ class MenuGrid extends StatelessWidget {
                     '${item['label']}',
                     style: TextStyle(
                       fontSize: 16,
-                      color: HColors.darkgrey,
-                      fontWeight: FontWeight.w500,
+                      // color: HColors.darkgrey,
+                      fontWeight: FontWeight.w400,
                       height: 1.50,
                     ),
                   ),
