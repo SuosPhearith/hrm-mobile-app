@@ -94,7 +94,7 @@ class MyApp extends StatelessWidget {
           backgroundColor: Colors.white,
           selectedItemColor: const Color(0xFF002458),
           unselectedItemColor: HColors.darkgrey,
-          selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600),
+          selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500),
           unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500),
           showUnselectedLabels: true,
           elevation: 0,
@@ -596,7 +596,7 @@ class AuthLayout extends StatelessWidget {
                   padding: const EdgeInsets.only(bottom: 16.0),
                   child: Text(
                     '© ${DateTime.now().year} ${dotenv.env['APP_NAME']}',
-                    style: TextStyle(fontSize: 12.0, color: Colors.grey[600]),
+                    style: TextStyle(fontSize: 12.0, color: Colors.grey[500]),
                   ),
                 ),
               ],
