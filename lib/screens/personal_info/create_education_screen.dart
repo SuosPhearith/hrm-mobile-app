@@ -566,7 +566,7 @@ class _CreateEducationScreenState extends State<CreateEducationScreen> {
                       title,
                       style: const TextStyle(
                         fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ),

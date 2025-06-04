@@ -3,7 +3,9 @@ import 'package:mobile_app/app_lang.dart';
 import 'package:mobile_app/providers/global/setting_provider.dart';
 import 'package:mobile_app/providers/local/request/detail_request_provider.dart';
 import 'package:mobile_app/services/request/detail_request_service.dart';
+import 'package:mobile_app/shared/color/colors.dart';
 import 'package:mobile_app/utils/help_util.dart';
+import 'package:mobile_app/widgets/custom_header.dart';
 import 'package:provider/provider.dart';
 
 class DetailRequestScreen extends StatefulWidget {
@@ -35,11 +37,16 @@ class _DetailRequestScreenState extends State<DetailRequestScreen> {
           final dataSetup = provider.dataSetup?.data;
           final dataUsers = provider.users?.data.results;
           return Scaffold(
-            backgroundColor: Color(0xFFF1F5F9),
+            backgroundColor: Colors.white,
             appBar: AppBar(
               title: Text(
-                  'ស្នើរសុំ | ${getSafeString(safeValue: '...', value: AppLang.translate(lang: settingProvider.lang ?? 'kh', data: data?['request']?['request_status']))}'),
+                'ស្នើរសុំ | ${getSafeString(safeValue: '...', value: AppLang.translate(lang: settingProvider.lang ?? 'kh', data: data?['request']?['request_status']))}',
+                style: TextStyle(
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
               centerTitle: true,
+              bottom: CustomHeader(),
             ),
             body: RefreshIndicator(
               key: _refreshIndicatorKey,
@@ -56,9 +63,21 @@ class _DetailRequestScreenState extends State<DetailRequestScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             // User Profile Card
-                            ...mapToList(data?['requesters']).map(
-                              (record) {
+                            ...mapToList(data?['requesters'])
+                                .asMap()
+                                .entries
+                                .map(
+                              (entry) {
+                                int index = entry.key;
+                                var record = entry.value;
+                                bool isLastItem = index ==
+                                    mapToList(data?['requesters']).length - 1;
+
                                 return Container(
+                                  margin: EdgeInsets.only(
+                                      bottom: isLastItem
+                                          ? 0
+                                          : 12), // Add spacing except for last item
                                   clipBehavior: Clip.antiAlias,
                                   decoration: ShapeDecoration(
                                     color: Colors.white,
@@ -88,13 +107,19 @@ class _DetailRequestScreenState extends State<DetailRequestScreen> {
                                                 '${getSafeString(safeValue: '...', value: record?['user']?['name_kh'])} (${getSafeString(safeValue: '...', value: record?['user']?['name_en'])})',
                                                 style: TextStyle(
                                                     fontWeight:
-                                                        FontWeight.bold),
+                                                        FontWeight.w500),
+                                              ),
+                                              SizedBox(
+                                                height: 2,
                                               ),
                                               Text(
                                                 '${AppLang.translate(lang: settingProvider.lang ?? 'kh', data: record?['user']?['user_work']?['general_department'])} ',
                                                 style: TextStyle(
                                                   fontSize: 12,
                                                 ),
+                                              ),
+                                              SizedBox(
+                                                height: 2,
                                               ),
                                               Wrap(
                                                 crossAxisAlignment:
@@ -142,13 +167,16 @@ class _DetailRequestScreenState extends State<DetailRequestScreen> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text('ព័ត៌មានលម្អិត',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleMedium),
+                                Text(
+                                  'ព័ត៌មានលម្អិត',
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
                                 Icon(
                                   Icons.edit,
-                                  color: Colors.grey[600],
+                                  color: HColors.darkgrey,
                                 )
                               ],
                             ),
@@ -240,74 +268,77 @@ class _DetailRequestScreenState extends State<DetailRequestScreen> {
                             //   ],
                             // ),
 
-                            SizedBox(
-                              height: mapToList(data?['request']
+                            Stack(
+                              children: [
+                                // Continuous vertical line
+                                Positioned(
+                                  left:
+                                      18, // Align with the center of the icon (icon size 24 / 2 + padding)
+                                  top: 20,
+                                  bottom: 0,
+                                  child: Container(
+                                    width: 2,
+                                    color: Colors.grey[300],
+                                  ),
+                                ),
+                                // Timeline entries
+                                ListView.builder(
+                                  physics:
+                                      const NeverScrollableScrollPhysics(), // Disable scrolling in ListView
+                                  shrinkWrap:
+                                      true, // Make ListView take only the space it needs
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 8.0),
+                                  itemCount: mapToList(data?['request']
                                           ?['request_reviewers'])
-                                      .length *
-                                  150.0, // Adjust height based on content
-                              child: Stack(
-                                children: [
-                                  // Continuous vertical line
-                                  Positioned(
-                                    left:
-                                        36, // Align with the center of the icon (icon size 24 / 2 + padding)
-                                    top: 0,
-                                    bottom: 0,
-                                    child: Container(
-                                      width: 2,
-                                      color: Colors.grey[300],
-                                    ),
-                                  ),
-                                  // Timeline entries
-                                  ListView.builder(
-                                    physics:
-                                        const NeverScrollableScrollPhysics(), // Disable scrolling in ListView
-                                    shrinkWrap:
-                                        true, // Make ListView take only the space it needs
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 8.0),
-                                    itemCount: mapToList(data?['request']
-                                            ?['request_reviewers'])
-                                        .length,
-                                    itemBuilder: (context, index) {
-                                      final record = mapToList(data?['request']
-                                          ?['request_reviewers'])[index];
-                                      return _timelineEntry(
-                                        profileUrl:
-                                            '${getSafeString(value: record?['user']?['avatar']?['file_domain'])}${getSafeString(value: record?['user']?['avatar']['uri'])}',
-                                        title: AppLang.translate(
-                                            lang: settingProvider.lang ?? 'kh',
-                                            data: record?['reviewer_type']),
-                                        date: formatDateTime(
-                                            record?['updated_at']),
-                                        userName:
-                                            '${getSafeString(value: record?['user']?['salute']?['name_kh'])} ${getSafeString(value: record?['user']?['name_kh'])} (${getSafeString(value: record?['user']?['name_en'])})',
-                                        role: AppLang.translate(
-                                            lang: settingProvider.lang ?? 'kh',
-                                            data: record?['user']?['user_work']
-                                                ?['position']),
-                                        content: record?['comment'],
-                                      );
-                                    },
-                                  ),
-                                ],
-                              ),
+                                      .length,
+                                  itemBuilder: (context, index) {
+                                    final record = mapToList(data?['request']
+                                        ?['request_reviewers'])[index];
+                                    return _timelineEntry(
+                                      profileUrl:
+                                          '${getSafeString(value: record?['user']?['avatar']?['file_domain'])}${getSafeString(value: record?['user']?['avatar']['uri'])}',
+                                      title: AppLang.translate(
+                                          lang: settingProvider.lang ?? 'kh',
+                                          data: record?['reviewer_type']),
+                                      date:
+                                          formatDateTime(record?['updated_at']),
+                                      userName:
+                                          '${getSafeString(value: record?['user']?['salute']?['name_kh'])} ${getSafeString(value: record?['user']?['name_kh'])} (${getSafeString(value: record?['user']?['name_en'])})',
+                                      role: AppLang.translate(
+                                          lang: settingProvider.lang ?? 'kh',
+                                          data: record?['user']?['user_work']
+                                              ?['position']),
+                                      content: record?['comment'],
+                                    );
+                                  },
+                                ),
+                              ],
                             ),
 
-                            const SizedBox(height: 24),
+                            // const SizedBox(height: 24),
 
                             data?['request_permission']['allow_assign'] == true
                                 ? Column(
                                     children: [
                                       Row(
                                         children: [
-                                          Icon(Icons.add_circle,
-                                              color: Colors.grey[600]),
+                                          Container(
+                                            width: 36,
+                                            height: 36,
+                                            decoration: BoxDecoration(
+                                                color: HColors.darkgrey
+                                                    .withOpacity(0.1),
+                                                borderRadius:
+                                                    BorderRadius.circular(50)),
+                                            child: Icon(Icons.add,
+                                                color: HColors.darkgrey),
+                                          ),
                                           const SizedBox(width: 10),
                                           const Text("ស្នើរសុំ",
                                               style: TextStyle(
                                                   fontSize: 16,
-                                                  fontWeight: FontWeight.bold)),
+                                                  fontWeight: FontWeight.w500)),
                                         ],
                                       ),
                                       // Group Sections
@@ -362,105 +393,119 @@ class _DetailRequestScreenState extends State<DetailRequestScreen> {
                                 ? Row(
                                     children: [
                                       Expanded(
-                                        child: TextField(
-                                          controller: _comment,
-                                          minLines: 3,
-                                          maxLines: 5,
-                                          decoration: InputDecoration(
-                                            hintText:
-                                                'Enter your comment here...',
-                                            labelText: 'Comment',
-                                            labelStyle: TextStyle(
-                                              color: Colors.grey[600],
-                                              fontWeight: FontWeight.w500,
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Divider(
+                                              color: HColors.darkgrey
+                                                  .withOpacity(0.1),
                                             ),
-                                            hintStyle: TextStyle(
-                                              color: Colors.grey[400],
-                                            ),
-                                            border: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(12.0),
-                                              borderSide: BorderSide(
-                                                color: Colors.grey[300]!,
-                                                width: 1.5,
-                                              ),
-                                            ),
-                                            enabledBorder: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(12.0),
-                                              borderSide: BorderSide(
-                                                color: Colors.grey[300]!,
-                                                width: 1.5,
-                                              ),
-                                            ),
-                                            focusedBorder: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(12.0),
-                                              borderSide: BorderSide(
-                                                color: Colors.blueAccent,
-                                                width: 2.0,
-                                              ),
-                                            ),
-                                            filled: true,
-                                            fillColor: Colors.grey[50],
-                                            contentPadding:
-                                                EdgeInsets.symmetric(
-                                              vertical: 12.0,
-                                              horizontal: 16.0,
-                                            ),
-                                          ),
-                                          style: TextStyle(
-                                            fontSize: 16.0,
-                                            color: Colors.black87,
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        width: 5,
-                                      ),
-                                      Container(
-                                        decoration: BoxDecoration(
-                                            border:
-                                                Border.all(color: Colors.grey),
-                                            borderRadius:
-                                                BorderRadius.circular(12)),
-                                        child: IconButton(
-                                          icon: Icon(Icons.send,
-                                              color: Colors.blueAccent),
-                                          onPressed: () async {
-                                            try {
-                                              final DetailRequestService
-                                                  service =
-                                                  DetailRequestService();
-
-                                              await service.assign(
-                                                requestId: widget.id ?? '',
-                                                comment: _comment.text.trim(),
-                                                reviewers:
-                                                    convertSelectedUsersToReviewers(
-                                                        selectedUsersByReviewerType),
-                                              );
-                                              _comment.clear();
-                                              selectedUsersByReviewerType
-                                                  .clear();
-                                              await provider.getHome(
-                                                  id: widget.id ?? '');
-                                            } catch (e) {
-                                              // Optionally show a user-friendly error message (e.g., using a SnackBar in Flutter)
-                                              if (context.mounted) {
-                                                ScaffoldMessenger.of(context)
-                                                    .showSnackBar(
-                                                  SnackBar(
-                                                    content: Text(
-                                                        'Failed to assign request: $e'),
-                                                    backgroundColor: Colors.red,
+                                            TextField(
+                                              controller: _comment,
+                                              minLines: null,
+                                              maxLines: null,
+                                              decoration: InputDecoration(
+                                                hintText:
+                                                    'Enter your comment here...',
+                                                labelText: 'Comment',
+                                                labelStyle: TextStyle(
+                                                  color: Colors.grey[600],
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                                hintStyle: TextStyle(
+                                                  color: Colors.grey[400],
+                                                ),
+                                                // border: OutlineInputBorder(
+                                                //   borderRadius:
+                                                //       BorderRadius.circular(
+                                                //           12.0),
+                                                //   borderSide: BorderSide(
+                                                //     color: Colors.grey[300]!,
+                                                //     width: 1.5,
+                                                //   ),
+                                                // ),
+                                                // enabledBorder:
+                                                //     OutlineInputBorder(
+                                                //   borderRadius:
+                                                //       BorderRadius.circular(
+                                                //           12.0),
+                                                //   borderSide: BorderSide(
+                                                //     color: Colors.grey[300]!,
+                                                //     width: 1.5,
+                                                //   ),
+                                                // ),
+                                                focusedBorder:
+                                                    OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          12.0),
+                                                  borderSide: BorderSide(
+                                                    color: Colors.blueAccent,
+                                                    width: 2.0,
                                                   ),
-                                                );
-                                              }
-                                            }
-                                          },
+                                                ),
+                                                filled: true,
+                                                fillColor: Colors.grey[50],
+                                                contentPadding:
+                                                    EdgeInsets.symmetric(
+                                                  vertical: 12.0,
+                                                  horizontal: 16.0,
+                                                ),
+                                              ),
+                                              style: TextStyle(
+                                                fontSize: 16.0,
+                                                color: Colors.black87,
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ),
+                                      // SizedBox(
+                                      //   width: 5,
+                                      // ),
+                                      // Container(
+                                      //   decoration: BoxDecoration(
+                                      //       border:
+                                      //           Border.all(color: Colors.grey),
+                                      //       borderRadius:
+                                      //           BorderRadius.circular(12)),
+                                      //   child: IconButton(
+                                      //     icon: Icon(Icons.send,
+                                      //         color: Colors.blueAccent),
+                                      //     onPressed: () async {
+                                      //       try {
+                                      //         final DetailRequestService
+                                      //             service =
+                                      //             DetailRequestService();
+
+                                      //         await service.assign(
+                                      //           requestId: widget.id ?? '',
+                                      //           comment: _comment.text.trim(),
+                                      //           reviewers:
+                                      //               convertSelectedUsersToReviewers(
+                                      //                   selectedUsersByReviewerType),
+                                      //         );
+                                      //         _comment.clear();
+                                      //         selectedUsersByReviewerType
+                                      //             .clear();
+                                      //         await provider.getHome(
+                                      //             id: widget.id ?? '');
+                                      //       } catch (e) {
+                                      //         // Optionally show a user-friendly error message (e.g., using a SnackBar in Flutter)
+                                      //         if (context.mounted) {
+                                      //           ScaffoldMessenger.of(context)
+                                      //               .showSnackBar(
+                                      //             SnackBar(
+                                      //               content: Text(
+                                      //                   'Failed to assign request: $e'),
+                                      //               backgroundColor: Colors.red,
+                                      //             ),
+                                      //           );
+                                      //         }
+                                      //       }
+                                      //     },
+                                      //   ),
+                                      // ),
                                     ],
                                   )
                                 : const SizedBox.shrink()
@@ -490,7 +535,7 @@ class _DetailRequestScreenState extends State<DetailRequestScreen> {
               Expanded(
                 child: Text(
                   title,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
+                  style: const TextStyle(fontWeight: FontWeight.w400),
                 ),
               ),
               IconButton(
@@ -516,8 +561,8 @@ class _DetailRequestScreenState extends State<DetailRequestScreen> {
         margin: const EdgeInsets.symmetric(vertical: 4),
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: Colors.grey[200],
-          borderRadius: BorderRadius.circular(8),
+          color: HColors.darkgrey.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(5),
         ),
         child: Row(
           children: [
@@ -528,8 +573,8 @@ class _DetailRequestScreenState extends State<DetailRequestScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(name,
-                      style: const TextStyle(fontWeight: FontWeight.bold)),
-                  Text(position, style: const TextStyle(color: Colors.grey)),
+                      style: const TextStyle(fontWeight: FontWeight.w500)),
+                  Text(position, style: TextStyle(color: HColors.darkgrey)),
                 ],
               ),
             ),
@@ -553,12 +598,12 @@ class _DetailRequestScreenState extends State<DetailRequestScreen> {
   Widget _infoRowWithAvatar(String avatarUrl, String title, String subtitle,
       {String? trailing}) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 2),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           CircleAvatar(
-            radius: 12,
+            radius: 18,
             backgroundImage: NetworkImage(avatarUrl),
             backgroundColor: Colors.grey[300],
           ),
@@ -572,7 +617,7 @@ class _DetailRequestScreenState extends State<DetailRequestScreen> {
                     Expanded(
                       child: Text(
                         title,
-                        style: TextStyle(fontWeight: FontWeight.w600),
+                        style: TextStyle(fontWeight: FontWeight.w400),
                       ),
                     ),
                     if (trailing != null)
@@ -607,7 +652,12 @@ class _DetailRequestScreenState extends State<DetailRequestScreen> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: Colors.grey[700], size: 24),
+          Container(
+              padding: EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(50),
+                  color: HColors.darkgrey.withOpacity(0.1)),
+              child: Icon(icon, color: HColors.darkgrey, size: 24)),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -617,18 +667,21 @@ class _DetailRequestScreenState extends State<DetailRequestScreen> {
                   children: [
                     Expanded(
                         child: Text(title,
-                            style: TextStyle(fontWeight: FontWeight.w600))),
+                            style: TextStyle(
+                              fontWeight: FontWeight.w400,
+                              fontSize: 16,
+                            ))),
                     if (trailing != null)
                       Container(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 8, vertical: 2),
                         decoration: BoxDecoration(
-                          color: Colors.indigo[100],
-                          borderRadius: BorderRadius.circular(8),
+                          color: HColors.bluegrey.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(trailing,
-                            style:
-                                TextStyle(fontSize: 12, color: Colors.indigo)),
+                            style: TextStyle(
+                                fontSize: 12, color: HColors.bluegrey)),
                       ),
                   ],
                 ),
@@ -652,26 +705,23 @@ class _DetailRequestScreenState extends State<DetailRequestScreen> {
     IconData icon = Icons.star,
   }) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+      // padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+      padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 0),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Icon positioned over the continuous line
           Container(
-            padding: EdgeInsets.all(8),
+            padding: EdgeInsets.all(5),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: HColors.darkgrey.withOpacity(0.1),
               borderRadius:
-                  BorderRadius.circular(100), // Large value = fully rounded
+                  BorderRadius.circular(50), // Large value = fully rounded
             ),
-            child: Column(
-              children: [
-                Icon(
-                  icon,
-                  color: Colors.grey,
-                  size: 28,
-                ),
-              ],
+            child: Icon(
+              icon,
+              color: HColors.bluegrey,
+              size: 28,
             ),
           ),
           const SizedBox(width: 12),
@@ -682,11 +732,11 @@ class _DetailRequestScreenState extends State<DetailRequestScreen> {
                 if (title != null)
                   Text(
                     title,
-                    style: TextStyle(color: Colors.grey[600], fontSize: 16),
+                    style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
                   ),
                 Text(
                   date,
-                  style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                  style: TextStyle(color: HColors.darkgrey, fontSize: 12),
                 ),
                 Row(
                   children: [
@@ -701,18 +751,22 @@ class _DetailRequestScreenState extends State<DetailRequestScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          SizedBox(
+                            height: 5,
+                          ),
                           Text(
                             userName.isNotEmpty ? userName : 'Unknown User',
-                            style: const TextStyle(fontWeight: FontWeight.w600),
+                            style: const TextStyle(fontWeight: FontWeight.w500),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                           ),
+                          // SizedBox(height: 5,),
                           if (role.isNotEmpty)
                             Text(
                               role,
                               style: TextStyle(
                                 fontSize: 12,
-                                color: Colors.grey[600],
+                                color: HColors.darkgrey,
                               ),
                             ),
                         ],
@@ -720,7 +774,7 @@ class _DetailRequestScreenState extends State<DetailRequestScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 16),
                 if (content != null)
                   Container(
                     padding:
@@ -743,6 +797,9 @@ class _DetailRequestScreenState extends State<DetailRequestScreen> {
                   )
                 else
                   const SizedBox.shrink(),
+                SizedBox(
+                  height: 5,
+                )
               ],
             ),
           ),
@@ -781,7 +838,7 @@ class _DetailRequestScreenState extends State<DetailRequestScreen> {
                         title,
                         style: const TextStyle(
                           fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                       IconButton(

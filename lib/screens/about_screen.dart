@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:mobile_app/app_lang.dart';
 import 'package:mobile_app/providers/global/setting_provider.dart';
 import 'package:mobile_app/providers/local/about_provider.dart';
+import 'package:mobile_app/shared/color/colors.dart';
 import 'package:mobile_app/utils/help_util.dart';
+import 'package:mobile_app/widgets/custom_header.dart';
 import 'package:mobile_app/widgets/skeleton.dart';
 import 'package:provider/provider.dart';
 
@@ -19,18 +21,19 @@ class AboutScreen extends StatelessWidget {
         builder: (context, aboutProvider, settingProvider, child) {
           final lang = settingProvider.lang;
           return Scaffold(
-            backgroundColor: Colors.grey[100],
+            backgroundColor: Colors.white,
             appBar: AppBar(
               backgroundColor: Colors.white,
               title: Text(
                 AppLang.translate(key: 'about_system', lang: lang ?? 'kh'),
                 style: const TextStyle(
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w500,
                   color: Colors.black,
                 ),
               ),
               centerTitle: true,
               elevation: 0,
+              bottom: CustomHeader(),
             ),
             body: aboutProvider.isLoading
                 ? Skeleton()
@@ -145,8 +148,9 @@ class AboutScreen extends StatelessWidget {
         Text(
           title,
           style: TextStyle(
-            fontSize: Theme.of(context).textTheme.bodyLarge!.fontSize,
-            fontWeight: FontWeight.bold,
+            // fontSize: Theme.of(context).textTheme.bodyLarge!.fontSize,
+            fontSize: 20,
+            fontWeight: FontWeight.w500,
             color: Colors.black,
           ),
         ),
@@ -161,158 +165,171 @@ class AboutScreen extends StatelessWidget {
     required String title,
     required String subtitle,
   }) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 4.0),
-      padding: const EdgeInsets.all(12.0),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12.0),
-      ),
-      child: Row(
-        children: [
-          Container(
-            height: 50.0,
-            width: 50.0,
-            decoration: BoxDecoration(
-              color: Colors.grey[200],
-              shape: BoxShape.circle,
-            ),
-            child: Center(
-              child: Icon(
-                icon,
-                size: 24.0,
-                color: Colors.grey[700],
-              ),
+    return Row(
+      children: [
+        Container(
+          height: 35.0,
+          width: 35.0,
+          decoration: BoxDecoration(
+            color: HColors.darkgrey.withOpacity(0.1),
+            shape: BoxShape.circle,
+          ),
+          child: Center(
+            child: Icon(
+              icon,
+              size: 24.0,
+              color: HColors.darkgrey,
             ),
           ),
-          const SizedBox(width: 12.0),
-          Expanded(
+        ),
+        const SizedBox(width: 8.0),
+        Expanded(
+          child: Container(
+            padding: const EdgeInsets.all(8.0),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              border: Border(
+                top: BorderSide(
+                  color: Colors.grey.shade300,
+                  width: 0.5,
+                ),
+                bottom: BorderSide(
+                  color: Colors.grey.shade300,
+                  width: 0.5,
+                ),
+              ),
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   title,
                   style: TextStyle(
-                    fontSize: Theme.of(context).textTheme.bodyLarge!.fontSize,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.grey.shade800,
+                    // fontSize: Theme.of(context).textTheme.bodyLarge!.fontSize,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w400,
+                    // color: Colors.grey.shade800,
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
                 Text(
                   subtitle,
                   style: TextStyle(
-                    fontSize: Theme.of(context).textTheme.bodyMedium!.fontSize,
-                    color: Colors.grey.shade600,
+                    // fontSize:
+                    //     Theme.of(context).textTheme.bodyMedium!.fontSize,
+                    fontSize: 12,
+                    color: HColors.darkgrey,
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
-  Widget _buildScannerTile({
-    required BuildContext context,
-    required String title,
-    required String subtitle,
-    required String status,
-    required String count,
-  }) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8.0),
-      padding: const EdgeInsets.all(12.0),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12.0),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Flexible(
-            child: Row(
-              children: [
-                Container(
-                  height: 40.0,
-                  width: 40.0,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[200],
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                  child: Center(
-                    child: Icon(
-                      Icons.face,
-                      size: 24.0,
-                      color: Colors.grey[700],
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12.0),
-                Flexible(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        title,
-                        style: TextStyle(
-                          fontSize:
-                              Theme.of(context).textTheme.bodyLarge!.fontSize,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.grey.shade800,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      Text(
-                        subtitle,
-                        style: TextStyle(
-                          fontSize:
-                              Theme.of(context).textTheme.bodyMedium!.fontSize,
-                          color: Colors.grey.shade600,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Column(
-            mainAxisSize: MainAxisSize.min,
+ Widget _buildScannerTile({
+  required BuildContext context,
+  required String title,
+  required String subtitle,
+  required String status,
+  required String count,
+}) {
+  // Define color based on translated status
+  final bool isActive = status == 'សកម្ម';
+  final Color statusColor = isActive ? HColors.green : HColors.danger;
+  final Color statusGradient = isActive
+      ? Colors.green.withOpacity(0.2)
+      : Colors.red.withOpacity(0.2);
+
+  return Container(
+    margin: const EdgeInsets.only(bottom: 8.0),
+    padding: const EdgeInsets.all(8.0),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(12.0),
+      border: Border.all(color: HColors.darkgrey.withOpacity(0.2)),
+    ),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Flexible(
+          child: Row(
             children: [
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
+                height: 40.0,
+                width: 40.0,
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Colors.green[100]!, Colors.green[200]!],
-                  ),
-                  borderRadius: BorderRadius.circular(20.0),
+                  color: HColors.darkgrey.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8.0),
                 ),
-                child: Text(
-                  status,
-                  style: TextStyle(
-                    fontSize: Theme.of(context).textTheme.bodyMedium!.fontSize,
-                    color: Colors.green.shade800,
-                    fontWeight: FontWeight.w500,
+                child: Center(
+                  child: Icon(
+                    Icons.face,
+                    size: 24.0,
+                    color: HColors.darkgrey,
                   ),
                 ),
               ),
-              const SizedBox(height: 4.0),
-              Text(
-                count,
-                style: TextStyle(
-                  fontSize: Theme.of(context).textTheme.bodyMedium!.fontSize,
-                  color: Colors.grey.shade700,
+              const SizedBox(width: 12.0),
+              Flexible(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    Text(
+                      subtitle,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: HColors.darkgrey,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
-        ],
-      ),
-    );
-  }
+        ),
+        Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
+              decoration: BoxDecoration(
+                color: statusGradient,
+                borderRadius: BorderRadius.circular(20.0),
+              ),
+              child: Text(
+                status,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: statusColor,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            const SizedBox(height: 4.0),
+            Text(
+              count,
+              style: TextStyle(
+                fontSize: 12,
+                color: HColors.darkgrey,
+              ),
+            ),
+          ],
+        ),
+      ],
+    ),
+  );
+}
 }

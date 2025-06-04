@@ -33,9 +33,9 @@ class CreateRequestService {
     required String startDate,
     required String endDate,
     required String? objective,
-    required int requestTypeId,
+    required int? requestTypeId,
     required int requestCategoryId,
-    required String attachment,
+    // required String? attachment,
   }) async {
     try {
       final response = await DioClient.dio.post(

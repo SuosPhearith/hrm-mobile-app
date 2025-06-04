@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_app/widgets/custom_header.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -38,12 +39,13 @@ class _HollidayScreenState extends State<HollidayScreen> {
         title: const Text(
           'ឈប់សម្រាក',
           style: TextStyle(
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w500,
             color: Colors.black,
           ),
         ),
         centerTitle: true,
         elevation: 0,
+        bottom: CustomHeader(),
       ),
       body: Column(
         children: [

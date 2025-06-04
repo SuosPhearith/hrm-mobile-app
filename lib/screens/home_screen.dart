@@ -5,6 +5,7 @@ import 'package:mobile_app/app_routes.dart';
 import 'package:mobile_app/providers/global/auth_provider.dart';
 import 'package:mobile_app/providers/global/setting_provider.dart';
 import 'package:mobile_app/providers/local/home_provider.dart';
+import 'package:mobile_app/shared/color/colors.dart';
 import 'package:mobile_app/utils/help_util.dart';
 import 'package:mobile_app/widgets/custom_progress_bar.dart';
 import 'package:mobile_app/widgets/skeleton.dart';
@@ -85,6 +86,87 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
+// // Widget for user profile header
+// class UserProfileHeader extends StatelessWidget {
+//   final AuthProvider authProvider;
+
+//   const UserProfileHeader({super.key, required this.authProvider});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     final lang = Provider.of<SettingProvider>(context).lang;
+//     return Padding(
+//       padding: const EdgeInsets.all(16.0),
+//       child: Row(
+//         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//         children: [
+//           Flexible(
+//             child: Row(
+//               children: [
+//                 ClipOval(
+//                   child: Image.network(
+//                     '${authProvider.profile?.data['user']['avatar']['file_domain']}${authProvider.profile?.data['user']['avatar']['uri']}', // Replace with actual URL
+//                     width: 40.0,
+//                     height: 40.0,
+//                     fit: BoxFit.cover,
+//                     errorBuilder: (context, error, stackTrace) => Container(
+//                       width: 40.0,
+//                       height: 40.0,
+//                       decoration: BoxDecoration(
+//                         shape: BoxShape.circle,
+//                         color: Colors.grey[600],
+//                       ),
+//                       child: const Center(
+//                         child:
+//                             Icon(Icons.person, size: 30.0, color: Colors.white),
+//                       ),
+//                     ),
+//                   ),
+//                 ),
+//                 const SizedBox(width: 6.0),
+//                 Flexible(
+//                   child: Column(
+//                     crossAxisAlignment: CrossAxisAlignment.start,
+//                     children: [
+//                       Text(
+//                         AppLang.translate(
+//                             data: authProvider.profile?.data['user'],
+//                             lang: lang ?? 'kh'),
+//                         style: TextStyle(
+//                           fontSize:
+//                               Theme.of(context).textTheme.bodyLarge!.fontSize,
+//                           fontWeight: FontWeight.w500,
+//                         ),
+//                       ),
+//                       Text(
+//                         AppLang.translate(
+//                             data: authProvider.profile?.data['user']['roles'][0]
+//                                 ['role'],
+//                             lang: lang ?? 'kh'),
+//                         style: TextStyle(
+//                           fontSize:
+//                               Theme.of(context).textTheme.bodySmall!.fontSize,
+//                         ),
+//                         overflow: TextOverflow.ellipsis,
+//                       ),
+//                     ],
+//                   ),
+//                 ),
+//               ],
+//             ),
+//           ),
+//           Row(
+//             children: [
+//               _IconButton(icon: Icons.download, onPressed: null),
+//               const SizedBox(width: 8.0),
+//               _IconButton(icon: Icons.notifications, onPressed: null),
+//             ],
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }
 // Widget for user profile header
 class UserProfileHeader extends StatelessWidget {
   final AuthProvider authProvider;
@@ -94,9 +176,68 @@ class UserProfileHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final lang = Provider.of<SettingProvider>(context).lang;
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Row(
+    // return Padding(
+    //   padding: const EdgeInsets.all(16.0),
+    // child: Row(
+    //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    //   children: [
+    //     Flexible(
+    //       child: Row(
+    //         children: [
+    //           Container(
+    //             width: 40.0,
+    //             height: 40.0,
+    //             decoration: BoxDecoration(
+    //               shape: BoxShape.circle,
+    //               color: HColors.darkgrey.withOpacity(0.7),
+    //             ),
+    //             child: const Center(
+    //               child: Icon(Icons.person, size: 30.0, color: Colors.white),
+    //             ),
+    //           ),
+    //           const SizedBox(width: 6.0),
+    //           Flexible(
+    //             child: Column(
+    //               crossAxisAlignment: CrossAxisAlignment.start,
+    //               children: [
+    //                 Text(
+    //                   AppLang.translate(
+    //                       data: homeProvider.name, lang: lang ?? 'kh'),
+    //                   style: TextStyle(
+    //                     fontSize:
+    //                         Theme.of(context).textTheme.bodyLarge!.fontSize,
+    //                     fontWeight: FontWeight.w500,
+    //                   ),
+    //                 ),
+    //                 Text(
+    //                   AppLang.translate(
+    //                       data: homeProvider.department, lang: lang ?? 'kh'),
+    //                   style: TextStyle(
+    //                     fontSize:
+    //                         Theme.of(context).textTheme.bodySmall!.fontSize,
+    //                   ),
+    //                   overflow: TextOverflow.ellipsis,
+    //                 ),
+    //               ],
+    //             ),
+    //           ),
+    //         ],
+    //       ),
+    //     ),
+    // Row(
+    //   children: [
+    //     _IconButton(icon: Icons.download, onPressed: null),
+    //     const SizedBox(width: 8.0),
+    //     _IconButton(icon: Icons.notifications, onPressed: null),
+    //   ],
+    // ),
+    //     ],
+    //   ),
+    // );
+    return AppBar(
+      backgroundColor: Colors.transparent,
+      scrolledUnderElevation: 0,
+      title: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Flexible(
@@ -104,7 +245,7 @@ class UserProfileHeader extends StatelessWidget {
               children: [
                 ClipOval(
                   child: Image.network(
-                    '${authProvider.profile?.data['user']['avatar']['file_domain']}${authProvider.profile?.data['user']['avatar']['uri']}', // Replace with actual URL
+                    '${authProvider.profile?.data['user']['avatar']['file_domain']}${authProvider.profile?.data['user']['avatar']['uri']}',
                     width: 40.0,
                     height: 40.0,
                     fit: BoxFit.cover,
@@ -134,7 +275,7 @@ class UserProfileHeader extends StatelessWidget {
                         style: TextStyle(
                           fontSize:
                               Theme.of(context).textTheme.bodyLarge!.fontSize,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                       Text(
@@ -153,16 +294,21 @@ class UserProfileHeader extends StatelessWidget {
                 ),
               ],
             ),
-          ),
-          Row(
+          )
+        ],
+      ),
+      actions: [
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Row(
             children: [
               _IconButton(icon: Icons.download, onPressed: null),
               const SizedBox(width: 8.0),
               _IconButton(icon: Icons.notifications, onPressed: null),
             ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
@@ -181,10 +327,10 @@ class _IconButton extends StatelessWidget {
       height: 40.0,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: Colors.grey[200],
+        color: HColors.darkgrey.withOpacity(0.1),
       ),
       child: Center(
-        child: Icon(icon, color: Colors.grey[600], size: 22.0),
+        child: Icon(icon, color: HColors.darkgrey, size: 22.0),
       ),
     );
   }
@@ -286,7 +432,7 @@ class DailyView extends StatelessWidget {
                 AppLang.translate(key: 'home_today', lang: lang ?? 'kh'),
                 style: TextStyle(
                   fontSize: Theme.of(context).textTheme.bodyLarge!.fontSize,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w500,
                   color: Colors.blue[900],
                 ),
               ),
@@ -336,7 +482,7 @@ class DailyView extends StatelessWidget {
                       style: TextStyle(
                         fontSize:
                             Theme.of(context).textTheme.bodyLarge!.fontSize,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w500,
                         color: Colors.blue[800],
                       ),
                     ),
@@ -487,7 +633,7 @@ class MonthlyView extends StatelessWidget {
                 AppLang.translate(key: 'home_monthly', lang: lang ?? 'kh'),
                 style: TextStyle(
                   fontSize: Theme.of(context).textTheme.bodyLarge!.fontSize,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w500,
                   color: Colors.blue[900],
                 ),
               ),
@@ -612,7 +758,7 @@ class CardView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final lang = Provider.of<SettingProvider>(context).lang;
+    // final lang = Provider.of<SettingProvider>(context).lang;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
@@ -921,6 +1067,7 @@ class MenuGrid extends StatelessWidget {
         mainAxisSpacing: 0,
         crossAxisSpacing: 0,
         childAspectRatio: 142 / 100,
+        padding: EdgeInsets.zero,
         children: menuItems.map((item) {
           return GestureDetector(
             onTap: item['route'] != null
@@ -944,15 +1091,14 @@ class MenuGrid extends StatelessWidget {
                   Icon(
                     item['icon'] as IconData,
                     size: 24,
-                    color: Color(0xFF0F172A),
+                    color: HColors.darkgrey,
                   ),
                   SizedBox(height: 12),
                   Text(
                     '${item['label']}',
                     style: TextStyle(
-                      color: Color(0xFF0F172A),
                       fontSize: 16,
-                      fontFamily: 'Kantumruy Pro',
+                      // color: HColors.darkgrey,
                       fontWeight: FontWeight.w400,
                       height: 1.50,
                     ),
@@ -1021,7 +1167,7 @@ class RequestSection extends StatelessWidget {
                           style: TextStyle(
                             fontSize:
                                 Theme.of(context).textTheme.bodySmall!.fontSize,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w500,
                             color: selectedIndex == 'Pending'
                                 ? Colors.blue
                                 : Colors.grey.shade700,
@@ -1049,7 +1195,7 @@ class RequestSection extends StatelessWidget {
                           style: TextStyle(
                             fontSize:
                                 Theme.of(context).textTheme.bodySmall!.fontSize,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w500,
                             color: selectedIndex == 'Reviewing'
                                 ? Colors.blue
                                 : Colors.grey.shade700,
@@ -1092,113 +1238,151 @@ class RequestCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final lang = Provider.of<SettingProvider>(context).lang;
 
-    return Container(
-      width: double.infinity,
-      margin: const EdgeInsets.symmetric(vertical: 6),
-      clipBehavior: Clip.antiAlias,
-      decoration: ShapeDecoration(
-        color: Colors.white,
-        shape: RoundedRectangleBorder(
-          side: const BorderSide(
-            width: 1,
-            color: Color(0xFFCBD5E1),
-          ),
-          borderRadius: BorderRadius.circular(12),
-        ),
-      ),
+    return GestureDetector(
+      onTap: () {
+        // GestureDetector(
+        //                     onTap: () {
+        //                       context.push(
+        //                         '${AppRoutes.detailRequest}/1}',
+        //                       );
+        //                     },
+        //                     child: Text('Something when wrong'),
+        //                   ),
+        context.push(
+          '${AppRoutes.detailRequest}/${item['id']}',
+        );
+      },
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'P-12345',
-                    style: TextStyle(
-                      color: const Color(0xFF64748B),
-                      fontSize: 12,
-                      fontFamily: 'Kantumruy Pro',
-                      fontWeight: FontWeight.w400,
-                      height: 1.67,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Flexible(
-                        child: Text(
-                          '20-01-2025 ដល់ 23-01-2025',
-                          style: TextStyle(
-                            color: const Color(0xFF0F172A),
-                            fontSize: 16,
-                            fontFamily: 'Kantumruy Pro',
-                            fontWeight: FontWeight.w400,
-                            height: 1.50,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 6, vertical: 2),
-                        decoration: ShapeDecoration(
-                          color: const Color(0x193B82F6),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                        ),
-                        child: Text(
-                          '4 ថ្ងៃ',
-                          style: TextStyle(
-                            color: const Color(0xFF3B82F6),
-                            fontSize: 10,
-                            fontFamily: 'Kantumruy Pro',
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'ច្បាប់ឈប់សម្រាក (រយះពេលខ្លី) | បញ្ហាសុខភាព',
-                    style: TextStyle(
-                      color: const Color(0xFF64748B),
-                      fontSize: 12,
-                      fontFamily: 'Kantumruy Pro',
-                      fontWeight: FontWeight.w400,
-                      height: 1.67,
-                    ),
-                  ),
-                ],
-              ),
+        width: double.infinity,
+        margin: const EdgeInsets.symmetric(vertical: 6),
+        clipBehavior: Clip.antiAlias,
+        decoration: ShapeDecoration(
+          color: Colors.white,
+          shape: RoundedRectangleBorder(
+            side: const BorderSide(
+              width: 1,
+              color: Color(0xFFCBD5E1),
             ),
-            const SizedBox(width: 12),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-              decoration: ShapeDecoration(
-                color: const Color(0x19F59E0B),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      AppLang.translate(
+                          data: item['request_category'], lang: lang ?? 'kh'),
+                      style: TextStyle(
+                        fontSize:
+                            Theme.of(context).textTheme.bodyMedium!.fontSize,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Flexible(
+                          child: Text(
+                            '${formatDate(item['start_datetime'])} to ${formatDate(item['end_datetime'])}',
+                            style: TextStyle(
+                              fontSize: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall!
+                                  .fontSize,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 6, vertical: 2),
+                          decoration: ShapeDecoration(
+                            color: const Color(0x193B82F6),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                          ),
+                          // child: Text(
+                          //   '4 ថ្ងៃ',
+                          //   style: TextStyle(
+                          //     color: const Color(0xFF3B82F6),
+                          //     fontSize: 10,
+                          //     fontFamily: 'Kantumruy Pro',
+                          //     fontWeight: FontWeight.w500,
+                          //   ),
+                          // ),
+                          child: Text(
+                            calculateDateDifference(
+                                item['start_datetime'], item['end_datetime']),
+                            style: TextStyle(
+                              fontSize: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall!
+                                  .fontSize,
+                              color: Color(0xFF3B82F6),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '${AppLang.translate(data: item['request_type'], lang: lang ?? 'kh')} | ${formatStringValue(item['objective'])}',
+                      style: TextStyle(
+                          fontSize:
+                              Theme.of(context).textTheme.bodySmall!.fontSize),
+                    ),
+                  ],
                 ),
               ),
-              child: Text(
-                'កំពុងរង់ចាំ',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: const Color(0xFFF59E0B),
-                  fontSize: 10,
-                  fontFamily: 'Kantumruy Pro',
-                  fontWeight: FontWeight.w500,
+              const SizedBox(width: 12),
+              // Container(
+              //   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              // decoration: ShapeDecoration(
+              //   color: const Color(0x19F59E0B),
+              //   shape: RoundedRectangleBorder(
+              //     borderRadius: BorderRadius.circular(12),
+              //   ),
+              // ),
+              //   child: Text(
+              //     'កំពុងរង់ចាំ',
+              //     textAlign: TextAlign.center,
+              //     style: TextStyle(
+              //       color: const Color(0xFFF59E0B),
+              //       fontSize: 10,
+              //       fontFamily: 'Kantumruy Pro',
+              //       fontWeight: FontWeight.w500,
+              //     ),
+              //   ),
+              // ),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10.0, vertical: 4.0),
+                decoration: ShapeDecoration(
+                  color: const Color(0x19F59E0B),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: Text(
+                  AppLang.translate(
+                      data: item['request_status'], lang: lang ?? 'kh'),
+                  style: TextStyle(
+                    fontSize: Theme.of(context).textTheme.bodySmall!.fontSize,
+                    color: const Color(0xFFF59E0B),
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

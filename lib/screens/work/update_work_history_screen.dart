@@ -689,7 +689,7 @@ class _UpdateWorkHistoryScreenState extends State<UpdateWorkHistoryScreen> {
                       title,
                       style: const TextStyle(
                         fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ),

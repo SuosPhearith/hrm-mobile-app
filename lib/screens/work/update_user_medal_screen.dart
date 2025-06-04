@@ -455,7 +455,7 @@ class _UpdateUserMedalScreenState extends State<UpdateUserMedalScreen> {
                       title,
                       style: const TextStyle(
                         fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ),

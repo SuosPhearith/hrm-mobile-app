@@ -4,6 +4,7 @@ import 'package:mobile_app/app_lang.dart';
 import 'package:mobile_app/app_routes.dart';
 import 'package:mobile_app/providers/global/setting_provider.dart';
 import 'package:mobile_app/providers/local/request_provider.dart';
+import 'package:mobile_app/shared/color/colors.dart';
 import 'package:mobile_app/utils/help_util.dart';
 import 'package:mobile_app/widgets/custom_header.dart';
 import 'package:provider/provider.dart';
@@ -30,7 +31,8 @@ class _RequestScreenState extends State<RequestScreen> {
         builder: (context, requestProvider, settingProvider, child) {
           final dataSetup = requestProvider.dataSetup?.data;
           return Scaffold(
-            backgroundColor: Color(0xFFF1F5F9),
+            // backgroundColor: Color(0xFFF1F5F9),
+            backgroundColor: Colors.white,
             appBar: AppBar(
               bottom: CustomHeader(),
               title: Text(
@@ -39,7 +41,7 @@ class _RequestScreenState extends State<RequestScreen> {
                   lang: settingProvider.lang ?? 'kh',
                 ),
                 style: const TextStyle(
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w500,
                   color: Colors.black,
                 ),
               ),
@@ -63,7 +65,7 @@ class _RequestScreenState extends State<RequestScreen> {
                       child: Icon(
                         Icons.add,
                         size: 28.0,
-                        color: Colors.blue[800],
+                        color: HColors.darkgrey,
                       ),
                     ),
                   ),
@@ -140,34 +142,71 @@ class _RequestScreenState extends State<RequestScreen> {
     Map<String, dynamic> dataSetup,
   ) {
     final lang = Provider.of<SettingProvider>(context, listen: false).lang;
+
+    // Expanded list of icons to cover more categories
+    final List<IconData> icons = [
+      Icons.person,
+      Icons.airplanemode_on,
+      Icons.home,
+      Icons.car_repair,
+      Icons.medical_services,
+      Icons.school,
+      Icons.work,
+      Icons.restaurant,
+      Icons.shopping_cart,
+      Icons.sports,
+      Icons.music_note,
+      Icons.camera_alt,
+      Icons.travel_explore,
+      Icons.build,
+      Icons.cleaning_services,
+      Icons.pets,
+      Icons.local_hospital,
+      Icons.local_pharmacy,
+      Icons.local_taxi,
+      Icons.local_shipping,
+      Icons.business,
+      Icons.account_balance,
+      Icons.security,
+      Icons.support,
+      Icons.help,
+    ];
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(8.0)),
       ),
       backgroundColor: Colors.white,
       builder: (BuildContext context) {
+        final requestCategories = dataSetup['request_categories'] != null
+            ? dataSetup['request_categories'] as List
+            : [];
+
         return Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(8.0),
           child: Column(
             mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'បន្ថែមសំណើថ្មី',
-                style: TextStyle(
-                  fontSize: 20.0,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blue[900],
-                ),
-              ),
-              const SizedBox(height: 16.0),
-              ...(dataSetup['request_categories'] != null
-                      ? dataSetup['request_categories'] as List
-                      : [])
-                  .map((record) {
+              // Text(
+              //   'បន្ថែមសំណើថ្មី',
+              //   style: TextStyle(
+              //     fontSize: 20.0,
+              //     fontWeight: FontWeight.w500,
+              //   ),
+              // ),
+              // const SizedBox(height: 16.0),
+              ...requestCategories.asMap().entries.map((entry) {
+                int index = entry.key;
+                var record = entry.value;
+
+                // Use modulo to cycle through icons if there are more categories than icons
+                IconData selectedIcon = icons[index % icons.length];
+
                 return _buildBottomSheetOption(
-                  icon: Icons.account_circle,
+                  icon: selectedIcon,
                   label: AppLang.translate(data: record, lang: lang ?? 'kh'),
                   onTap: () {
                     Navigator.pop(context);
@@ -187,29 +226,29 @@ class _RequestScreenState extends State<RequestScreen> {
     required String label,
     required VoidCallback onTap,
   }) {
-    return GestureDetector(
+    return InkWell(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(12.0),
-        margin: EdgeInsets.only(bottom: 8),
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey),
-          borderRadius: BorderRadius.circular(12.0),
-        ),
+        // padding: const EdgeInsets.all(8),
+        margin: EdgeInsets.only(bottom: 8, top: 8),
+        // decoration: BoxDecoration(
+        //   border: Border.all(color: Colors.grey),
+        //   borderRadius: BorderRadius.circular(12.0),
+        // ),
         child: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(8.0),
               decoration: BoxDecoration(shape: BoxShape.circle),
-              child: Icon(icon, size: 24.0, color: Colors.grey),
+              child: Icon(icon, size: 24.0, color: HColors.darkgrey),
             ),
-            const SizedBox(width: 12.0),
+            const SizedBox(width: 8.0),
             Text(
               label,
               style: TextStyle(
                 fontSize: 16.0,
-                fontWeight: FontWeight.w600,
-                color: Colors.grey.shade800,
+                fontWeight: FontWeight.w400,
+                color: HColors.darkgrey,
               ),
             ),
           ],
@@ -253,8 +292,8 @@ class _RequestScreenState extends State<RequestScreen> {
                     id,
                     style: TextStyle(
                       color: const Color(0xFF64748B),
-                      fontSize: 12,
-                      fontFamily: 'Kantumruy Pro',
+                      fontSize: 14,
+                      // fontFamily: 'Kantumruy Pro',
                       fontWeight: FontWeight.w400,
                       height: 1.67,
                     ),
@@ -269,7 +308,7 @@ class _RequestScreenState extends State<RequestScreen> {
                           style: TextStyle(
                             color: const Color(0xFF0F172A),
                             fontSize: 14,
-                            fontFamily: 'Kantumruy Pro',
+                            // fontFamily: 'Kantumruy Pro',
                             fontWeight: FontWeight.w400,
                             height: 1.50,
                           ),
@@ -290,7 +329,7 @@ class _RequestScreenState extends State<RequestScreen> {
                           style: TextStyle(
                             color: const Color(0xFF3B82F6),
                             fontSize: 10,
-                            fontFamily: 'Kantumruy Pro',
+                            // fontFamily: 'Kantumruy Pro',
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -303,7 +342,7 @@ class _RequestScreenState extends State<RequestScreen> {
                     style: TextStyle(
                       color: const Color(0xFF64748B),
                       fontSize: 12,
-                      fontFamily: 'Kantumruy Pro',
+                      // fontFamily: 'Kantumruy Pro',
                       fontWeight: FontWeight.w400,
                       height: 1.67,
                     ),
@@ -326,7 +365,7 @@ class _RequestScreenState extends State<RequestScreen> {
                 style: TextStyle(
                   color: const Color(0xFFF59E0B),
                   fontSize: 10,
-                  fontFamily: 'Kantumruy Pro',
+                  // fontFamily: 'Kantumruy Pro',
                   fontWeight: FontWeight.w500,
                 ),
               ),

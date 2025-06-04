@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:mobile_app/shared/color/colors.dart';
 
 class DateRangeSelector extends StatelessWidget {
   final DateTime? startDate;
@@ -39,6 +40,7 @@ class DateRangeSelector extends StatelessWidget {
               children: [
                 Icon(
                   Icons.calendar_month_rounded,
+                  color: HColors.darkgrey,
                   size: 24.0,
                 ),
                 SizedBox(
@@ -49,8 +51,8 @@ class DateRangeSelector extends StatelessWidget {
                       ? "ពី ${DateFormat('dd-MM-yyyy').format(startDate!)} ដល់ ${DateFormat('dd-MM-yyyy').format(endDate!)}"
                       : "ជ្រើសរើសកាលបរិច្ឆេទ",
                   style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                    color: Colors.grey.shade900,
+                    fontWeight: FontWeight.w500,
+                    // color: HColors.darkgrey,
                     fontSize: 14.0,
                   ),
                 ),
@@ -59,7 +61,7 @@ class DateRangeSelector extends StatelessWidget {
             Icon(
               Icons.edit,
               size: 20.0,
-              color: Theme.of(context).colorScheme.primary,
+             color: HColors.darkgrey,
             ),
           ],
         ),

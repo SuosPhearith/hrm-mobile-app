@@ -4,7 +4,9 @@ import 'package:mobile_app/app_lang.dart';
 import 'package:mobile_app/providers/global/setting_provider.dart';
 import 'package:mobile_app/providers/local/work_provider.dart';
 import 'package:mobile_app/services/work_service.dart';
+import 'package:mobile_app/shared/color/colors.dart';
 import 'package:mobile_app/utils/help_util.dart';
+import 'package:mobile_app/widgets/custom_header.dart';
 import 'package:mobile_app/widgets/helper.dart';
 import 'package:provider/provider.dart';
 
@@ -79,11 +81,12 @@ class _WorkScreenState extends State<WorkScreen> {
         builder: (context, provider, settingProvider, child) {
           final user = provider.data?.data['user'];
           return Scaffold(
-            backgroundColor: Colors.grey[100],
+            backgroundColor: Colors.white,
             appBar: AppBar(
               title: Text(AppLang.translate(
                   key: 'work', lang: settingProvider.lang ?? 'kh')),
               centerTitle: true,
+              bottom: CustomHeader(),
             ),
             body: RefreshIndicator(
               key: _refreshIndicatorKey,
@@ -104,7 +107,7 @@ class _WorkScreenState extends State<WorkScreen> {
                                   lang: settingProvider.lang ?? 'kh'),
                               onEditTap: () => {
                                 context.push(
-                                    '/update-personal-info/${user['id']}'),
+                                    '/update-user-work/${user['id']}/${user['user_work']['id']}'),
                               },
                             ),
 
@@ -158,7 +161,7 @@ class _WorkScreenState extends State<WorkScreen> {
                               name: getSafeString(
                                   value: AppLang.translate(
                                       data: user?['user_work']
-                                          ['general_department'],
+                                          ['department'],
                                       lang: settingProvider.lang ?? 'kh')),
                               description: AppLang.translate(
                                   key: 'department',
@@ -426,7 +429,7 @@ class _WorkScreenState extends State<WorkScreen> {
     required String text,
     IconData icon = Icons.group,
     Color textColor = Colors.blueGrey,
-    Color iconColor = Colors.grey,
+    Color iconColor = HColors.darkgrey,
     Color? avatarColor,
     VoidCallback? onEditTap, // Made optional with nullable type
   }) {
@@ -475,7 +478,7 @@ class _WorkScreenState extends State<WorkScreen> {
           if (onEditTap != null)
             GestureDetector(
               onTap: onEditTap,
-              child: Icon(Icons.edit, size: 20.0, color: Colors.grey),
+              child: Icon(Icons.edit, size: 20.0, color: HColors.darkgrey),
             ),
         ],
       ),

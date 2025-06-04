@@ -2,6 +2,7 @@ class AppLang {
   static const Map<String, String> _english = {
     'greeting': 'Hello',
     'request': 'Request',
+    'to':'To',
     // Home ================================================
     'home_today': 'Daily',
     'home_monthly': 'Monthly',
@@ -143,6 +144,7 @@ class AppLang {
     'medals_add':'Add Medal',
     'medals':'Medal',
     'work_experience_update':'Update Work History',
+    'update_user_work': 'Update Work',
     // create work history 
     'Please select institution':'Please select institution',
     'Please select department':'Please select department',
@@ -151,6 +153,7 @@ class AppLang {
     'given date':'Given date',
     'throught':'Throught',
     'update_user_medal':'Update Medal', 
+    'request_type':'Request Type',
     // Layout ================================================
   };
 
@@ -300,7 +303,7 @@ class AppLang {
     'medals_add':'បន្ថែមឥស្សរយស',
     'medals':'ឥស្សរយស',
     'work_experience_update':'កែប្រែប្រវត្តិការងារ',
-
+    'update_user_work': 'កែប្រែព័ត៌មានការងារ',
     //create user work
     'start_date':'ថ្ងៃចាប់ផ្ដើម',
     'end_date':'ថ្ងៃបញ្ចប់',
@@ -310,7 +313,9 @@ class AppLang {
     //create user medal
     'given date':'ថ្ងៃផ្ដល់',
     'throught':'តាមរយៈ',
-    'update_user_medal':'កែប្រែឥស្សរយស'
+    'update_user_medal':'កែប្រែឥស្សរយស',
+    'to':'ដល់',
+    'request_type':'ប្រភេទច្បាប់',
     // Layout ================================================
   };
 
