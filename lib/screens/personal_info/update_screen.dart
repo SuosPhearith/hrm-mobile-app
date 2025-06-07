@@ -1,11 +1,15 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:mobile_app/app_lang.dart';
 import 'package:mobile_app/providers/global/setting_provider.dart';
 import 'package:mobile_app/providers/local/personalinfo/update_personal_info_provider.dart';
 import 'package:mobile_app/services/personal_info/update_personal_info_service.dart';
 import 'package:mobile_app/shared/color/colors.dart';
+import 'package:mobile_app/shared/component/build_selection.dart';
+import 'package:mobile_app/shared/component/build_text_filed.dart';
+import 'package:mobile_app/shared/date/field_date.dart';
 
 import 'package:mobile_app/utils/help_util.dart';
 import 'package:mobile_app/widgets/custom_header.dart';
@@ -30,6 +34,8 @@ class _UpdatePersonalInfoScreenState extends State<UpdatePersonalInfoScreen> {
 
   final UpdatePersonalInfoService _service = UpdatePersonalInfoService();
   bool _isDataLoaded = false;
+  DateTime? _dob;
+  // DateTime? _endDate;
 
   @override
   void dispose() {
@@ -113,8 +119,9 @@ class _UpdatePersonalInfoScreenState extends State<UpdatePersonalInfoScreen> {
         txtIdentity.text = getSafeString(
             value: userData['identity_card_number'], safeValue: '');
         txtNote.text = getSafeString(value: userData['note'], safeValue: '');
-        txtDob.text =
-            getSafeString(value: formatDate(userData['dob']), safeValue: '');
+        // Load Date of Birth
+        final dobStr = getSafeString(value: userData['dob'], safeValue: '');
+        _dob = dobStr.isNotEmpty ? DateTime.tryParse(dobStr) : null;
 
         // Load address fields - place of birth
         txtDobProvince.text = userData['pob_province'] != null
@@ -210,7 +217,7 @@ class _UpdatePersonalInfoScreenState extends State<UpdatePersonalInfoScreen> {
           phoneCode: '+855',
           phoneNumber: txtPhone.text,
           email: txtEmail.text,
-          dob: convertDateForApi(txtDob.text),
+          dob: DateFormat('yyyy-MM-dd').format(_dob!),
           identityCardNumber: txtIdentity.text,
           saluteId: selectedSaluteId?.toString(),
           sexId: selectedGenderId.toString(),
@@ -258,60 +265,31 @@ class _UpdatePersonalInfoScreenState extends State<UpdatePersonalInfoScreen> {
     });
   }
 
-  Future<void> _selectDate() async {
-    // Parse existing date if available
-    DateTime? initialDate;
-    if (txtDob.text.isNotEmpty && txtDob.text != 'N/A') {
-      try {
-        initialDate = DateTime.parse(txtDob.text);
-      } catch (e) {
-        initialDate = DateTime.now();
-      }
-    } else {
-      initialDate = DateTime.now();
-    }
+  // Future<void> _selectDate() async {
+  //   // Parse existing date if available
+  //   DateTime? initialDate;
+  //   if (txtDob.text.isNotEmpty && txtDob.text != 'N/A') {
+  //     try {
+  //       initialDate = DateTime.parse(txtDob.text);
+  //     } catch (e) {
+  //       initialDate = DateTime.now();
+  //     }
+  //   } else {
+  //     initialDate = DateTime.now();
+  //   }
 
-    DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: initialDate,
-      firstDate: DateTime(1900),
-      lastDate: DateTime.now(),
-    );
-    if (picked != null) {
-      setState(() {
-        txtDob.text = "${picked.toLocal()}".split(' ')[0];
-      });
-    }
-  }
-
-  // Add this helper method to convert DD-MM-YYYY to YYYY-MM-DD
-  String convertDateForApi(String dateString) {
-    if (dateString.isEmpty) return '';
-
-    try {
-      // Check if it's already in YYYY-MM-DD format
-      if (RegExp(r'^\d{4}-\d{2}-\d{2}$').hasMatch(dateString)) {
-        return dateString;
-      }
-
-      // Handle DD-MM-YYYY format
-      if (RegExp(r'^\d{2}-\d{2}-\d{4}$').hasMatch(dateString)) {
-        List<String> parts = dateString.split('-');
-        String day = parts[0];
-        String month = parts[1];
-        String year = parts[2];
-        return '$year-$month-$day';
-      }
-
-      // Try to parse as DateTime and format
-      DateTime date = DateTime.parse(dateString);
-      return "${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
-    } catch (e) {
-      print('Date conversion error: $e');
-      return dateString; // Return original if conversion fails
-    }
-  }
-
+  //   DateTime? picked = await showDatePicker(
+  //     context: context,
+  //     initialDate: initialDate,
+  //     firstDate: DateTime(1900),
+  //     lastDate: DateTime.now(),
+  //   );
+  //   if (picked != null) {
+  //     setState(() {
+  //       txtDob.text = "${picked.toLocal()}".split(' ')[0];
+  //     });
+  //   }
+  // }
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
@@ -380,12 +358,14 @@ class _UpdatePersonalInfoScreenState extends State<UpdatePersonalInfoScreen> {
                               //   ),
                               // ),
                               // Relative Type Selection
-                              _buildSelectionField(
+                              buildSelectionField(
+                                context: context,
                                 controller: txtSalute,
                                 label: AppLang.translate(
                                     lang: settingProvider.lang ?? 'kh',
                                     key: 'user_info_salute'),
                                 items: salutes,
+                                selectedId: selectedSaluteId,
                                 onSelected: (id, value) {
                                   setState(() {
                                     selectedSaluteId = id;
@@ -397,18 +377,18 @@ class _UpdatePersonalInfoScreenState extends State<UpdatePersonalInfoScreen> {
                               Row(
                                 children: [
                                   Expanded(
-                                    child: _buildTextField(
+                                    child: buildTextField(
                                       controller: txtKhName,
                                       label:
-                                          "${AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'user_info_kh_name')} *",
+                                          "${AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'user_info_kh_name')} *", context: context,
                                     ),
                                   ),
                                   const SizedBox(width: 16),
                                   Expanded(
-                                    child: _buildTextField(
+                                    child: buildTextField(
                                       controller: txtEnName,
                                       label:
-                                          "${AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'user_info_en_name')} *",
+                                          "${AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'user_info_en_name')} *", context: context,
                                     ),
                                   ),
                                 ],
@@ -443,12 +423,12 @@ class _UpdatePersonalInfoScreenState extends State<UpdatePersonalInfoScreen> {
                               //   ),
                               //   keyboardType: TextInputType.phone,
                               // ),
-                              _buildTextField(
+                              buildTextField(
                                 controller: txtPhone,
                                 label: AppLang.translate(
                                     lang: settingProvider.lang ?? 'kh',
                                     key: 'user_info_phone'),
-                                keyboardType: TextInputType.phone,
+                                keyboardType: TextInputType.phone, context: context,
                               ),
                               const SizedBox(height: 24),
                               // TextFormField(
@@ -463,12 +443,12 @@ class _UpdatePersonalInfoScreenState extends State<UpdatePersonalInfoScreen> {
                               //   ),
                               //   keyboardType: TextInputType.emailAddress,
                               // ),
-                              _buildTextField(
+                              buildTextField(
                                 controller: txtEmail,
                                 label: AppLang.translate(
                                     lang: settingProvider.lang ?? 'kh',
                                     key: 'user_info_email'),
-                                keyboardType: TextInputType.emailAddress,
+                                keyboardType: TextInputType.emailAddress, context: context,
                               ),
                               const SizedBox(height: 24),
                               // TextFormField(
@@ -482,7 +462,8 @@ class _UpdatePersonalInfoScreenState extends State<UpdatePersonalInfoScreen> {
                               //     ),
                               //   ),
                               // ),
-                              _buildTextField(
+                              buildTextField(
+                                context: context,
                                 controller: txtIdentity,
                                 label: AppLang.translate(
                                   lang: settingProvider.lang ?? 'kh',
@@ -493,20 +474,33 @@ class _UpdatePersonalInfoScreenState extends State<UpdatePersonalInfoScreen> {
                               const SizedBox(height: 24),
 
                               // Date of Birth
-                              _buildTextField(
-                                controller: txtDob,
+                              // buildTextField(
+                              //   controller: txtDob,
+                              // label: AppLang.translate(
+                              //     lang: settingProvider.lang ?? 'kh',
+                              //     key: 'user_info_date_of_birth'),
+                              //   readOnly: true,
+                              //   onTap: _selectDate,
+                              //   suffixIcon: IconButton(
+                              //     icon: Icon(
+                              //       Icons.calendar_today_rounded,
+                              //       color: Colors.grey,
+                              //     ),
+                              //     onPressed: _selectDate,
+                              //   ),
+                              // ),
+                              DateInputField(
                                 label: AppLang.translate(
                                     lang: settingProvider.lang ?? 'kh',
                                     key: 'user_info_date_of_birth'),
-                                readOnly: true,
-                                onTap: _selectDate,
-                                suffixIcon: IconButton(
-                                  icon: Icon(
-                                    Icons.calendar_today_rounded,
-                                    color: Colors.grey,
-                                  ),
-                                  onPressed: _selectDate,
-                                ),
+                                hint: 'សូមជ្រើសរើសកាលបរិច្ឆេទ',
+                                initialDate: DateTime.now(),
+                                selectedDate: _dob,
+                                onDateSelected: (date) {
+                                  setState(() {
+                                    _dob = date;
+                                  });
+                                },
                               ),
                               const SizedBox(height: 24),
                               // TextFormField(
@@ -521,7 +515,8 @@ class _UpdatePersonalInfoScreenState extends State<UpdatePersonalInfoScreen> {
                               //     ),
                               //   ),
                               // ),
-                              _buildTextField(
+                              buildTextField(
+                                context: context,
                                 controller: txtNote,
                                 label: AppLang.translate(
                                   lang: settingProvider.lang ?? 'kh',
@@ -533,14 +528,14 @@ class _UpdatePersonalInfoScreenState extends State<UpdatePersonalInfoScreen> {
                               Container(
                                 padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
-                                  color: Colors.grey.shade100,
+                                  color: HColors.darkgrey.withOpacity(0.1),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: Row(
                                   children: [
                                     Icon(
                                       Icons.location_on_outlined,
-                                      color: Colors.grey,
+                                      color: HColors.darkgrey,
                                     ),
                                     const SizedBox(width: 8),
                                     Text(AppLang.translate(
@@ -565,7 +560,8 @@ class _UpdatePersonalInfoScreenState extends State<UpdatePersonalInfoScreen> {
                                     //     ),
                                     //   ),
                                     // ),
-                                    child: _buildTextField(
+                                    child: buildTextField(
+                                      context: context,
                                       controller: txtDobProvince,
                                       label: AppLang.translate(
                                         lang: settingProvider.lang ?? 'kh',
@@ -588,7 +584,8 @@ class _UpdatePersonalInfoScreenState extends State<UpdatePersonalInfoScreen> {
                                     //     ),
                                     //   ),
                                     // ),
-                                    child: _buildTextField(
+                                    child: buildTextField(
+                                      context: context,
                                       controller: txtDobDistrict,
                                       label: AppLang.translate(
                                         lang: settingProvider.lang ?? 'kh',
@@ -614,7 +611,8 @@ class _UpdatePersonalInfoScreenState extends State<UpdatePersonalInfoScreen> {
                                     //     ),
                                     //   ),
                                     // ),
-                                    child: _buildTextField(
+                                    child: buildTextField(
+                                      context: context,
                                       controller: txtDobCommune,
                                       label: AppLang.translate(
                                         lang: settingProvider.lang ?? 'kh',
@@ -636,7 +634,8 @@ class _UpdatePersonalInfoScreenState extends State<UpdatePersonalInfoScreen> {
                                     //     ),
                                     //   ),
                                     // ),
-                                    child: _buildTextField(
+                                    child: buildTextField(
+                                      context: context,
                                       controller: txtDobVillage,
                                       label: AppLang.translate(
                                         lang: settingProvider.lang ?? 'kh',
@@ -662,7 +661,8 @@ class _UpdatePersonalInfoScreenState extends State<UpdatePersonalInfoScreen> {
                                     //     ),
                                     //   ),
                                     // ),
-                                    child: _buildTextField(
+                                    child: buildTextField(
+                                      context: context,
                                       controller: txtDobStreetNumber,
                                       label: AppLang.translate(
                                         lang: settingProvider.lang ?? 'kh',
@@ -684,7 +684,8 @@ class _UpdatePersonalInfoScreenState extends State<UpdatePersonalInfoScreen> {
                                     //     ),
                                     //   ),
                                     // ),
-                                    child: _buildTextField(
+                                    child: buildTextField(
+                                      context: context,
                                       controller: txtDobHomeNumber,
                                       label: AppLang.translate(
                                         lang: settingProvider.lang ?? 'kh',
@@ -699,14 +700,14 @@ class _UpdatePersonalInfoScreenState extends State<UpdatePersonalInfoScreen> {
                               Container(
                                 padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
-                                  color: Colors.grey.shade100,
+                                  color: HColors.darkgrey.withOpacity(0.1),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: Row(
                                   children: [
                                     Icon(
                                       Icons.location_on_outlined,
-                                      color: Colors.grey,
+                                      color: HColors.darkgrey,
                                     ),
                                     const SizedBox(width: 8),
                                     Text(AppLang.translate(
@@ -731,7 +732,8 @@ class _UpdatePersonalInfoScreenState extends State<UpdatePersonalInfoScreen> {
                                     //     ),
                                     //   ),
                                     // ),
-                                    child: _buildTextField(
+                                    child: buildTextField(
+                                      context: context,
                                       controller: txtProvince,
                                       label: AppLang.translate(
                                         lang: settingProvider.lang ?? 'kh',
@@ -754,7 +756,8 @@ class _UpdatePersonalInfoScreenState extends State<UpdatePersonalInfoScreen> {
                                     //     ),
                                     //   ),
                                     // ),
-                                    child: _buildTextField(
+                                    child: buildTextField(
+                                      context: context,
                                       controller: txtDistrict,
                                       label: AppLang.translate(
                                         lang: settingProvider.lang ?? 'kh',
@@ -782,7 +785,8 @@ class _UpdatePersonalInfoScreenState extends State<UpdatePersonalInfoScreen> {
                                     //     ),
                                     //   ),
                                     // ),
-                                    child: _buildTextField(
+                                    child: buildTextField(
+                                      context: context,
                                       controller: txtCommune,
                                       label: AppLang.translate(
                                         lang: settingProvider.lang ?? 'kh',
@@ -804,7 +808,8 @@ class _UpdatePersonalInfoScreenState extends State<UpdatePersonalInfoScreen> {
                                     //     ),
                                     //   ),
                                     // ),
-                                    child: _buildTextField(
+                                    child: buildTextField(
+                                      context: context,
                                       controller: txtVillage,
                                       label: AppLang.translate(
                                         lang: settingProvider.lang ?? 'kh',
@@ -832,7 +837,8 @@ class _UpdatePersonalInfoScreenState extends State<UpdatePersonalInfoScreen> {
                                     //     ),
                                     //   ),
                                     // ),
-                                    child: _buildTextField(
+                                    child: buildTextField(
+                                      context: context,
                                       controller: txtStreetNumber,
                                       label: AppLang.translate(
                                         lang: settingProvider.lang ?? 'kh',
@@ -854,12 +860,12 @@ class _UpdatePersonalInfoScreenState extends State<UpdatePersonalInfoScreen> {
                                     //     ),
                                     //   ),
                                     // ),
-                                    child: _buildTextField(
+                                    child: buildTextField(
                                       controller: txtHomeNumber,
                                       label: AppLang.translate(
                                         lang: settingProvider.lang ?? 'kh',
                                         key: 'user_info_number',
-                                      ),
+                                      ), context: context,
                                       // keyboardType: TextInputType.number,
                                     ),
                                   ),
@@ -932,184 +938,7 @@ class _UpdatePersonalInfoScreenState extends State<UpdatePersonalInfoScreen> {
 
     return types;
   }
+  
 
-  // Reusable Selection Field widget (keeping for future use)
-  Widget _buildSelectionField({
-    required TextEditingController controller,
-    required String label,
-    required Map<String, String> items,
-    required void Function(String id, String value) onSelected,
-  }) {
-    return TextFormField(
-      controller: controller,
-      readOnly: true,
-      onTap: () async {
-        await _showSelectionBottomSheet(
-          context: context,
-          title: label,
-          items: items,
-          onSelected: onSelected,
-        );
-      },
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: const TextStyle(color: HColors.darkgrey),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.0),
-          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.0),
-          borderSide: const BorderSide(color: HColors.darkgrey),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.0),
-          borderSide: BorderSide(
-              color: Theme.of(context).colorScheme.primary, width: 1.0),
-        ),
-        suffixIcon: Icon(Icons.arrow_drop_down,
-            color: Theme.of(context).colorScheme.primary),
-        filled: true,
-      ),
-    );
-  }
-
-  // Bottom sheet selector (keeping for future use)
-  Future<void> _showSelectionBottomSheet({
-    required BuildContext context,
-    required String title,
-    required Map<String, String> items,
-    required Function(String id, String value) onSelected,
-  }) async {
-    await showModalBottomSheet(
-      context: context,
-      builder: (context) {
-        return Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Text(
-                title,
-                style:
-                    const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
-              ),
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 16.0, vertical: 12.0),
-                child: ListView.separated(
-                  itemCount: items.length,
-                  separatorBuilder: (context, index) =>
-                      const SizedBox(height: 8.0),
-                  itemBuilder: (context, index) {
-                    final entry = items.entries.elementAt(index);
-                    return Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        onTap: () {
-                          onSelected(entry.key, entry.value);
-                          Navigator.pop(context);
-                        },
-                        borderRadius: BorderRadius.circular(16.0),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.surface,
-                            borderRadius: BorderRadius.circular(16.0),
-                            border: Border.all(
-                              color: Colors.grey,
-                              width: 1.0,
-                            ),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 20.0,
-                              vertical: 16.0,
-                            ),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    entry.value,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyLarge
-                                        ?.copyWith(
-                                          fontWeight: FontWeight.w500,
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .onSurface,
-                                        ),
-                                  ),
-                                ),
-                                const Icon(
-                                  Icons.arrow_forward_ios_rounded,
-                                  size: 16.0,
-                                  color: Colors.grey,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            )
-          ],
-        );
-      },
-    );
-  }
-
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String label,
-    String? Function(String?)? validator,
-    bool readOnly = false,
-    VoidCallback? onTap,
-    Widget? suffixIcon,
-    int maxLines = 1,
-    TextInputType? keyboardType,
-  }) {
-    return TextFormField(
-      controller: controller,
-      readOnly: readOnly,
-      onTap: onTap,
-      validator: validator,
-      maxLines: maxLines,
-      keyboardType: keyboardType,
-      style: TextStyle(
-          // color: HColors.darkgrey,
-          // fontFamily: 'KantumruyPro',
-          fontWeight: FontWeight.w400,
-          fontSize: 14),
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: const TextStyle(color: HColors.darkgrey),
-        // border: OutlineInputBorder(
-        //   borderRadius: BorderRadius.circular(12.0),
-        //   borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
-        // ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.0),
-          borderSide: const BorderSide(color: HColors.darkgrey, width: 1),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.0),
-          borderSide: BorderSide(
-              color: Theme.of(context).colorScheme.primary, width: 1.0),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.0),
-          borderSide: BorderSide(color: Theme.of(context).colorScheme.error),
-        ),
-        suffixIcon: suffixIcon,
-        filled: true,
-      ),
-    );
-  }
+  
 }

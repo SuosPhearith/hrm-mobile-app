@@ -686,7 +686,7 @@ class _DetailRequestScreenState extends State<DetailRequestScreen> {
                   ],
                 ),
                 const SizedBox(height: 4),
-                Text(subtitle, style: TextStyle(color: Colors.grey[600])),
+                Text(subtitle, style: TextStyle(color: HColors.darkgrey)),
               ],
             ),
           ),

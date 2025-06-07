@@ -5,7 +5,9 @@ import 'package:mobile_app/app_lang.dart';
 import 'package:mobile_app/providers/global/setting_provider.dart';
 import 'package:mobile_app/providers/local/personalinfo/create_education_provider.dart';
 import 'package:mobile_app/services/personal_info/create_personalinfo_service.dart';
+import 'package:mobile_app/shared/component/build_selection.dart';
 import 'package:mobile_app/utils/help_util.dart';
+import 'package:mobile_app/widgets/custom_header.dart';
 import 'package:mobile_app/widgets/helper.dart';
 import 'package:provider/provider.dart';
 
@@ -64,6 +66,7 @@ class _CreateLanguageLevelState extends State<CreateLanguageLevel> {
       selectedListeningLevelId = null;
     });
   }
+
   void _handleSubmit() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -135,11 +138,24 @@ class _CreateLanguageLevelState extends State<CreateLanguageLevel> {
               dataKey: 'language_levels',
               settingProvider: settingProvider);
           return Scaffold(
-            backgroundColor: Colors.grey[100],
+            backgroundColor: Colors.white,
             appBar: AppBar(
               title: Text(
                   AppLang.translate(lang: 'kh', key: 'user_info_language_add')),
               centerTitle: true,
+              bottom: CustomHeader(),
+              actions: [
+                Padding(
+                  padding: EdgeInsets.all(8),
+                  child: InkWell(
+                    onTap: () => _handleSubmit(),
+                    child: Icon(
+                      Icons.check,
+                      color: Colors.blueAccent,
+                    ),
+                  ),
+                )
+              ],
             ),
             body: RefreshIndicator(
               key: _refreshIndicatorKey,
@@ -157,7 +173,8 @@ class _CreateLanguageLevelState extends State<CreateLanguageLevel> {
                           child: Column(
                             children: [
                               // Language Selection
-                              _buildSelectionField(
+                              buildSelectionField(
+                                context: context,
                                 controller: _langauge,
                                 label:
                                     '${AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'user_info_language')} *',
@@ -178,7 +195,7 @@ class _CreateLanguageLevelState extends State<CreateLanguageLevel> {
                               Row(
                                 children: [
                                   Expanded(
-                                    child: _buildSelectionField(
+                                    child: buildSelectionField(
                                       controller: _speakingLevel,
                                       label:
                                           '${AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'speaking level')} *',
@@ -191,11 +208,13 @@ class _CreateLanguageLevelState extends State<CreateLanguageLevel> {
                                           _speakingLevel.text = value;
                                         });
                                       },
+                                      context: context,
                                     ),
                                   ),
                                   const SizedBox(width: 8),
                                   Expanded(
-                                    child: _buildSelectionField(
+                                    child: buildSelectionField(
+                                      context: context,
                                       controller: _readingLevel,
                                       label:
                                           '${AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'reading level')} *',
@@ -218,7 +237,8 @@ class _CreateLanguageLevelState extends State<CreateLanguageLevel> {
                               Row(
                                 children: [
                                   Expanded(
-                                    child: _buildSelectionField(
+                                    child: buildSelectionField(
+                                      context: context,
                                       controller: _writtingLevel,
                                       label:
                                           '${AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'writting level')} *',
@@ -235,7 +255,8 @@ class _CreateLanguageLevelState extends State<CreateLanguageLevel> {
                                   ),
                                   const SizedBox(width: 8),
                                   Expanded(
-                                    child: _buildSelectionField(
+                                    child: buildSelectionField(
+                                      context: context,
                                       controller: _listeningLevel,
                                       label:
                                           '${AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'listenning level')} *',
@@ -259,29 +280,29 @@ class _CreateLanguageLevelState extends State<CreateLanguageLevel> {
                       ),
                     ),
             ),
-            bottomNavigationBar: Padding(
-              padding: const EdgeInsets.all(15),
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    backgroundColor: Colors.blue[900],
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                  ),
-                  onPressed: () {
-                    _handleSubmit();
-                  },
-                  child: Text(
-                    AppLang.translate(
-                        lang: settingProvider.lang ?? 'kh', key: 'create'),
-                    style: const TextStyle(fontSize: 16, color: Colors.white),
-                  ),
-                ),
-              ),
-            ),
+            // bottomNavigationBar: Padding(
+            //   padding: const EdgeInsets.all(15),
+            //   child: SizedBox(
+            //     width: double.infinity,
+            //     child: ElevatedButton(
+            //       style: ElevatedButton.styleFrom(
+            //         padding: const EdgeInsets.symmetric(vertical: 12),
+            //         backgroundColor: Colors.blue[900],
+            //         shape: RoundedRectangleBorder(
+            //           borderRadius: BorderRadius.circular(30),
+            //         ),
+            //       ),
+            //       onPressed: () {
+            //         _handleSubmit();
+            //       },
+            //       child: Text(
+            //         AppLang.translate(
+            //             lang: settingProvider.lang ?? 'kh', key: 'create'),
+            //         style: const TextStyle(fontSize: 16, color: Colors.white),
+            //       ),
+            //     ),
+            //   ),
+            // ),
           );
         }));
   }
@@ -316,158 +337,5 @@ class _CreateLanguageLevelState extends State<CreateLanguageLevel> {
     }
 
     return result;
-  }
-
-  // Reusable Selection Field widget
-  Widget _buildSelectionField({
-    required TextEditingController controller,
-    required String label,
-    required Map<String, String> items,
-    required void Function(String id, String value) onSelected,
-    String? selectedId, // Add selectedId parameter
-  }) {
-    return TextFormField(
-      controller: controller,
-      readOnly: true,
-      onTap: () async {
-        await _showSelectionBottomSheet(
-          context: context,
-          title: label,
-          items: items,
-          onSelected: onSelected,
-          //  selectedId: selectedEducationTypeId, // Pass current selection
-          selectedId: selectedId, // Pass current selection
-        );
-      },
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: TextStyle(color: Colors.blueGrey),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.0),
-          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.0),
-          borderSide: BorderSide(color: Colors.blueGrey),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.0),
-          borderSide: BorderSide(
-              color: Theme.of(context).colorScheme.primary, width: 1.0),
-        ),
-        suffixIcon: Icon(Icons.arrow_drop_down,
-            color: Theme.of(context).colorScheme.primary),
-        filled: true,
-      ),
-    );
-  }
-
-  Future<void> _showSelectionBottomSheet({
-    required BuildContext context,
-    required String title,
-    required Map<String, String> items,
-    required Function(String id, String value) onSelected,
-    String? selectedId, // Add selectedId parameter
-  }) async {
-    await showModalBottomSheet(
-      context: context,
-      builder: (context) {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      title,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                  // IconButton(
-                  //   icon: const Icon(Icons.close),
-                  //   onPressed: () => Navigator.pop(context),
-                  // ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16.0,
-                  vertical: 12.0,
-                ),
-                child: ListView.separated(
-                  itemCount: items.length,
-                  separatorBuilder: (context, index) =>
-                      const SizedBox(height: 8.0),
-                  itemBuilder: (context, index) {
-                    final entry = items.entries.elementAt(index);
-                    final isSelected = selectedId == entry.key;
-
-                    return Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        onTap: () {
-                          onSelected(entry.key, entry.value);
-                          Navigator.pop(context);
-                        },
-                        borderRadius: BorderRadius.circular(16.0),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.surface,
-                            borderRadius: BorderRadius.circular(16.0),
-                            border: Border.all(
-                              color: isSelected
-                                  ? Theme.of(context).colorScheme.primary
-                                  : Colors.grey,
-                              width: isSelected ? 1.5 : 1.0,
-                            ),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 20.0,
-                              vertical: 16.0,
-                            ),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    entry.value,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyLarge
-                                        ?.copyWith(
-                                          fontWeight: FontWeight.w500,
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .onSurface,
-                                        ),
-                                  ),
-                                ),
-                                if (isSelected)
-                                  Icon(
-                                    Icons.check_circle,
-                                    color: Colors.green,
-                                    size: 24.0,
-                                  )
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ),
-          ],
-        );
-      },
-    );
   }
 }

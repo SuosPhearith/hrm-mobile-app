@@ -3,6 +3,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile_app/app_lang.dart';
 import 'package:mobile_app/providers/global/setting_provider.dart';
+import 'package:mobile_app/providers/local/personal_info_provider.dart';
 import 'package:mobile_app/screens/about_screen.dart';
 import 'package:mobile_app/screens/daily_screen.dart';
 import 'package:mobile_app/screens/evaluate_screen.dart';
@@ -56,6 +57,8 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => SettingProvider()),
+        ChangeNotifierProvider(create: (_) => PersonalInfoProvider()),
+        
       ],
       child: const MyApp(),
     ),
