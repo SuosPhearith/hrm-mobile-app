@@ -1,10 +1,15 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:mobile_app/app_lang.dart';
 import 'package:mobile_app/providers/global/setting_provider.dart';
 import 'package:mobile_app/providers/local/personalinfo/update_user_family_provider.dart';
 import 'package:mobile_app/services/personal_info/create_personalinfo_service.dart';
+import 'package:mobile_app/shared/component/bottom_appbar.dart';
+import 'package:mobile_app/shared/component/build_selection.dart';
+import 'package:mobile_app/shared/component/build_text_filed.dart';
+import 'package:mobile_app/shared/date/field_date.dart';
 import 'package:mobile_app/utils/help_util.dart';
 import 'package:mobile_app/widgets/helper.dart';
 import 'package:provider/provider.dart';
@@ -23,7 +28,7 @@ class _UpdateRelativeScreenState extends State<UpdateRelativeScreen> {
       GlobalKey<RefreshIndicatorState>();
 
   bool _isDataLoaded = false; // Track if data has been loaded
-
+  DateTime? dob;
   Future<void> _refreshData(UpdateUserFamilyProvider provider) async {
     return await provider.getHome();
   }
@@ -94,8 +99,11 @@ class _UpdateRelativeScreenState extends State<UpdateRelativeScreen> {
             getSafeString(value: data['name_kh'], safeValue: '');
         _lastNameController.text =
             getSafeString(value: data['name_en'], safeValue: '');
-        _dobController.text =
-            getSafeString(value: formatDate(data['dob']), safeValue: '');
+        // _dobController.text =
+        //     getSafeString(value: formatDate(data['dob']), safeValue: '');
+        // Load Date of Birth
+        final dobStr = getSafeString(value: data['dob'], safeValue: '');
+        dob = dobStr.isNotEmpty ? DateTime.tryParse(dobStr) : null;
         _jobController.text = getSafeString(value: data['job'], safeValue: '');
         _workPlaceController.text =
             getSafeString(value: data['work_place'], safeValue: '');
@@ -132,7 +140,6 @@ class _UpdateRelativeScreenState extends State<UpdateRelativeScreen> {
       return;
     }
 
-    
     showConfirmDialogWithNavigation(
         context,
         AppLang.translate(
@@ -144,7 +151,7 @@ class _UpdateRelativeScreenState extends State<UpdateRelativeScreen> {
                 'kh',
             key: 'Are you sure to update'),
         DialogType.primary, () async {
-          //ណូរ៉ា
+      //ណូរ៉ា
       try {
         await _service.updateUserFamily(
           familyId: widget.familyId,
@@ -152,9 +159,7 @@ class _UpdateRelativeScreenState extends State<UpdateRelativeScreen> {
           nameKh: _firstNameController.text.trim(),
           nameEn: _lastNameController.text.trim(),
           sexId: selectedGender ?? '',
-          dob: _dobController.text.isNotEmpty
-              ? convertDateForApi(_dobController.text)
-              : null,
+          dob: DateFormat('yyyy-MM-dd').format(dob!),
           familyRoleId: selectedRelativeTypeId,
           job: _jobController.text.trim().isNotEmpty
               ? _jobController.text.trim()
@@ -219,58 +224,31 @@ class _UpdateRelativeScreenState extends State<UpdateRelativeScreen> {
     });
   }
 
-  Future<void> _selectDate() async {
-    // Parse existing date if available
-    DateTime? initialDate;
-    if (_dobController.text.isNotEmpty && _dobController.text != 'N/A') {
-      try {
-        initialDate = DateTime.parse(_dobController.text);
-      } catch (e) {
-        initialDate = DateTime.now();
-      }
-    } else {
-      initialDate = DateTime.now();
-    }
+  // Future<void> _selectDate() async {
+  //   // Parse existing date if available
+  //   DateTime? initialDate;
+  //   if (_dobController.text.isNotEmpty && _dobController.text != 'N/A') {
+  //     try {
+  //       initialDate = DateTime.parse(_dobController.text);
+  //     } catch (e) {
+  //       initialDate = DateTime.now();
+  //     }
+  //   } else {
+  //     initialDate = DateTime.now();
+  //   }
 
-    DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: initialDate,
-      firstDate: DateTime(1900),
-      lastDate: DateTime.now(),
-    );
-    if (picked != null) {
-      setState(() {
-        _dobController.text = "${picked.toLocal()}".split(' ')[0];
-      });
-    }
-  }
-   // Add this helper method to convert DD-MM-YYYY to YYYY-MM-DD
-  String convertDateForApi(String dateString) {
-    if (dateString.isEmpty) return '';
-
-    try {
-      // Check if it's already in YYYY-MM-DD format
-      if (RegExp(r'^\d{4}-\d{2}-\d{2}$').hasMatch(dateString)) {
-        return dateString;
-      }
-
-      // Handle DD-MM-YYYY format
-      if (RegExp(r'^\d{2}-\d{2}-\d{4}$').hasMatch(dateString)) {
-        List<String> parts = dateString.split('-');
-        String day = parts[0];
-        String month = parts[1];
-        String year = parts[2];
-        return '$year-$month-$day';
-      }
-
-      // Try to parse as DateTime and format
-      DateTime date = DateTime.parse(dateString);
-      return "${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
-    } catch (e) {
-      print('Date conversion error: $e');
-      return dateString; // Return original if conversion fails
-    }
-  }
+  //   DateTime? picked = await showDatePicker(
+  //     context: context,
+  //     initialDate: initialDate,
+  //     firstDate: DateTime(1900),
+  //     lastDate: DateTime.now(),
+  //   );
+  //   if (picked != null) {
+  //     setState(() {
+  //       _dobController.text = "${picked.toLocal()}".split(' ')[0];
+  //     });
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -288,11 +266,13 @@ class _UpdateRelativeScreenState extends State<UpdateRelativeScreen> {
           }
 
           return Scaffold(
-            backgroundColor: Colors.grey[100],
+            backgroundColor: Colors.white,
+
             appBar: AppBar(
               title: Text(AppLang.translate(
                   lang: 'kh', key: 'user_info_family_update')),
               centerTitle: true,
+              bottom: CustomHeader(),
             ),
             body: RefreshIndicator(
               key: _refreshIndicatorKey,
@@ -315,12 +295,14 @@ class _UpdateRelativeScreenState extends State<UpdateRelativeScreen> {
                             const SizedBox(height: 16.0),
 
                             // Relative Type Selection
-                            _buildSelectionField(
+                            buildSelectionField(
+                              context: context,
                               controller: _relativeTypeController,
                               label: AppLang.translate(
                                   lang: settingProvider.lang ?? 'kh',
                                   key: 'relative_type'),
                               items: relativeTypes,
+                              selectedId: selectedRelativeTypeId,
                               onSelected: (id, value) {
                                 setState(() {
                                   selectedRelativeTypeId = id;
@@ -335,10 +317,7 @@ class _UpdateRelativeScreenState extends State<UpdateRelativeScreen> {
                               AppLang.translate(
                                   lang: settingProvider.lang ?? 'kh',
                                   key: 'user_info_sex'),
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyLarge
-                                  ?.copyWith(fontWeight: FontWeight.w500),
+                              style: TextStyle(fontWeight: FontWeight.w500),
                             ),
                             const SizedBox(height: 8.0),
                             Row(
@@ -378,7 +357,8 @@ class _UpdateRelativeScreenState extends State<UpdateRelativeScreen> {
                             const SizedBox(height: 24.0),
 
                             // Name (Khmer)
-                            _buildTextField(
+                            buildTextField(
+                              context: context,
                               controller: _firstNameController,
                               label:
                                   '${AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'user_info_kh_name')} *',
@@ -391,7 +371,8 @@ class _UpdateRelativeScreenState extends State<UpdateRelativeScreen> {
                             const SizedBox(height: 24.0),
 
                             // Name (Latin)
-                            _buildTextField(
+                            buildTextField(
+                              context: context,
                               controller: _lastNameController,
                               label:
                                   '${AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'user_info_en_name')} *',
@@ -403,32 +384,47 @@ class _UpdateRelativeScreenState extends State<UpdateRelativeScreen> {
                             ),
                             const SizedBox(height: 24.0),
 
-                            // Date of Birth
-                            _buildTextField(
-                              controller: _dobController,
+                            // // Date of Birth
+                            // _buildTextField(
+                            //   controller: _dobController,
+                            //   label: AppLang.translate(
+                            //       lang: settingProvider.lang ?? 'kh',
+                            //       key: 'dob'),
+                            //   readOnly: true,
+                            //   onTap: _selectDate,
+                            //   suffixIcon: IconButton(
+                            //     icon: const Icon(Icons.calendar_today_rounded),
+                            //     onPressed: _selectDate,
+                            //   ),
+                            // ),
+                            DateInputField(
                               label: AppLang.translate(
                                   lang: settingProvider.lang ?? 'kh',
-                                  key: 'dob'),
-                              readOnly: true,
-                              onTap: _selectDate,
-                              suffixIcon: IconButton(
-                                icon: const Icon(Icons.calendar_today_rounded),
-                                onPressed: _selectDate,
-                              ),
+                                  key: 'user_info_date_of_birth'),
+                              hint: 'សូមជ្រើសរើសកាលបរិច្ឆេទ',
+                              initialDate: DateTime.now(),
+                              selectedDate: dob,
+                              onDateSelected: (date) {
+                                setState(() {
+                                  dob = date;
+                                });
+                              },
                             ),
                             const SizedBox(height: 24.0),
 
                             // Job
-                            _buildTextField(
+                            buildTextField(
                               controller: _jobController,
                               label: AppLang.translate(
                                   lang: settingProvider.lang ?? 'kh',
                                   key: 'job'),
+                              context: context,
                             ),
                             const SizedBox(height: 24.0),
 
                             // Work Place
-                            _buildTextField(
+                            buildTextField(
+                              context: context,
                               controller: _workPlaceController,
                               label: AppLang.translate(
                                   lang: settingProvider.lang ?? 'kh',
@@ -474,176 +470,5 @@ class _UpdateRelativeScreenState extends State<UpdateRelativeScreen> {
             ),
           );
         }));
-  }
-
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String label,
-    String? Function(String?)? validator,
-    bool readOnly = false,
-    VoidCallback? onTap,
-    Widget? suffixIcon,
-    int maxLines = 1,
-  }) {
-    return TextFormField(
-      controller: controller,
-      readOnly: readOnly,
-      onTap: onTap,
-      validator: validator,
-      maxLines: maxLines,
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: const TextStyle(color: Colors.blueGrey),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.0),
-          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.0),
-          borderSide: const BorderSide(color: Colors.blueGrey),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.0),
-          borderSide: BorderSide(
-              color: Theme.of(context).colorScheme.primary, width: 2.0),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.0),
-          borderSide: BorderSide(color: Theme.of(context).colorScheme.error),
-        ),
-        suffixIcon: suffixIcon,
-        filled: true,
-      ),
-    );
-  }
-
-  // Reusable Selection Field widget (keeping for future use)
-  Widget _buildSelectionField({
-    required TextEditingController controller,
-    required String label,
-    required Map<String, String> items,
-    required void Function(String id, String value) onSelected,
-  }) {
-    return TextFormField(
-      controller: controller,
-      readOnly: true,
-      onTap: () async {
-        await _showSelectionBottomSheet(
-          context: context,
-          title: label,
-          items: items,
-          onSelected: onSelected,
-        );
-      },
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: const TextStyle(color: Colors.blueGrey),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.0),
-          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.0),
-          borderSide: const BorderSide(color: Colors.blueGrey),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.0),
-          borderSide: BorderSide(
-              color: Theme.of(context).colorScheme.primary, width: 1.0),
-        ),
-        suffixIcon: Icon(Icons.arrow_drop_down,
-            color: Theme.of(context).colorScheme.primary),
-        filled: true,
-      ),
-    );
-  }
-
-  // Bottom sheet selector (keeping for future use)
-  Future<void> _showSelectionBottomSheet({
-    required BuildContext context,
-    required String title,
-    required Map<String, String> items,
-    required Function(String id, String value) onSelected,
-  }) async {
-    await showModalBottomSheet(
-      context: context,
-      builder: (context) {
-        return Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Text(
-                title,
-                style:
-                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 16.0, vertical: 12.0),
-                child: ListView.separated(
-                  itemCount: items.length,
-                  separatorBuilder: (context, index) =>
-                      const SizedBox(height: 8.0),
-                  itemBuilder: (context, index) {
-                    final entry = items.entries.elementAt(index);
-                    return Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        onTap: () {
-                          onSelected(entry.key, entry.value);
-                          Navigator.pop(context);
-                        },
-                        borderRadius: BorderRadius.circular(16.0),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.surface,
-                            borderRadius: BorderRadius.circular(16.0),
-                            border: Border.all(
-                              color: Colors.grey,
-                              width: 1.0,
-                            ),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 20.0,
-                              vertical: 16.0,
-                            ),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    entry.value,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyLarge
-                                        ?.copyWith(
-                                          fontWeight: FontWeight.w500,
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .onSurface,
-                                        ),
-                                  ),
-                                ),
-                                const Icon(
-                                  Icons.arrow_forward_ios_rounded,
-                                  size: 16.0,
-                                  color: Colors.grey,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            )
-          ],
-        );
-      },
-    );
   }
 }

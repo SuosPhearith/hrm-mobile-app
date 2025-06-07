@@ -1,11 +1,15 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:mobile_app/app_lang.dart';
 import 'package:mobile_app/providers/global/setting_provider.dart';
 
 import 'package:mobile_app/providers/local/personalinfo/update_education_provider.dart';
 import 'package:mobile_app/services/personal_info/create_personalinfo_service.dart';
+import 'package:mobile_app/shared/component/bottom_appbar.dart';
+import 'package:mobile_app/shared/component/build_selection.dart';
+import 'package:mobile_app/shared/date/field_date.dart';
 import 'package:mobile_app/utils/help_util.dart';
 import 'package:mobile_app/widgets/helper.dart';
 import 'package:provider/provider.dart';
@@ -48,6 +52,8 @@ class _UpdateEducationScreenState extends State<UpdateEducationScreen> {
   String? selectedSchoolId;
   String? selectedEducationPlaceId;
   bool _isDataLoaded = false;
+  DateTime? _startDate;
+  DateTime? _endDate;
   @override
   void dispose() {
     _dateIn.dispose();
@@ -69,8 +75,15 @@ class _UpdateEducationScreenState extends State<UpdateEducationScreen> {
 
       setState(() {
         // Set text fields
-        _dateIn.text = formatDate(provider.data?.data['study_at']);
-        _dateOut.text = formatDate(provider.data?.data['graduate_at']);
+
+        final startDateStr = getSafeString(
+            value: provider.data?.data['study_at'], safeValue: '');
+        _startDate =
+            startDateStr.isNotEmpty ? DateTime.tryParse(startDateStr) : null;
+        final endDateStr = getSafeString(
+            value: provider.data?.data['graduate_at'], safeValue: '');
+        _endDate =
+            endDateStr.isNotEmpty ? DateTime.tryParse(startDateStr) : null;
 
         _type.text = getSafeString(
             value: provider.data?.data['education_type']?['name_kh'],
@@ -106,72 +119,6 @@ class _UpdateEducationScreenState extends State<UpdateEducationScreen> {
     });
   }
 
-  // Future<void> _selectDate(TextEditingController controller) async {
-  //   DateTime? picked = await showDatePicker(
-  //     context: context,
-  //     initialDate: DateTime.now(),
-  //     firstDate: DateTime(1900),
-  //     lastDate: DateTime(2100),
-  //   );
-  //   if (picked != null) {
-  //     setState(() {
-  //       controller.text = "${picked.toLocal()}".split(' ')[0];
-  //     });
-  //   }
-  // }
-  Future<void> _selectDate(TextEditingController controller) async {
-    // Parse existing date if available
-    DateTime? initialDate;
-    if ( controller.text.isNotEmpty &&  controller.text != 'N/A') {
-      try {
-        initialDate = DateTime.parse( controller.text);
-      } catch (e) {
-        initialDate = DateTime.now();
-      }
-    } else {
-      initialDate = DateTime.now();
-    }
-
-    DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: initialDate,
-      firstDate: DateTime(1900),
-      lastDate: DateTime.now(),
-    );
-    if (picked != null) {
-      setState(() {
-         controller.text = "${picked.toLocal()}".split(' ')[0];
-      });
-    }
-  }
-  // Add this helper method to convert DD-MM-YYYY to YYYY-MM-DD
-  String convertDateForApi(String dateString) {
-    if (dateString.isEmpty) return '';
-
-    try {
-      // Check if it's already in YYYY-MM-DD format
-      if (RegExp(r'^\d{4}-\d{2}-\d{2}$').hasMatch(dateString)) {
-        return dateString;
-      }
-
-      // Handle DD-MM-YYYY format
-      if (RegExp(r'^\d{2}-\d{2}-\d{4}$').hasMatch(dateString)) {
-        List<String> parts = dateString.split('-');
-        String day = parts[0];
-        String month = parts[1];
-        String year = parts[2];
-        return '$year-$month-$day';
-      }
-
-      // Try to parse as DateTime and format
-      DateTime date = DateTime.parse(dateString);
-      return "${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
-    } catch (e) {
-      print('Date conversion error: $e');
-      return dateString; // Return original if conversion fails
-    }
-  }
-
   void _handleSubmit() async {
     // First validate the form fields
     if (!_formKey.currentState!.validate()) {
@@ -187,10 +134,10 @@ class _UpdateEducationScreenState extends State<UpdateEducationScreen> {
           selectedEducationLevelId!.isEmpty) {
         return 'Please select education level';
       }
-      if (_dateIn.text.isEmpty) {
+      if (_startDate==null) {
         return 'Start Date is required';
       }
-      if (_dateOut.text.isEmpty) {
+      if (_endDate==null) {
         return 'End Date is required';
       }
       return null;
@@ -233,8 +180,8 @@ class _UpdateEducationScreenState extends State<UpdateEducationScreen> {
           majorId: selectedMajorId ?? '',
           schoolId: selectedSchoolId ?? '',
           educationPlaceId: selectedEducationPlaceId ?? '',
-          studyAt:convertDateForApi (_dateIn.text),
-          graduateAt: convertDateForApi(_dateOut.text),
+          studyAt: DateFormat('yyyy-MM-dd').format(_startDate!),
+          graduateAt: DateFormat('yyyy-MM-dd').format(_endDate!),
           note: null,
           attachmentId: null,
         );
@@ -300,11 +247,24 @@ class _UpdateEducationScreenState extends State<UpdateEducationScreen> {
             _loadExistingData(createEducationProvider);
           }
           return Scaffold(
-            backgroundColor: Colors.grey[100],
+            backgroundColor: Colors.white,
             appBar: AppBar(
               title: Text(AppLang.translate(
                   lang: 'kh', key: 'user_info_education_update')),
               centerTitle: true,
+              actions: [
+                Padding(
+                  padding: EdgeInsets.all(8),
+                  child: InkWell(
+                    onTap: () => _handleSubmit(),
+                    child: Icon(
+                      Icons.check,
+                      color: Colors.blueAccent,
+                    ),
+                  ),
+                )
+              ],
+              bottom: CustomHeader(),
             ),
             body: RefreshIndicator(
               key: _refreshIndicatorKey,
@@ -322,7 +282,8 @@ class _UpdateEducationScreenState extends State<UpdateEducationScreen> {
                           children: [
                             const SizedBox(height: 10),
                             // Education Type
-                            _buildSelectionField(
+                            buildSelectionField(
+                              context: context,
                               controller: _type,
                               label:
                                   '${AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'user_education_type')} *',
@@ -338,7 +299,7 @@ class _UpdateEducationScreenState extends State<UpdateEducationScreen> {
                             ),
                             const SizedBox(height: 16),
                             // Education Level
-                            _buildSelectionField(
+                            buildSelectionField(
                               controller: _educationLevel,
                               label:
                                   '${AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'user_educationLevel')} *',
@@ -351,10 +312,12 @@ class _UpdateEducationScreenState extends State<UpdateEducationScreen> {
                                   _educationLevel.text = value;
                                 });
                               },
+                              context: context,
                             ),
                             const SizedBox(height: 16),
                             // Certificate
-                            _buildSelectionField(
+                            buildSelectionField(
+                              context: context,
                               controller: _certificate,
                               label:
                                   '${AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'certificate')} *',
@@ -370,7 +333,8 @@ class _UpdateEducationScreenState extends State<UpdateEducationScreen> {
                             ),
                             const SizedBox(height: 16),
                             // Majors
-                            _buildSelectionField(
+                            buildSelectionField(
+                              context: context,
                               controller: _skill,
                               label: AppLang.translate(
                                   lang: settingProvider.lang ?? 'kh',
@@ -387,7 +351,8 @@ class _UpdateEducationScreenState extends State<UpdateEducationScreen> {
                             ),
                             const SizedBox(height: 16),
                             // School
-                            _buildSelectionField(
+                            buildSelectionField(
+                              context: context,
                               controller: _school,
                               label: AppLang.translate(
                                   lang: settingProvider.lang ?? 'kh',
@@ -404,7 +369,8 @@ class _UpdateEducationScreenState extends State<UpdateEducationScreen> {
                             ),
                             const SizedBox(height: 16),
                             // Place Study
-                            _buildSelectionField(
+                            buildSelectionField(
+                              context: context,
                               controller: _place,
                               label: AppLang.translate(
                                   lang: settingProvider.lang ?? 'kh',
@@ -425,117 +391,32 @@ class _UpdateEducationScreenState extends State<UpdateEducationScreen> {
                             Row(
                               children: [
                                 Expanded(
-                                  child: TextFormField(
-                                    controller: _dateIn,
-                                    readOnly: true,
-                                    decoration: InputDecoration(
-                                      labelText: AppLang.translate(
-                                          lang: settingProvider.lang ?? 'kh',
-                                          key: 'enroll date'),
-                                      labelStyle:
-                                          TextStyle(color: Colors.blueGrey),
-                                      border: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(12.0),
-                                        borderSide: BorderSide(
-                                            color: Colors
-                                                .blueGrey), // Normal border color
-                                      ),
-                                      enabledBorder: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(12.0),
-                                        borderSide: BorderSide(
-                                            color: Colors
-                                                .blueGrey), // Enabled but not focused
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(12.0),
-                                        borderSide: BorderSide(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .primary, // Focused border color
-                                          width: 2.0,
-                                        ),
-                                      ),
-                                      errorBorder: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(12.0),
-                                        borderSide: BorderSide(
-                                            color: Colors.red), // Error state
-                                      ),
-                                      focusedErrorBorder: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(12.0),
-                                        borderSide: BorderSide(
-                                          color:
-                                              Colors.red, // Focused error state
-                                          width: 2.0,
-                                        ),
-                                      ),
-                                      suffixIcon: IconButton(
-                                        icon: const Icon(Icons.calendar_today),
-                                        onPressed: () => _selectDate(_dateIn),
-                                      ),
-                                    ),
+                                  child: DateInputField(
+                                    label: 'ថ្ងៃចាប់ផ្តើម',
+                                    hint: 'សូមជ្រើសរើសកាលបរិច្ឆេទ',
+                                    initialDate: DateTime.now(),
+                                    selectedDate: _startDate,
+                                    onDateSelected: (date) {
+                                      setState(() {
+                                        _startDate = date;
+                                      });
+                                    },
                                   ),
                                 ),
-                                const SizedBox(width: 8),
+                                SizedBox(
+                                  width: 16,
+                                ),
                                 Expanded(
-                                  child: TextFormField(
-                                    controller: _dateOut,
-                                    readOnly: true,
-                                    decoration: InputDecoration(
-                                      labelText: AppLang.translate(
-                                        lang: settingProvider.lang ?? 'kh',
-                                        key: 'graduated date',
-                                      ),
-                                      labelStyle:
-                                          TextStyle(color: Colors.blueGrey),
-                                      border: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(12.0),
-                                        borderSide: BorderSide(
-                                            color: Colors
-                                                .blueGrey), // Normal border color
-                                      ),
-                                      enabledBorder: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(12.0),
-                                        borderSide: BorderSide(
-                                            color: Colors
-                                                .blueGrey), // Enabled but not focused
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(12.0),
-                                        borderSide: BorderSide(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .primary, // Focused border color
-                                          width: 2.0,
-                                        ),
-                                      ),
-                                      errorBorder: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(12.0),
-                                        borderSide: BorderSide(
-                                            color: Colors.red), // Error state
-                                      ),
-                                      focusedErrorBorder: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(12.0),
-                                        borderSide: BorderSide(
-                                          color:
-                                              Colors.red, // Focused error state
-                                          width: 2.0,
-                                        ),
-                                      ),
-                                      suffixIcon: IconButton(
-                                        icon: const Icon(Icons.calendar_today),
-                                        onPressed: () => _selectDate(_dateOut),
-                                      ),
-                                    ),
+                                  child: DateInputField(
+                                    label: 'ថ្ងៃបញ្ចប់',
+                                    hint: 'សូមជ្រើសរើសកាលបរិច្ឆេទ',
+                                    initialDate: DateTime.now(),
+                                    selectedDate: _endDate,
+                                    onDateSelected: (date) {
+                                      setState(() {
+                                        _endDate = date;
+                                      });
+                                    },
                                   ),
                                 ),
                               ],
@@ -548,29 +429,29 @@ class _UpdateEducationScreenState extends State<UpdateEducationScreen> {
                       ),
                     ),
             ),
-            bottomNavigationBar: Padding(
-              padding: const EdgeInsets.all(15),
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    backgroundColor: Colors.blue[900],
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                  ),
-                  onPressed: () {
-                    _handleSubmit();
-                  },
-                  child: Text(
-                    AppLang.translate(
-                        lang: settingProvider.lang ?? 'kh', key: 'update'),
-                    style: TextStyle(fontSize: 16, color: Colors.white),
-                  ),
-                ),
-              ),
-            ),
+            // bottomNavigationBar: Padding(
+            //   padding: const EdgeInsets.all(15),
+            //   child: SizedBox(
+            //     width: double.infinity,
+            //     child: ElevatedButton(
+            //       style: ElevatedButton.styleFrom(
+            //         padding: const EdgeInsets.symmetric(vertical: 12),
+            //         backgroundColor: Colors.blue[900],
+            //         shape: RoundedRectangleBorder(
+            //           borderRadius: BorderRadius.circular(30),
+            //         ),
+            //       ),
+            //       onPressed: () {
+            //         _handleSubmit();
+            //       },
+            //       child: Text(
+            //         AppLang.translate(
+            //             lang: settingProvider.lang ?? 'kh', key: 'update'),
+            //         style: TextStyle(fontSize: 16, color: Colors.white),
+            //       ),
+            //     ),
+            //   ),
+            // ),
           );
         }));
   }
@@ -605,158 +486,5 @@ class _UpdateEducationScreenState extends State<UpdateEducationScreen> {
     }
 
     return result;
-  }
-
-  // Reusable Selection Field widget
-  Widget _buildSelectionField({
-    required TextEditingController controller,
-    required String label,
-    required Map<String, String> items,
-    required void Function(String id, String value) onSelected,
-    String? selectedId, // Add selectedId parameter
-  }) {
-    return TextFormField(
-      controller: controller,
-      readOnly: true,
-      onTap: () async {
-        await _showSelectionBottomSheet(
-          context: context,
-          title: label,
-          items: items,
-          onSelected: onSelected,
-          //  selectedId: selectedEducationTypeId, // Pass current selection
-          selectedId: selectedId, // Pass current selection
-        );
-      },
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: TextStyle(color: Colors.blueGrey),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.0),
-          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.0),
-          borderSide: BorderSide(color: Colors.blueGrey),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.0),
-          borderSide: BorderSide(
-              color: Theme.of(context).colorScheme.primary, width: 1.0),
-        ),
-        suffixIcon: Icon(Icons.arrow_drop_down,
-            color: Theme.of(context).colorScheme.primary),
-        filled: true,
-      ),
-    );
-  }
-
-  Future<void> _showSelectionBottomSheet({
-    required BuildContext context,
-    required String title,
-    required Map<String, String> items,
-    required Function(String id, String value) onSelected,
-    String? selectedId, // Add selectedId parameter
-  }) async {
-    await showModalBottomSheet(
-      context: context,
-      builder: (context) {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      title,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                  // IconButton(
-                  //   icon: const Icon(Icons.close),
-                  //   onPressed: () => Navigator.pop(context),
-                  // ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16.0,
-                  vertical: 12.0,
-                ),
-                child: ListView.separated(
-                  itemCount: items.length,
-                  separatorBuilder: (context, index) =>
-                      const SizedBox(height: 8.0),
-                  itemBuilder: (context, index) {
-                    final entry = items.entries.elementAt(index);
-                    final isSelected = selectedId == entry.key;
-
-                    return Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        onTap: () {
-                          onSelected(entry.key, entry.value);
-                          Navigator.pop(context);
-                        },
-                        borderRadius: BorderRadius.circular(16.0),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.surface,
-                            borderRadius: BorderRadius.circular(16.0),
-                            border: Border.all(
-                              color: isSelected
-                                  ? Theme.of(context).colorScheme.primary
-                                  : Colors.grey,
-                              width: isSelected ? 1.5 : 1.0,
-                            ),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 20.0,
-                              vertical: 16.0,
-                            ),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    entry.value,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyLarge
-                                        ?.copyWith(
-                                          fontWeight: FontWeight.w500,
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .onSurface,
-                                        ),
-                                  ),
-                                ),
-                                if (isSelected)
-                                  Icon(
-                                    Icons.check_circle,
-                                    color: Colors.green,
-                                    size: 24.0,
-                                  )
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ),
-          ],
-        );
-      },
-    );
   }
 }

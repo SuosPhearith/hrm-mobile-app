@@ -2,12 +2,14 @@
   import 'package:flutter/material.dart';
 import 'package:mobile_app/shared/color/colors.dart';
 
-Widget buildSelectionField({
-  required BuildContext context,
+// Reusable Selection Field widget
+  Widget buildSelectionField({
     required TextEditingController controller,
     required String label,
     required Map<String, String> items,
     required void Function(String id, String value) onSelected,
+    String? selectedId, // Add selectedId parameter
+    required BuildContext context,
   }) {
     return TextFormField(
       controller: controller,
@@ -18,61 +20,107 @@ Widget buildSelectionField({
           title: label,
           items: items,
           onSelected: onSelected,
+          //  selectedId: selectedEducationTypeId, // Pass current selection
+          selectedId: selectedId, // Pass current selection
         );
       },
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: TextStyle(color: Colors.blueGrey),
+        // hintText: hint,
+          suffixIcon: Icon(Icons.arrow_drop_down,
+            color: HColors.darkgrey),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.0),
-          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.0),
-          borderSide: BorderSide(color: Colors.blueGrey),
+          borderRadius: BorderRadius.circular(10),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.0),
-          borderSide: BorderSide(
-              color: Theme.of(context).colorScheme.primary, width: 1.0),
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(color: HColors.darkgrey, width: 1),
         ),
-        suffixIcon: Icon(Icons.arrow_drop_down,
-            color: Theme.of(context).colorScheme.primary),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(color: Colors.grey[300]!, width: 1),
+        ),
         filled: true,
+        fillColor: Colors.white,
+        labelStyle: TextStyle(
+          color: HColors.darkgrey,
+          fontWeight: FontWeight.w400,
+        ),
+        hintStyle: TextStyle(
+          color: HColors.darkgrey,
+        ),
       ),
+      // decoration: InputDecoration(
+      //   labelText: label,
+      //   labelStyle: TextStyle(color: HColors.darkgrey),
+      //   border: OutlineInputBorder(
+      //     borderRadius: BorderRadius.circular(12.0),
+      //     borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
+      //   ),
+      //   enabledBorder: OutlineInputBorder(
+      //     borderRadius: BorderRadius.circular(12.0),
+      //     borderSide: BorderSide(color: HColors.darkgrey),
+      //   ),
+      //   focusedBorder: OutlineInputBorder(
+      //     borderRadius: BorderRadius.circular(12.0),
+      //     borderSide: BorderSide(
+      //         color: Theme.of(context).colorScheme.primary, width: 1.0),
+      //   ),
+        // suffixIcon: Icon(Icons.arrow_drop_down,
+        //     color: Theme.of(context).colorScheme.primary),
+      //   filled: true,
+      // ),
     );
   }
 
-  //bottom sheet selector
   Future<void> _showSelectionBottomSheet({
     required BuildContext context,
     required String title,
     required Map<String, String> items,
     required Function(String id, String value) onSelected,
+    String? selectedId, // Add selectedId parameter
   }) async {
     await showModalBottomSheet(
       context: context,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
       builder: (context) {
         return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
               padding: const EdgeInsets.all(16.0),
-              child: Text(
-                title,
-                style:
-                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                  // IconButton(
+                  //   icon: const Icon(Icons.close),
+                  //   onPressed: () => Navigator.pop(context),
+                  // ),
+                ],
               ),
             ),
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(
-                    horizontal: 16.0, vertical: 12.0),
+                  horizontal: 8.0,
+                  // vertical: 8.0,
+                ),
                 child: ListView.separated(
                   itemCount: items.length,
                   separatorBuilder: (context, index) =>
                       const SizedBox(height: 8.0),
                   itemBuilder: (context, index) {
                     final entry = items.entries.elementAt(index);
+                    final isSelected = selectedId == entry.key;
+
                     return Material(
                       color: Colors.transparent,
                       child: InkWell(
@@ -85,18 +133,28 @@ Widget buildSelectionField({
                           decoration: BoxDecoration(
                             color: Theme.of(context).colorScheme.surface,
                             borderRadius: BorderRadius.circular(16.0),
-                            border: Border.all(
-                              color: Colors.grey,
-                              width: 1.0,
-                            ),
+                            // border: Border.all(
+                            //   color: isSelected
+                            //       ? HColors.darkgrey
+                            //       : HColors.darkgrey,
+                            //   width: isSelected ? 1.5 : 1.0,
+                            // ),
                           ),
                           child: Padding(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 20.0,
-                              vertical: 16.0,
+                              horizontal: 10.0,
+                              vertical: 12.0,
                             ),
                             child: Row(
                               children: [
+                                Icon(
+                                  Icons.person_2_outlined,
+                                  color: HColors.darkgrey,
+                                  size: 24,
+                                ),
+                                SizedBox(
+                                  width: 8,
+                                ),
                                 Expanded(
                                   child: Text(
                                     entry.value,
@@ -104,18 +162,19 @@ Widget buildSelectionField({
                                         .textTheme
                                         .bodyLarge
                                         ?.copyWith(
-                                          fontWeight: FontWeight.w500,
+                                          fontWeight: FontWeight.w400,
                                           color: Theme.of(context)
                                               .colorScheme
                                               .onSurface,
                                         ),
                                   ),
                                 ),
-                                Icon(
-                                  Icons.arrow_forward_ios_rounded,
-                                  size: 16.0,
-                                  color: Colors.grey,
-                                ),
+                                if (isSelected)
+                                  Icon(
+                                    Icons.check_circle,
+                                    color: Colors.green,
+                                    size: 24.0,
+                                  )
                               ],
                             ),
                           ),
@@ -125,12 +184,13 @@ Widget buildSelectionField({
                   },
                 ),
               ),
-            )
+            ),
           ],
         );
       },
     );
   }
+  
 
   class BuildSelectionField extends StatefulWidget {
   final List<Map<String, dynamic>> items;
