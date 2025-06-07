@@ -178,6 +178,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             if (context.mounted) {
                               Provider.of<AuthProvider>(context, listen: false)
                                   .setSaveToken(true, res);
+                              Provider.of<AuthProvider>(context, listen: false)
+                                  .handleCheckAuth();
                             }
                           } catch (e) {
                             if (e is DioException) {

@@ -45,16 +45,23 @@ class SettingProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Select Language
   Future<void> handleSelectLanguage() async {
     notifyListeners();
-    String lang = await _storage.read(key: 'lang') ?? '';
+    String lang = '';
+    try {
+      String? langValue = await _storage.read(key: 'lang');
+      lang = langValue ?? '';
+    } catch (e) {
+      await _storage.delete(key: 'lang');
+      lang = '';
+    }
+
     if (lang.isNotEmpty) {
       _isSelectingLanguage = true;
-      notifyListeners();
-      return;
+    } else {
+      _isSelectingLanguage = false;
     }
-    _isSelectingLanguage = false;
+
     notifyListeners();
   }
 }
