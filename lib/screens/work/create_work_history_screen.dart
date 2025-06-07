@@ -1,12 +1,17 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:mobile_app/app_lang.dart';
 import 'package:mobile_app/providers/global/setting_provider.dart';
 import 'package:mobile_app/providers/local/work/create_work_provider.dart';
+import 'package:mobile_app/providers/local/work_provider.dart';
 
 import 'package:mobile_app/services/work/create_work_service.dart';
+import 'package:mobile_app/shared/color/colors.dart';
+import 'package:mobile_app/shared/date/field_date.dart';
 import 'package:mobile_app/utils/help_util.dart';
+import 'package:mobile_app/widgets/custom_header.dart';
 import 'package:mobile_app/widgets/helper.dart';
 import 'package:provider/provider.dart';
 
@@ -46,7 +51,8 @@ class _CreateWorkHistoryScreenState extends State<CreateWorkHistoryScreen> {
   String? selectedOfficeId;
   String? selectedpossitionId;
   String? selectedRankPositionId;
-
+ DateTime? _startDate;
+  DateTime? _endDate;
   @override
   void dispose() {
     _dateIn.dispose();
@@ -60,19 +66,7 @@ class _CreateWorkHistoryScreenState extends State<CreateWorkHistoryScreen> {
     super.dispose();
   }
 
-  Future<void> _selectDate(TextEditingController controller) async {
-    DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(1900),
-      lastDate: DateTime(2100),
-    );
-    if (picked != null) {
-      setState(() {
-        controller.text = "${picked.toLocal()}".split(' ')[0];
-      });
-    }
-  }
+ 
 
   void _handleSubmit() async {
     // First validate the form fields
@@ -82,12 +76,12 @@ class _CreateWorkHistoryScreenState extends State<CreateWorkHistoryScreen> {
 
     // Validate each field one by one and show first error encountered
     String? getFirstValidationError() {
-      if (selectedPlaceId == null || selectedPlaceId!.isEmpty) {
-        return 'Please select institution';
-      }
-      if (selecteddepartmentId == null || selecteddepartmentId!.isEmpty) {
-        return 'Please select department';
-      }
+      // if (selectedPlaceId == null || selectedPlaceId!.isEmpty) {
+      //   return 'Please select institution';
+      // }
+      // if (selecteddepartmentId == null || selecteddepartmentId!.isEmpty) {
+      //   return 'Please select department';
+      // }
       if (_dateIn.text.isEmpty) {
         return 'Start Date is required';
       }
@@ -125,6 +119,8 @@ class _CreateWorkHistoryScreenState extends State<CreateWorkHistoryScreen> {
             key: 'Are you sure to create'),
         DialogType.primary, () async {
       try {
+        //startWorkingAt: DateFormat('yyyy-MM-dd').format(_startDate!),
+        //  appointedAt: DateFormat('yyyy-MM-dd').format(_endDate!),
         await _service.createUserWorkHistory(
           userId: widget.id ?? '',
           departmentId: selecteddepartmentId!,
@@ -133,8 +129,8 @@ class _CreateWorkHistoryScreenState extends State<CreateWorkHistoryScreen> {
           officeId:selectedOfficeId,
           positionId: selectedpossitionId,
           rankPositionId: selectedRankPositionId,
-          startWorkingAt: _dateIn.text,
-          stopWorkingAt: _dateOut.text,
+          startWorkingAt: DateFormat('yyyy-MM-dd').format(_startDate!),
+          stopWorkingAt: DateFormat('yyyy-MM-dd').format(_endDate!),
         );
 
         if (mounted) {
@@ -142,7 +138,7 @@ class _CreateWorkHistoryScreenState extends State<CreateWorkHistoryScreen> {
             const SnackBar(content: Text('ការស្នើសុំត្រូវបានបញ្ជូនដោយជោគជ័យ')),
           );
           // _clearAllFields();
-
+          Provider.of<WorkProvider>(context,listen: false).getHome();
           context.pop();
         }
       } catch (e) {
@@ -175,12 +171,15 @@ class _CreateWorkHistoryScreenState extends State<CreateWorkHistoryScreen> {
               settingProvider: settingProvider);
 
           return Scaffold(
-            backgroundColor: Colors.grey[100],
+            backgroundColor: Colors.white,
+            
             appBar: AppBar(
               title: Text(AppLang.translate(
                   lang: settingProvider.lang ?? 'kh',
                   key: 'work_experience_add')),
               centerTitle: true,
+              scrolledUnderElevation: 0,
+              bottom: CustomHeader(),
             ),
             body: RefreshIndicator(
               key: _refreshIndicatorKey,
@@ -198,120 +197,153 @@ class _CreateWorkHistoryScreenState extends State<CreateWorkHistoryScreen> {
                           children: [
                             const SizedBox(height: 10),
                             // Date Picker Row
+                            // Row(
+                            //   children: [
+                            //     Expanded(
+                            //       child: TextFormField(
+                            //         controller: _dateIn,
+                            //         readOnly: true,
+                            //         decoration: InputDecoration(
+                            //           labelText: AppLang.translate(
+                            //               lang: settingProvider.lang ?? 'kh',
+                            //               key: 'start_date'),
+                            //           labelStyle:
+                            //               TextStyle(color: Colors.blueGrey),
+                            //           border: OutlineInputBorder(
+                            //             borderRadius:
+                            //                 BorderRadius.circular(12.0),
+                            //             borderSide: BorderSide(
+                            //                 color: Colors
+                            //                     .blueGrey), // Normal border color
+                            //           ),
+                            //           enabledBorder: OutlineInputBorder(
+                            //             borderRadius:
+                            //                 BorderRadius.circular(12.0),
+                            //             borderSide: BorderSide(
+                            //                 color: Colors
+                            //                     .blueGrey), // Enabled but not focused
+                            //           ),
+                            //           focusedBorder: OutlineInputBorder(
+                            //             borderRadius:
+                            //                 BorderRadius.circular(12.0),
+                            //             borderSide: BorderSide(
+                            //               color: Theme.of(context)
+                            //                   .colorScheme
+                            //                   .primary, // Focused border color
+                            //               width: 2.0,
+                            //             ),
+                            //           ),
+                            //           errorBorder: OutlineInputBorder(
+                            //             borderRadius:
+                            //                 BorderRadius.circular(12.0),
+                            //             borderSide: BorderSide(
+                            //                 color: Colors.red), // Error state
+                            //           ),
+                            //           focusedErrorBorder: OutlineInputBorder(
+                            //             borderRadius:
+                            //                 BorderRadius.circular(12.0),
+                            //             borderSide: BorderSide(
+                            //               color:
+                            //                   Colors.red, // Focused error state
+                            //               width: 2.0,
+                            //             ),
+                            //           ),
+                            //           suffixIcon: IconButton(
+                            //             icon: const Icon(Icons.calendar_today),
+                            //             onPressed: () => _selectDate(_dateIn),
+                            //           ),
+                            //         ),
+                            //       ),
+                            //     ),
+                            //     const SizedBox(width: 8),
+                            //     Expanded(
+                            //       child: TextFormField(
+                            //         controller: _dateOut,
+                            //         readOnly: true,
+                            //         decoration: InputDecoration(
+                            //           labelText: AppLang.translate(
+                            //             lang: settingProvider.lang ?? 'kh',
+                            //             key: 'end_date',
+                            //           ),
+                            //           labelStyle:
+                            //               TextStyle(color: Colors.blueGrey),
+                            //           border: OutlineInputBorder(
+                            //             borderRadius:
+                            //                 BorderRadius.circular(12.0),
+                            //             borderSide: BorderSide(
+                            //                 color: Colors
+                            //                     .blueGrey), // Normal border color
+                            //           ),
+                            //           enabledBorder: OutlineInputBorder(
+                            //             borderRadius:
+                            //                 BorderRadius.circular(12.0),
+                            //             borderSide: BorderSide(
+                            //                 color: Colors
+                            //                     .blueGrey), // Enabled but not focused
+                            //           ),
+                            //           focusedBorder: OutlineInputBorder(
+                            //             borderRadius:
+                            //                 BorderRadius.circular(12.0),
+                            //             borderSide: BorderSide(
+                            //               color: Theme.of(context)
+                            //                   .colorScheme
+                            //                   .primary, // Focused border color
+                            //               width: 2.0,
+                            //             ),
+                            //           ),
+                            //           errorBorder: OutlineInputBorder(
+                            //             borderRadius:
+                            //                 BorderRadius.circular(12.0),
+                            //             borderSide: BorderSide(
+                            //                 color: Colors.red), // Error state
+                            //           ),
+                            //           focusedErrorBorder: OutlineInputBorder(
+                            //             borderRadius:
+                            //                 BorderRadius.circular(12.0),
+                            //             borderSide: BorderSide(
+                            //               color:
+                            //                   Colors.red, // Focused error state
+                            //               width: 2.0,
+                            //             ),
+                            //           ),
+                            //           suffixIcon: IconButton(
+                            //             icon: const Icon(Icons.calendar_today),
+                            //             onPressed: () => _selectDate(_dateOut),
+                            //           ),
+                            //         ),
+                            //       ),
+                            //     ),
+                            //   ],
+                            // ),
                             Row(
                               children: [
                                 Expanded(
-                                  child: TextFormField(
-                                    controller: _dateIn,
-                                    readOnly: true,
-                                    decoration: InputDecoration(
-                                      labelText: AppLang.translate(
-                                          lang: settingProvider.lang ?? 'kh',
-                                          key: 'start_date'),
-                                      labelStyle:
-                                          TextStyle(color: Colors.blueGrey),
-                                      border: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(12.0),
-                                        borderSide: BorderSide(
-                                            color: Colors
-                                                .blueGrey), // Normal border color
-                                      ),
-                                      enabledBorder: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(12.0),
-                                        borderSide: BorderSide(
-                                            color: Colors
-                                                .blueGrey), // Enabled but not focused
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(12.0),
-                                        borderSide: BorderSide(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .primary, // Focused border color
-                                          width: 2.0,
-                                        ),
-                                      ),
-                                      errorBorder: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(12.0),
-                                        borderSide: BorderSide(
-                                            color: Colors.red), // Error state
-                                      ),
-                                      focusedErrorBorder: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(12.0),
-                                        borderSide: BorderSide(
-                                          color:
-                                              Colors.red, // Focused error state
-                                          width: 2.0,
-                                        ),
-                                      ),
-                                      suffixIcon: IconButton(
-                                        icon: const Icon(Icons.calendar_today),
-                                        onPressed: () => _selectDate(_dateIn),
-                                      ),
-                                    ),
+                                  child: DateInputField(
+                                    label: 'ថ្ងៃចាប់ផ្តើម',
+                                    hint: 'សូមជ្រើសរើសកាលបរិច្ឆេទ',
+                                    initialDate: DateTime.now(),
+                                    selectedDate: _startDate,
+                                    onDateSelected: (date) {
+                                      setState(() {
+                                        _startDate = date;
+                                      });
+                                    },
                                   ),
                                 ),
-                                const SizedBox(width: 8),
+                                SizedBox(
+                                  width: 16,
+                                ),
                                 Expanded(
-                                  child: TextFormField(
-                                    controller: _dateOut,
-                                    readOnly: true,
-                                    decoration: InputDecoration(
-                                      labelText: AppLang.translate(
-                                        lang: settingProvider.lang ?? 'kh',
-                                        key: 'end_date',
-                                      ),
-                                      labelStyle:
-                                          TextStyle(color: Colors.blueGrey),
-                                      border: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(12.0),
-                                        borderSide: BorderSide(
-                                            color: Colors
-                                                .blueGrey), // Normal border color
-                                      ),
-                                      enabledBorder: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(12.0),
-                                        borderSide: BorderSide(
-                                            color: Colors
-                                                .blueGrey), // Enabled but not focused
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(12.0),
-                                        borderSide: BorderSide(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .primary, // Focused border color
-                                          width: 2.0,
-                                        ),
-                                      ),
-                                      errorBorder: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(12.0),
-                                        borderSide: BorderSide(
-                                            color: Colors.red), // Error state
-                                      ),
-                                      focusedErrorBorder: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(12.0),
-                                        borderSide: BorderSide(
-                                          color:
-                                              Colors.red, // Focused error state
-                                          width: 2.0,
-                                        ),
-                                      ),
-                                      suffixIcon: IconButton(
-                                        icon: const Icon(Icons.calendar_today),
-                                        onPressed: () => _selectDate(_dateOut),
-                                      ),
-                                    ),
+                                  child: DateInputField(
+                                    label: 'ថ្ងៃបញ្ចប់',
+                                    hint: 'សូមជ្រើសរើសកាលបរិច្ឆេទ',
+                                    initialDate: DateTime.now(),
+                                    selectedDate: _endDate,
+                                    onDateSelected: (date) {
+                                      setState(() {
+                                        _endDate = date;
+                                      });
+                                    },
                                   ),
                                 ),
                               ],
@@ -490,12 +522,13 @@ class _CreateWorkHistoryScreenState extends State<CreateWorkHistoryScreen> {
   }
 
   // Reusable Selection Field widget
-  Widget _buildSelectionField({
+   Widget _buildSelectionField({
     required TextEditingController controller,
     required String label,
     required Map<String, String> items,
     required void Function(String id, String value) onSelected,
     String? selectedId, // Add selectedId parameter
+    // required BuildContext context,
   }) {
     return TextFormField(
       controller: controller,
@@ -506,30 +539,56 @@ class _CreateWorkHistoryScreenState extends State<CreateWorkHistoryScreen> {
           title: label,
           items: items,
           onSelected: onSelected,
-          //  selectedId: selectedEducationrankPossitionId, // Pass current selection
+          //  selectedId: selectedEducationTypeId, // Pass current selection
           selectedId: selectedId, // Pass current selection
         );
       },
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: TextStyle(color: Colors.blueGrey),
+        // hintText: hint,
+          suffixIcon: Icon(Icons.arrow_drop_down,
+            color: HColors.darkgrey),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.0),
-          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.0),
-          borderSide: BorderSide(color: Colors.blueGrey),
+          borderRadius: BorderRadius.circular(10),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.0),
-          borderSide: BorderSide(
-              color: Theme.of(context).colorScheme.primary, width: 1.0),
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(color: HColors.darkgrey, width: 1),
         ),
-        suffixIcon: Icon(Icons.arrow_drop_down,
-            color: Theme.of(context).colorScheme.primary),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(color: Colors.grey[300]!, width: 1),
+        ),
         filled: true,
+        fillColor: Colors.white,
+        labelStyle: TextStyle(
+          color: HColors.darkgrey,
+          fontWeight: FontWeight.w400,
+        ),
+        hintStyle: TextStyle(
+          color: HColors.darkgrey,
+        ),
       ),
+      // decoration: InputDecoration(
+      //   labelText: label,
+      //   labelStyle: TextStyle(color: HColors.darkgrey),
+      //   border: OutlineInputBorder(
+      //     borderRadius: BorderRadius.circular(12.0),
+      //     borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
+      //   ),
+      //   enabledBorder: OutlineInputBorder(
+      //     borderRadius: BorderRadius.circular(12.0),
+      //     borderSide: BorderSide(color: HColors.darkgrey),
+      //   ),
+      //   focusedBorder: OutlineInputBorder(
+      //     borderRadius: BorderRadius.circular(12.0),
+      //     borderSide: BorderSide(
+      //         color: Theme.of(context).colorScheme.primary, width: 1.0),
+      //   ),
+        // suffixIcon: Icon(Icons.arrow_drop_down,
+        //     color: Theme.of(context).colorScheme.primary),
+      //   filled: true,
+      // ),
     );
   }
 
@@ -542,6 +601,7 @@ class _CreateWorkHistoryScreenState extends State<CreateWorkHistoryScreen> {
   }) async {
     await showModalBottomSheet(
       context: context,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
       builder: (context) {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -554,7 +614,7 @@ class _CreateWorkHistoryScreenState extends State<CreateWorkHistoryScreen> {
                     child: Text(
                       title,
                       style: const TextStyle(
-                        fontSize: 18,
+                        fontSize: 20,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -569,8 +629,8 @@ class _CreateWorkHistoryScreenState extends State<CreateWorkHistoryScreen> {
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 16.0,
-                  vertical: 12.0,
+                  horizontal: 8.0,
+                  // vertical: 8.0,
                 ),
                 child: ListView.separated(
                   itemCount: items.length,
@@ -592,20 +652,28 @@ class _CreateWorkHistoryScreenState extends State<CreateWorkHistoryScreen> {
                           decoration: BoxDecoration(
                             color: Theme.of(context).colorScheme.surface,
                             borderRadius: BorderRadius.circular(16.0),
-                            border: Border.all(
-                              color: isSelected
-                                  ? Theme.of(context).colorScheme.primary
-                                  : Colors.grey,
-                              width: isSelected ? 1.5 : 1.0,
-                            ),
+                            // border: Border.all(
+                            //   color: isSelected
+                            //       ? HColors.darkgrey
+                            //       : HColors.darkgrey,
+                            //   width: isSelected ? 1.5 : 1.0,
+                            // ),
                           ),
                           child: Padding(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 20.0,
-                              vertical: 16.0,
+                              horizontal: 10.0,
+                              vertical: 12.0,
                             ),
                             child: Row(
                               children: [
+                                // Icon(
+                                //   Icons.person_2_outlined,
+                                //   color: HColors.darkgrey,
+                                //   size: 24,
+                                // ),
+                                // SizedBox(
+                                //   width: 8,
+                                // ),
                                 Expanded(
                                   child: Text(
                                     entry.value,
@@ -613,7 +681,7 @@ class _CreateWorkHistoryScreenState extends State<CreateWorkHistoryScreen> {
                                         .textTheme
                                         .bodyLarge
                                         ?.copyWith(
-                                          fontWeight: FontWeight.w500,
+                                          fontWeight: FontWeight.w400,
                                           color: Theme.of(context)
                                               .colorScheme
                                               .onSurface,

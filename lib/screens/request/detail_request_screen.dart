@@ -216,8 +216,6 @@ class _DetailRequestScreenState extends State<DetailRequestScreen> {
                                   'អ្នកបង្កើត',
                                 ),
 
-                              
-
                                 Stack(
                                   children: [
                                     // Continuous vertical line
@@ -350,8 +348,6 @@ class _DetailRequestScreenState extends State<DetailRequestScreen> {
                                         ],
                                       )
                                     : const SizedBox.shrink(),
-
-                          
                               ],
                             ),
                           ),
@@ -959,32 +955,6 @@ class _DetailRequestScreenState extends State<DetailRequestScreen> {
                             ),
                             isDense: false,
                           ),
-                          // onChanged: (value) async {
-                          //   final DetailRequestService detailRequestService =
-                          //       DetailRequestService();
-
-                          //   if (value.trim().isEmpty) {
-                          //     setState(() {
-                          //       staticData = []; // or your default data
-                          //     });
-                          //     return;
-                          //   }
-
-                          //   // // Add debouncing to avoid too many API calls
-                          //   // Timer? _debounce;
-                          //   // if (_debounce?.isActive ?? false) _debounce!.cancel();
-                          //   // _debounce = Timer(const Duration(milliseconds: 500), () async {
-                          //   //   try {
-                          //   //     final resUser = await detailRequestService.users(key: value);
-                          //   //     setState(() {
-                          //   //       staticData = resUser.data.results;
-                          //   //     });
-                          //   //   } catch (e) {
-                          //   //     // Handle error appropriately
-                          //   //     print('Search error: $e');
-                          //   //   }
-                          //   // });
-                          // },
                           onChanged: (value) async {
                             final DetailRequestService detailRequestService =
                                 DetailRequestService();
@@ -1025,31 +995,6 @@ class _DetailRequestScreenState extends State<DetailRequestScreen> {
                                   ? '${userData['avatar']['file_domain']}${userData['avatar']['uri']}'
                                   : '';
 
-                              // return Chip(
-                              // avatar: CircleAvatar(
-                              //   radius: 14.0,
-                              //   backgroundImage: avatarUrl.isNotEmpty
-                              //       ? NetworkImage(avatarUrl)
-                              //       : null,
-                              //   backgroundColor: Colors.grey[300],
-                              // ),
-                              // label: Text(
-                              //   userName,
-                              //   style: const TextStyle(fontSize: 14.0),
-                              // ),
-                              //   deleteIcon: const Icon(Icons.close, size: 18.0),
-                              //   onDeleted: () {
-                              // setState(() {
-                              //   selectedItems.value = List.from(selected)
-                              //     ..removeWhere((s) => s['id'] == userId);
-                              // });
-                              //   },
-                              //   backgroundColor: Colors.grey[100],
-                              //   shape: RoundedRectangleBorder(
-                              //     borderRadius: BorderRadius.circular(16.0),
-                              //     side: BorderSide(color: Colors.grey[300]!),
-                              //   ),
-                              // );
                               return Column(
                                 children: [
                                   Stack(

@@ -1,10 +1,16 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:mobile_app/app_lang.dart';
 import 'package:mobile_app/providers/global/setting_provider.dart';
 import 'package:mobile_app/providers/local/work/update_user_medal_provider.dart';
+import 'package:mobile_app/providers/local/work_provider.dart';
 import 'package:mobile_app/services/work/create_work_service.dart';
+import 'package:mobile_app/shared/component/bottom_appbar.dart';
+import 'package:mobile_app/shared/component/build_selection.dart';
+import 'package:mobile_app/shared/component/build_text_filed.dart';
+import 'package:mobile_app/shared/date/field_date.dart';
 import 'package:mobile_app/utils/help_util.dart';
 import 'package:mobile_app/widgets/helper.dart';
 import 'package:provider/provider.dart';
@@ -18,11 +24,11 @@ class UpdateUserMedalScreen extends StatefulWidget {
 }
 
 class _UpdateUserMedalScreenState extends State<UpdateUserMedalScreen> {
-  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
-      GlobalKey<RefreshIndicatorState>();
-  Future<void> _refreshData(UpdateUserMedalProvider provider) async {
-    return await provider.getHome();
-  }
+  // final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
+  //     GlobalKey<RefreshIndicatorState>();
+  // Future<void> _refreshData(UpdateUserMedalProvider provider) async {
+  //   return await provider.getHome();
+  // }
 
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _givenDate = TextEditingController();
@@ -35,6 +41,7 @@ class _UpdateUserMedalScreenState extends State<UpdateUserMedalScreen> {
   String? selectedMedalId;
   String? selectedMedalTypeId;
   bool _isDataLoaded = false;
+  DateTime? _startDate;
   @override
   void dispose() {
     _givenDate.dispose();
@@ -70,7 +77,11 @@ class _UpdateUserMedalScreenState extends State<UpdateUserMedalScreen> {
 
       setState(() {
         final currentLang = settingProvider.lang ?? 'kh';
-        _givenDate.text = formatDate(medalData['given_at']);
+        final startDateStr = getSafeString(
+            value: provider.data?.data['given_at'], safeValue: '');
+        _startDate =
+            startDateStr.isNotEmpty ? DateTime.tryParse(startDateStr) : null;
+        // _givenDate.text = formatDate(medalData['given_at']);
         // Set medal type (តាមរយៈ)
         _medalType.text = currentLang == 'kh'
             ? (medalData['medal_types']?['name_kh'] ??
@@ -98,19 +109,19 @@ class _UpdateUserMedalScreenState extends State<UpdateUserMedalScreen> {
     });
   }
 
-  Future<void> _selectDate(TextEditingController controller) async {
-    DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(1900),
-      lastDate: DateTime(2100),
-    );
-    if (picked != null) {
-      setState(() {
-        controller.text = "${picked.toLocal()}".split(' ')[0];
-      });
-    }
-  }
+  // Future<void> _selectDate(TextEditingController controller) async {
+  //   DateTime? picked = await showDatePicker(
+  //     context: context,
+  //     initialDate: DateTime.now(),
+  //     firstDate: DateTime(1900),
+  //     lastDate: DateTime(2100),
+  //   );
+  //   if (picked != null) {
+  //     setState(() {
+  //       controller.text = "${picked.toLocal()}".split(' ')[0];
+  //     });
+  //   }
+  // }
 
   // Add this helper method to convert DD-MM-YYYY to YYYY-MM-DD
   String convertDateForApi(String dateString) {
@@ -167,7 +178,7 @@ class _UpdateUserMedalScreenState extends State<UpdateUserMedalScreen> {
           userMedalId: widget.userMedalId!,
           medalTypeId: selectedMedalTypeId!,
           medalId: selectedMedalId!,
-          givenAt: convertDateForApi(_givenDate.text),
+          givenAt: DateFormat('yyyy-MM-dd').format(_startDate!),
           note: _note.text,
         );
         if (mounted) {
@@ -175,6 +186,7 @@ class _UpdateUserMedalScreenState extends State<UpdateUserMedalScreen> {
             const SnackBar(content: Text('ការស្នើសុំត្រូវបានបញ្ជូនដោយជោគជ័យ')),
           );
           _clearAllControllers();
+          Provider.of<WorkProvider>(context,listen: false).getHome();
           context.pop();
         }
       } catch (e) {
@@ -208,128 +220,141 @@ class _UpdateUserMedalScreenState extends State<UpdateUserMedalScreen> {
               dataKey: 'medals',
               settingProvider: settingProvider);
           return Scaffold(
-            backgroundColor: Colors.grey[100],
+            backgroundColor: Colors.white,
             appBar: AppBar(
               title: Text(AppLang.translate(
                   lang: settingProvider.lang ?? 'kh',
                   key: 'update_user_medal')),
               centerTitle: true,
+              scrolledUnderElevation: 0,
+              bottom: CustomHeader(),
             ),
-            body: RefreshIndicator(
-              key: _refreshIndicatorKey,
-              color: Colors.blue[800],
-              backgroundColor: Colors.white,
-              onRefresh: () => _refreshData(provider),
-              child: provider.isLoading
-                  ? Center(child: Text('Loading...'))
-                  : SingleChildScrollView(
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      child: Padding(
-                        padding: const EdgeInsets.all(15),
-                        child: Form(
-                          key: _formKey,
-                          child: Column(
-                            children: [
-                              TextFormField(
-                                controller: _givenDate,
-                                readOnly: true,
-                                decoration: InputDecoration(
-                                  labelText: AppLang.translate(
-                                      lang: settingProvider.lang ?? 'kh',
-                                      key: 'given date'),
-                                  labelStyle: TextStyle(color: Colors.blueGrey),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(12.0),
-                                    borderSide: BorderSide(
-                                        color: Colors
-                                            .blueGrey), // Normal border color
-                                  ),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(12.0),
-                                    borderSide: BorderSide(
-                                        color: Colors
-                                            .blueGrey), // Enabled but not focused
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(12.0),
-                                    borderSide: BorderSide(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .primary, // Focused border color
-                                      width: 2.0,
-                                    ),
-                                  ),
-                                  errorBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(12.0),
-                                    borderSide: BorderSide(
-                                        color: Colors.red), // Error state
-                                  ),
-                                  focusedErrorBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(12.0),
-                                    borderSide: BorderSide(
-                                      color: Colors.red, // Focused error state
-                                      width: 2.0,
-                                    ),
-                                  ),
-                                  suffixIcon: IconButton(
-                                    icon: const Icon(Icons.calendar_today),
-                                    onPressed: () => _selectDate(_givenDate),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 16),
-                              // medal
-                              _buildSelectionField(
-                                controller: _medal,
-                                label:
-                                    '${AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'medals')} *',
-                                items: medals,
-                                selectedId:
-                                    selectedMedalId, // Pass current selection
-                                onSelected: (id, value) {
-                                  setState(() {
-                                    selectedMedalId = id;
-                                    _medal.text = value;
-                                  });
-                                },
-                              ),
+            body: provider.isLoading
+                ? Center(child: Text('Loading...'))
+                : SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    child: Padding(
+                      padding: const EdgeInsets.all(15),
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          children: [
+                            SizedBox(
+                              height: 10,
+                            ),
+                            DateInputField(
+                              label: 'ថ្ងៃចាប់ផ្តើម',
+                              hint: 'សូមជ្រើសរើសកាលបរិច្ឆេទ',
+                              initialDate: DateTime.now(),
+                              selectedDate: _startDate,
+                              onDateSelected: (date) {
+                                setState(() {
+                                  _startDate = date;
+                                });
+                              },
+                            ),
+                            // TextFormField(
+                            //   controller: _givenDate,
+                            //   readOnly: true,
+                            //   decoration: InputDecoration(
+                            //     labelText: AppLang.translate(
+                            //         lang: settingProvider.lang ?? 'kh',
+                            //         key: 'given date'),
+                            //     labelStyle: TextStyle(color: Colors.blueGrey),
+                            //     border: OutlineInputBorder(
+                            //       borderRadius: BorderRadius.circular(12.0),
+                            //       borderSide: BorderSide(
+                            //           color: Colors
+                            //               .blueGrey), // Normal border color
+                            //     ),
+                            //     enabledBorder: OutlineInputBorder(
+                            //       borderRadius: BorderRadius.circular(12.0),
+                            //       borderSide: BorderSide(
+                            //           color: Colors
+                            //               .blueGrey), // Enabled but not focused
+                            //     ),
+                            //     focusedBorder: OutlineInputBorder(
+                            //       borderRadius: BorderRadius.circular(12.0),
+                            //       borderSide: BorderSide(
+                            //         color: Theme.of(context)
+                            //             .colorScheme
+                            //             .primary, // Focused border color
+                            //         width: 2.0,
+                            //       ),
+                            //     ),
+                            //     errorBorder: OutlineInputBorder(
+                            //       borderRadius: BorderRadius.circular(12.0),
+                            //       borderSide: BorderSide(
+                            //           color: Colors.red), // Error state
+                            //     ),
+                            //     focusedErrorBorder: OutlineInputBorder(
+                            //       borderRadius: BorderRadius.circular(12.0),
+                            //       borderSide: BorderSide(
+                            //         color: Colors.red, // Focused error state
+                            //         width: 2.0,
+                            //       ),
+                            //     ),
+                            //     suffixIcon: IconButton(
+                            //       icon: const Icon(Icons.calendar_today),
+                            //       onPressed: () => _selectDate(_givenDate),
+                            //     ),
+                            //   ),
+                            // ),
+                            const SizedBox(height: 16),
+                            // medal
+                            buildSelectionField(
+                              context: context,
+                              controller: _medal,
+                              label:
+                                  '${AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'medals')} *',
+                              items: medals,
+                              selectedId:
+                                  selectedMedalId, // Pass current selection
+                              onSelected: (id, value) {
+                                setState(() {
+                                  selectedMedalId = id;
+                                  _medal.text = value;
+                                });
+                              },
+                            ),
 
-                              const SizedBox(height: 16),
+                            const SizedBox(height: 16),
 
-                              // Speaking and Reading Levels
-                              _buildSelectionField(
-                                controller: _medalType,
-                                label:
-                                    '${AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'throught')} *',
-                                items: medalType,
-                                selectedId:
-                                    selectedMedalTypeId, // Pass current selection
-                                onSelected: (id, value) {
-                                  setState(() {
-                                    selectedMedalTypeId = id;
-                                    _medalType.text = value;
-                                  });
-                                },
-                              ),
-                              const SizedBox(height: 16),
-                              _buildTextField(
-                                controller: _note,
-                                label: AppLang.translate(
-                                    lang: settingProvider.lang ?? 'kh',
-                                    key: 'user_info_note'),
-                                // validator: (value) => value!.isEmpty
-                                //     ? AppLang.translate(
-                                //         lang: settingProvider.lang ?? 'kh',
-                                //         key: 'please enter name_en')
-                                //     : null,
-                              ),
-                              const SizedBox(height: 16),
-                            ],
-                          ),
+                            // Speaking and Reading Levels
+                            buildSelectionField(
+                              context: context,
+                              controller: _medalType,
+                              label:
+                                  '${AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'throught')} *',
+                              items: medalType,
+                              selectedId:
+                                  selectedMedalTypeId, // Pass current selection
+                              onSelected: (id, value) {
+                                setState(() {
+                                  selectedMedalTypeId = id;
+                                  _medalType.text = value;
+                                });
+                              },
+                            ),
+                            const SizedBox(height: 16),
+                            buildTextField(
+                              context: context,
+                              controller: _note,
+                              label: AppLang.translate(
+                                  lang: settingProvider.lang ?? 'kh',
+                                  key: 'user_info_note'),
+                              // validator: (value) => value!.isEmpty
+                              //     ? AppLang.translate(
+                              //         lang: settingProvider.lang ?? 'kh',
+                              //         key: 'please enter name_en')
+                              //     : null,
+                            ),
+                            const SizedBox(height: 16),
+                          ],
                         ),
                       ),
                     ),
-            ),
+                  ),
             bottomNavigationBar: Padding(
               padding: const EdgeInsets.all(15),
               child: SizedBox(
@@ -387,199 +412,5 @@ class _UpdateUserMedalScreenState extends State<UpdateUserMedalScreen> {
     }
 
     return result;
-  }
-
-  // Reusable Selection Field widget
-  Widget _buildSelectionField({
-    required TextEditingController controller,
-    required String label,
-    required Map<String, String> items,
-    required void Function(String id, String value) onSelected,
-    String? selectedId, // Add selectedId parameter
-  }) {
-    return TextFormField(
-      controller: controller,
-      readOnly: true,
-      onTap: () async {
-        await _showSelectionBottomSheet(
-          context: context,
-          title: label,
-          items: items,
-          onSelected: onSelected,
-          //  selectedId: selectedEducationTypeId, // Pass current selection
-          selectedId: selectedId, // Pass current selection
-        );
-      },
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: TextStyle(color: Colors.blueGrey),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.0),
-          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.0),
-          borderSide: BorderSide(color: Colors.blueGrey),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.0),
-          borderSide: BorderSide(
-              color: Theme.of(context).colorScheme.primary, width: 1.0),
-        ),
-        suffixIcon: Icon(Icons.arrow_drop_down,
-            color: Theme.of(context).colorScheme.primary),
-        filled: true,
-      ),
-    );
-  }
-
-  Future<void> _showSelectionBottomSheet({
-    required BuildContext context,
-    required String title,
-    required Map<String, String> items,
-    required Function(String id, String value) onSelected,
-    String? selectedId, // Add selectedId parameter
-  }) async {
-    await showModalBottomSheet(
-      context: context,
-      builder: (context) {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      title,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                  // IconButton(
-                  //   icon: const Icon(Icons.close),
-                  //   onPressed: () => Navigator.pop(context),
-                  // ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16.0,
-                  vertical: 12.0,
-                ),
-                child: ListView.separated(
-                  itemCount: items.length,
-                  separatorBuilder: (context, index) =>
-                      const SizedBox(height: 8.0),
-                  itemBuilder: (context, index) {
-                    final entry = items.entries.elementAt(index);
-                    final isSelected = selectedId == entry.key;
-
-                    return Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        onTap: () {
-                          onSelected(entry.key, entry.value);
-                          Navigator.pop(context);
-                        },
-                        borderRadius: BorderRadius.circular(16.0),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.surface,
-                            borderRadius: BorderRadius.circular(16.0),
-                            border: Border.all(
-                              color: isSelected
-                                  ? Theme.of(context).colorScheme.primary
-                                  : Colors.grey,
-                              width: isSelected ? 1.5 : 1.0,
-                            ),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 20.0,
-                              vertical: 16.0,
-                            ),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    entry.value,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyLarge
-                                        ?.copyWith(
-                                          fontWeight: FontWeight.w500,
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .onSurface,
-                                        ),
-                                  ),
-                                ),
-                                if (isSelected)
-                                  Icon(
-                                    Icons.check_circle,
-                                    color: Colors.green,
-                                    size: 24.0,
-                                  )
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String label,
-    String? Function(String?)? validator,
-    bool readOnly = false,
-    VoidCallback? onTap,
-    Widget? suffixIcon,
-    int maxLines = 1,
-  }) {
-    return TextFormField(
-      controller: controller,
-      readOnly: readOnly,
-      onTap: onTap,
-      validator: validator,
-      maxLines: maxLines,
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: TextStyle(color: Colors.blueGrey),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.0),
-          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.0),
-          borderSide: BorderSide(color: Colors.blueGrey),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.0),
-          borderSide: BorderSide(
-              color: Theme.of(context).colorScheme.primary, width: 2.0),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.0),
-          borderSide: BorderSide(color: Theme.of(context).colorScheme.error),
-        ),
-        suffixIcon: suffixIcon,
-        filled: true,
-      ),
-    );
   }
 }

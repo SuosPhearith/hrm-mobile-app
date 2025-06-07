@@ -9,6 +9,7 @@ import 'package:intl/intl.dart';
 import 'package:mobile_app/app_lang.dart';
 import 'package:mobile_app/providers/global/setting_provider.dart';
 import 'package:mobile_app/providers/local/request/create_request_provider.dart';
+import 'package:mobile_app/providers/local/request_provider.dart';
 import 'package:mobile_app/services/request/create_request_service.dart';
 import 'package:mobile_app/shared/color/colors.dart';
 import 'package:mobile_app/shared/component/bottom_appbar.dart';
@@ -170,6 +171,7 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('ការស្នើសុំត្រូវបានបញ្ជូនដោយជោគជ័យ')),
         );
+        Provider.of<RequestProvider>(context,listen: false).getHome();
         context.pop();
       }
     } catch (e) {

@@ -175,7 +175,7 @@ class _UpdateLanguageLevelScreenState extends State<UpdateLanguageLevelScreen> {
             key: 'Are you sure to update'), // 'update'
         DialogType.primary, () async {
       try {
-        final res = await _service.updateUserLanguage(
+        await _service.updateUserLanguage(
           userId: widget.id ?? '',
           userLanguageId: widget.userLanguageId,
           languageId: selectedLanguageId!,
@@ -191,8 +191,9 @@ class _UpdateLanguageLevelScreenState extends State<UpdateLanguageLevelScreen> {
                 content: Text(
                     'ការកែប្រែត្រូវបានរក្សាទុកដោយជោគជ័យ')), // Changed message
           );
-          Provider.of<PersonalInfoProvider>(context, listen: false)
-              .setNewLanguage(res);
+          // Provider.of<PersonalInfoProvider>(context, listen: false)
+          //     .setNewLanguage(res);
+           Provider.of<PersonalInfoProvider>(context,listen: false).getHome();
           context.pop();
         }
       } catch (e) {

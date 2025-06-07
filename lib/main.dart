@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:mobile_app/app_lang.dart';
 import 'package:mobile_app/providers/global/setting_provider.dart';
 import 'package:mobile_app/providers/local/personal_info_provider.dart';
+import 'package:mobile_app/providers/local/request_provider.dart';
+import 'package:mobile_app/providers/local/work_provider.dart';
 import 'package:mobile_app/screens/about_screen.dart';
 import 'package:mobile_app/screens/daily_screen.dart';
 import 'package:mobile_app/screens/evaluate_screen.dart';
@@ -16,6 +18,7 @@ import 'package:mobile_app/screens/personal_info/update_language_level_screen.da
 import 'package:mobile_app/screens/personal_info/update_relative_screen.dart';
 import 'package:mobile_app/screens/personal_info/update_screen.dart';
 import 'package:mobile_app/screens/personal_info_screen.dart';
+import 'package:mobile_app/screens/qr_scanner_screen.dart';
 import 'package:mobile_app/screens/request/create_request_screen.dart';
 import 'package:mobile_app/screens/request/detail_request_screen.dart';
 import 'package:mobile_app/screens/request_screen.dart';
@@ -58,7 +61,8 @@ void main() async {
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => SettingProvider()),
         ChangeNotifierProvider(create: (_) => PersonalInfoProvider()),
-        
+        ChangeNotifierProvider(create: (_) => WorkProvider()),
+        ChangeNotifierProvider(create: (_) => RequestProvider())
       ],
       child: const MyApp(),
     ),
@@ -82,7 +86,7 @@ class MyApp extends StatelessWidget {
           secondary: Color(0xFF002458),
           surface: Colors.white,
         ),
-        textTheme:  TextTheme(
+        textTheme: TextTheme(
           bodyLarge: TextStyle(fontSize: 16, color: Colors.black),
           bodyMedium: TextStyle(fontSize: 14, color: Colors.black),
           bodySmall: TextStyle(fontSize: 12, color: HColors.darkgrey),
@@ -363,9 +367,7 @@ class _MainLayoutState extends State<MainLayout> {
     final lang = Provider.of<SettingProvider>(context).lang;
 
     return Scaffold(
-      
       body: SafeArea(
-        
         top: false,
         child: widget.navigationShell,
       ),
@@ -398,7 +400,7 @@ class _MainLayoutState extends State<MainLayout> {
         padding: EdgeInsets.zero,
         decoration: BoxDecoration(
           color: Colors.white,
-          
+
           // boxShadow: [
           //   // BoxShadow(
           //   //   color: Colors.black12,
@@ -429,8 +431,15 @@ class _MainLayoutState extends State<MainLayout> {
           type: BottomNavigationBarType.fixed,
           items: [
             BottomNavigationBarItem(
-              icon: _buildNavIcon(Icons.home, 0,),
-              activeIcon: _buildNavIcon(Icons.home, 0, active: true,),
+              icon: _buildNavIcon(
+                Icons.home,
+                0,
+              ),
+              activeIcon: _buildNavIcon(
+                Icons.home,
+                0,
+                active: true,
+              ),
               label: AppLang.translate(key: 'layout_home', lang: lang ?? 'kh'),
             ),
             BottomNavigationBarItem(
@@ -442,26 +451,56 @@ class _MainLayoutState extends State<MainLayout> {
             //   icon: Container(width: 24), // Empty space for FAB
             //   label: '',
             // ),
+            // BottomNavigationBarItem(
+            //   icon: GestureDetector(
+            //     onTap: () {
+            //       _showAddRequestBottomSheet(context);
+            //     },
+            //     child: Container(
+            //       padding: const EdgeInsets.all(8.0),
+            //       decoration: BoxDecoration(
+            //         borderRadius: BorderRadius.circular(50),
+            //         color: HColors.blue,
+            //       ),
+            //       child: const Icon(
+            //         Icons.qr_code_scanner_outlined,
+            //         size: 24.0,
+            //         color: HColors.yellow,
+            //       ),
+            //     ),
+            //   ),
+            //   label: '',
+            // ),
             BottomNavigationBarItem(
-                icon: GestureDetector(
-                  onTap: () {
-                    _showAddRequestBottomSheet(context);
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.all(6.0),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(50),
-                      color: HColors.blue,
-                    ),
-                    child: const Icon(
-                      Icons.add,
-                      size: 28.0,
-                      color: HColors.yellow,
-                    ),
+              icon: GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const QRScannerScreen()),
+                  ).then((result) {
+                    if (result != null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Scanned QR Code: $result')),
+                      );
+                    }
+                  });
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(8.0),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(50),
+                    color: HColors.blue,
+                  ),
+                  child: const Icon(
+                    Icons.qr_code_scanner_outlined,
+                    size: 24.0,
+                    color: HColors.yellow,
                   ),
                 ),
-                label: '',
               ),
+              label: '',
+            ),
             BottomNavigationBarItem(
               icon: _buildNavIcon(Icons.calendar_month, 3),
               activeIcon: _buildNavIcon(Icons.calendar_month, 3, active: true),

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:mobile_app/app_lang.dart';
 import 'package:mobile_app/providers/global/setting_provider.dart';
+import 'package:mobile_app/providers/local/personal_info_provider.dart';
 import 'package:mobile_app/providers/local/personalinfo/update_personal_info_provider.dart';
 import 'package:mobile_app/services/personal_info/update_personal_info_service.dart';
 import 'package:mobile_app/shared/color/colors.dart';
@@ -248,7 +249,7 @@ class _UpdatePersonalInfoScreenState extends State<UpdatePersonalInfoScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('ការស្នើសុំត្រូវបានបញ្ជូនដោយជោគជ័យ')),
           );
-
+          Provider.of<PersonalInfoProvider>(context, listen: false).getHome();
           context.pop();
         }
       } catch (e) {
@@ -264,6 +265,7 @@ class _UpdatePersonalInfoScreenState extends State<UpdatePersonalInfoScreen> {
       }
     });
   }
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
@@ -305,8 +307,7 @@ class _UpdatePersonalInfoScreenState extends State<UpdatePersonalInfoScreen> {
                 // ? Center(child: Text('Loading...'))
                 ? Skeleton()
                 : GestureDetector(
-                    onTap: () =>
-                        FocusManager.instance.primaryFocus?.unfocus(),
+                    onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
                     child: SingleChildScrollView(
                       physics: const AlwaysScrollableScrollPhysics(),
                       child: Padding(
@@ -349,7 +350,8 @@ class _UpdatePersonalInfoScreenState extends State<UpdatePersonalInfoScreen> {
                                   child: buildTextField(
                                     controller: txtKhName,
                                     label:
-                                        "${AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'user_info_kh_name')} *", context: context,
+                                        "${AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'user_info_kh_name')} *",
+                                    context: context,
                                   ),
                                 ),
                                 const SizedBox(width: 16),
@@ -357,7 +359,8 @@ class _UpdatePersonalInfoScreenState extends State<UpdatePersonalInfoScreen> {
                                   child: buildTextField(
                                     controller: txtEnName,
                                     label:
-                                        "${AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'user_info_en_name')} *", context: context,
+                                        "${AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'user_info_en_name')} *",
+                                    context: context,
                                   ),
                                 ),
                               ],
@@ -397,7 +400,8 @@ class _UpdatePersonalInfoScreenState extends State<UpdatePersonalInfoScreen> {
                               label: AppLang.translate(
                                   lang: settingProvider.lang ?? 'kh',
                                   key: 'user_info_phone'),
-                              keyboardType: TextInputType.phone, context: context,
+                              keyboardType: TextInputType.phone,
+                              context: context,
                             ),
                             const SizedBox(height: 24),
                             // TextFormField(
@@ -417,7 +421,8 @@ class _UpdatePersonalInfoScreenState extends State<UpdatePersonalInfoScreen> {
                               label: AppLang.translate(
                                   lang: settingProvider.lang ?? 'kh',
                                   key: 'user_info_email'),
-                              keyboardType: TextInputType.emailAddress, context: context,
+                              keyboardType: TextInputType.emailAddress,
+                              context: context,
                             ),
                             const SizedBox(height: 24),
                             // TextFormField(
@@ -441,7 +446,7 @@ class _UpdatePersonalInfoScreenState extends State<UpdatePersonalInfoScreen> {
                               keyboardType: TextInputType.number,
                             ),
                             const SizedBox(height: 24),
-            
+
                             // Date of Birth
                             // buildTextField(
                             //   controller: txtDob,
@@ -834,7 +839,8 @@ class _UpdatePersonalInfoScreenState extends State<UpdatePersonalInfoScreen> {
                                     label: AppLang.translate(
                                       lang: settingProvider.lang ?? 'kh',
                                       key: 'user_info_number',
-                                    ), context: context,
+                                    ),
+                                    context: context,
                                     // keyboardType: TextInputType.number,
                                   ),
                                 ),
@@ -906,7 +912,4 @@ class _UpdatePersonalInfoScreenState extends State<UpdatePersonalInfoScreen> {
 
     return types;
   }
-  
-
-  
 }

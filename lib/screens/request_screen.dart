@@ -25,115 +25,112 @@ class _RequestScreenState extends State<RequestScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => RequestProvider(),
-      child: Consumer2<RequestProvider, SettingProvider>(
-        builder: (context, requestProvider, settingProvider, child) {
-          final dataSetup = requestProvider.dataSetup?.data;
-          return Scaffold(
-            // backgroundColor: Color(0xFFF1F5F9),
-            backgroundColor: Colors.white,
-            appBar: AppBar(
-              bottom: CustomHeader(),
-              title: Text(
-                AppLang.translate(
-                  key: 'request',
-                  lang: settingProvider.lang ?? 'kh',
-                ),
-                style: const TextStyle(
-                  fontWeight: FontWeight.w500,
-                  color: Colors.black,
-                ),
+    return Consumer2<RequestProvider, SettingProvider>(
+      builder: (context, requestProvider, settingProvider, child) {
+        final dataSetup = requestProvider.dataSetup?.data;
+        return Scaffold(
+          // backgroundColor: Color(0xFFF1F5F9),
+          backgroundColor: Colors.white,
+          appBar: AppBar(
+            bottom: CustomHeader(),
+            title: Text(
+              AppLang.translate(
+                key: 'request',
+                lang: settingProvider.lang ?? 'kh',
               ),
-              centerTitle: true,
-              backgroundColor: Colors.white,
-              iconTheme: const IconThemeData(color: Colors.black),
-              elevation: 0,
-              actions: [
-                GestureDetector(
-                  onTap: () {
-                    _showAddRequestBottomSheet(context, dataSetup ?? {});
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Container(
-                      padding: const EdgeInsets.all(6.0),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.white,
-                      ),
-                      child: Icon(
-                        Icons.add,
-                        size: 28.0,
-                        color: HColors.darkgrey,
-                      ),
+              style: const TextStyle(
+                fontWeight: FontWeight.w500,
+                color: Colors.black,
+              ),
+            ),
+            centerTitle: true,
+            backgroundColor: Colors.white,
+            iconTheme: const IconThemeData(color: Colors.black),
+            elevation: 0,
+            actions: [
+              GestureDetector(
+                onTap: () {
+                  _showAddRequestBottomSheet(context, dataSetup ?? {});
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                    padding: const EdgeInsets.all(6.0),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white,
+                    ),
+                    child: Icon(
+                      Icons.add,
+                      size: 28.0,
+                      color: HColors.darkgrey,
                     ),
                   ),
                 ),
-              ],
-            ),
-            body: RefreshIndicator(
-              key: _refreshIndicatorKey,
-              color: Colors.blue[800],
-              backgroundColor: Colors.white,
-              onRefresh: () => _refreshData(requestProvider),
-              child: requestProvider.isLoading
-                  ? const Center(child: Text('Loading...'))
-                  : requestProvider.requestData == null
-                      ? Center(
-                          child: GestureDetector(
-                            onTap: () {
-                              context.push(
-                                '${AppRoutes.detailRequest}/1}',
-                              );
-                            },
-                            child: Text('Something when wrong'),
-                          ),
-                        )
-                      : SingleChildScrollView(
-                          physics: const AlwaysScrollableScrollPhysics(),
-                          child: Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Column(
-                              children: [
-                                ...requestProvider.requestData!.data.results
-                                    .map((
-                                  record,
-                                ) {
-                                  return GestureDetector(
-                                    onTap: () {
-                                      context.push(
-                                        '${AppRoutes.detailRequest}/${record['id']}',
-                                      );
-                                    },
-                                    child: _buildRequestCard(
-                                      id: AppLang.translate(
-                                        data: record['request_category'],
-                                        lang: settingProvider.lang ?? 'kh',
-                                      ),
-                                      status: AppLang.translate(
-                                        data: record['request_status'],
-                                        lang: settingProvider.lang ?? 'kh',
-                                      ),
-                                      dates:
-                                          '${formatDate(record['start_datetime'])} ដល់ ${formatDate(record['end_datetime'])}',
-                                      days: calculateDateDifference(
-                                        record['start_datetime'],
-                                        record['end_datetime'],
-                                      ),
-                                      description:
-                                          '${AppLang.translate(data: record['request_type'], lang: settingProvider.lang ?? 'kh')} | ${formatStringValue(record['objective'])}',
+              ),
+            ],
+          ),
+          body: RefreshIndicator(
+            key: _refreshIndicatorKey,
+            color: Colors.blue[800],
+            backgroundColor: Colors.white,
+            onRefresh: () => _refreshData(requestProvider),
+            child: requestProvider.isLoading
+                ? const Center(child: Text('Loading...'))
+                : requestProvider.requestData == null
+                    ? Center(
+                        child: GestureDetector(
+                          onTap: () {
+                            context.push(
+                              '${AppRoutes.detailRequest}/1}',
+                            );
+                          },
+                          child: Text('Something when wrong'),
+                        ),
+                      )
+                    : SingleChildScrollView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            children: [
+                              ...requestProvider.requestData!.data.results
+                                  .map((
+                                record,
+                              ) {
+                                return GestureDetector(
+                                  onTap: () {
+                                    context.push(
+                                      '${AppRoutes.detailRequest}/${record['id']}',
+                                    );
+                                  },
+                                  child: _buildRequestCard(
+                                    id: AppLang.translate(
+                                      data: record['request_category'],
+                                      lang: settingProvider.lang ?? 'kh',
                                     ),
-                                  );
-                                }),
-                              ],
-                            ),
+                                    status: AppLang.translate(
+                                      data: record['request_status'],
+                                      lang: settingProvider.lang ?? 'kh',
+                                    ),
+                                    dates:
+                                        '${formatDate(record['start_datetime'])} ដល់ ${formatDate(record['end_datetime'])}',
+                                    days: calculateDateDifference(
+                                      record['start_datetime'],
+                                      record['end_datetime'],
+                                    ),
+                                    description:
+                                        '${AppLang.translate(data: record['request_type'], lang: settingProvider.lang ?? 'kh')} | ${formatStringValue(record['objective'])}',
+                                  ),
+                                );
+                              }),
+                            ],
                           ),
                         ),
-            ),
-          );
-        },
-      ),
+                      ),
+          ),
+        );
+      },
     );
   }
 

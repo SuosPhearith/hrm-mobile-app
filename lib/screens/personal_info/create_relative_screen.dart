@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:mobile_app/app_lang.dart';
 import 'package:mobile_app/providers/global/setting_provider.dart';
+import 'package:mobile_app/providers/local/personal_info_provider.dart';
 import 'package:mobile_app/providers/local/personalinfo/create_relative_provider.dart';
 import 'package:mobile_app/services/personal_info/create_personalinfo_service.dart';
 import 'package:mobile_app/shared/component/build_selection.dart';
@@ -100,7 +101,7 @@ class _CreateRelativeScreenState extends State<CreateRelativeScreen> {
             const SnackBar(content: Text('ការស្នើសុំត្រូវបានបញ្ជូនដោយជោគជ័យ')),
           );
           _clearAllFields();
-
+           Provider.of<PersonalInfoProvider>(context,listen: false).getHome();
           context.pop();
         }
       } catch (e) {

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:mobile_app/providers/global/setting_provider.dart';
 import 'package:mobile_app/providers/local/evaluate_provider.dart';
 import 'package:mobile_app/shared/component/bottom_appbar.dart';
-import 'package:mobile_app/widgets/skeleton.dart';
 import 'package:provider/provider.dart';
 
 class EvaluateScreen extends StatefulWidget {
@@ -25,21 +24,27 @@ class _EvaluateScreenState extends State<EvaluateScreen> {
         create: (_) => EvaluationProvider(),
         child: Consumer2<EvaluationProvider, SettingProvider>(
             builder: (context, evaluationProvider, settingProvider, child) {
-          return Scaffold(
-              backgroundColor: Colors.white,
-              appBar: AppBar(
-                title: Text('Evaluate'),
-                centerTitle: true,
-                bottom: CustomHeader(),
-              ),
-              body: RefreshIndicator(
-                key: _refreshIndicatorKey,
-                color: Colors.blue[800],
+          return RefreshIndicator(
+             key: _refreshIndicatorKey,
+                  color: Colors.blue[800],
+                  backgroundColor: Colors.white,
+                  onRefresh: () => _refreshData(evaluationProvider),
+            child: Scaffold(
                 backgroundColor: Colors.white,
-                onRefresh: () => _refreshData(evaluationProvider),
-                child: evaluationProvider.isLoading
-                    ? Skeleton()
+                appBar: AppBar(
+                  title: Text(
+                    'វាយតម្លៃ',
+                    style: TextStyle(fontWeight: FontWeight.w500),
+                  ),
+                  centerTitle: true,
+                  bottom: CustomHeader(),
+                ),
+                body: evaluationProvider.isLoading
+                    ? Center(
+                        child: Text("Loading..."),
+                      )
                     : SingleChildScrollView(
+                      physics: AlwaysScrollableScrollPhysics(),
                         child: Padding(
                           padding: const EdgeInsets.all(16.0),
                           child: Column(
@@ -65,7 +70,7 @@ class _EvaluateScreenState extends State<EvaluateScreen> {
                                 final date = (result['date'] ?? '-').toString();
                                 final finalGrade =
                                     (result['final_grade'] ?? '-').toString();
-
+                            
                                 return Padding(
                                   padding: const EdgeInsets.only(bottom: 12.0),
                                   child: _buildevaluationCard(
@@ -79,8 +84,8 @@ class _EvaluateScreenState extends State<EvaluateScreen> {
                             ),
                           ),
                         ),
-                      ),
-              ));
+                      )),
+          );
         }));
   }
 }
@@ -99,8 +104,8 @@ Widget _buildevaluationCard({
         padding: const EdgeInsets.all(12.0),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(8.0),
-          border: Border.all(color: Colors.grey.withOpacity(0.2), width: 1),
+          borderRadius: BorderRadius.circular(12.0),
+          border: Border.all(color: Colors.grey.shade300),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
