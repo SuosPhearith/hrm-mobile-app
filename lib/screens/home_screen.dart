@@ -60,6 +60,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: Column(
                         children: [
                           UserProfileHeader(authProvider: authProvider),
+                          SizedBox(height: 10,),
                           DailyMonthlyView(
                             currentIndex: _currentIndex,
                             onPageChanged: (index) =>
@@ -235,7 +236,7 @@ class UserProfileHeader extends StatelessWidget {
     //   ),
     // );
     return AppBar(
-      backgroundColor: Colors.transparent,
+      // backgroundColor: Colors.transparent,
       scrolledUnderElevation: 0,
       title: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -356,7 +357,7 @@ class DailyMonthlyView extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: SizedBox(
-        height: 240,
+        height: 220,
         child: Column(
           children: [
             Expanded(
@@ -373,7 +374,7 @@ class DailyMonthlyView extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 6),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: List.generate(2, (index) {
@@ -391,7 +392,7 @@ class DailyMonthlyView extends StatelessWidget {
                 );
               }),
             ),
-            const SizedBox(height: 12),
+            // const SizedBox(height: 6),
           ],
         ),
       ),

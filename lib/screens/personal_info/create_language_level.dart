@@ -19,11 +19,11 @@ class CreateLanguageLevel extends StatefulWidget {
 }
 
 class _CreateLanguageLevelState extends State<CreateLanguageLevel> {
-  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
-      GlobalKey<RefreshIndicatorState>();
-  Future<void> _refreshData(CreateEducationProvider provider) async {
-    return await provider.getHome();
-  }
+  // final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
+  //     GlobalKey<RefreshIndicatorState>();
+  // Future<void> _refreshData(CreateEducationProvider provider) async {
+  //   return await provider.getHome();
+  // }
 
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _langauge = TextEditingController();
@@ -157,129 +157,123 @@ class _CreateLanguageLevelState extends State<CreateLanguageLevel> {
                 )
               ],
             ),
-            body: RefreshIndicator(
-              key: _refreshIndicatorKey,
-              color: Colors.blue[800],
-              backgroundColor: Colors.white,
-              onRefresh: () => _refreshData(provider),
-              child: provider.isLoading
-                  ? Center(child: Text('Loading...'))
-                  : SingleChildScrollView(
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      child: Padding(
-                        padding: const EdgeInsets.all(15),
-                        child: Form(
-                          key: _formKey,
-                          child: Column(
-                            children: [
-                              // Language Selection
-                              buildSelectionField(
-                                context: context,
-                                controller: _langauge,
-                                label:
-                                    '${AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'user_info_language')} *',
-                                items: languages,
-                                selectedId:
-                                    selectedLanguageId, // Pass current selection
-                                onSelected: (id, value) {
-                                  setState(() {
-                                    selectedLanguageId = id;
-                                    _langauge.text = value;
-                                  });
-                                },
-                              ),
-
-                              const SizedBox(height: 16),
-
-                              // Speaking and Reading Levels
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: buildSelectionField(
-                                      controller: _speakingLevel,
-                                      label:
-                                          '${AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'speaking level')} *',
-                                      items: proficiencyLevels,
-                                      selectedId:
-                                          selectedSpeakingLevelId, // Pass current selection
-                                      onSelected: (id, value) {
-                                        setState(() {
-                                          selectedSpeakingLevelId = id;
-                                          _speakingLevel.text = value;
-                                        });
-                                      },
-                                      context: context,
-                                    ),
+            body: provider.isLoading
+                ? Center(child: Text('Loading...'))
+                : SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    child: Padding(
+                      padding: const EdgeInsets.all(15),
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          children: [
+                            // Language Selection
+                            buildSelectionField(
+                              context: context,
+                              controller: _langauge,
+                              label:
+                                  '${AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'user_info_language')} *',
+                              items: languages,
+                              selectedId:
+                                  selectedLanguageId, // Pass current selection
+                              onSelected: (id, value) {
+                                setState(() {
+                                  selectedLanguageId = id;
+                                  _langauge.text = value;
+                                });
+                              },
+                            ),
+            
+                            const SizedBox(height: 16),
+            
+                            // Speaking and Reading Levels
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: buildSelectionField(
+                                    controller: _speakingLevel,
+                                    label:
+                                        '${AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'speaking level')} *',
+                                    items: proficiencyLevels,
+                                    selectedId:
+                                        selectedSpeakingLevelId, // Pass current selection
+                                    onSelected: (id, value) {
+                                      setState(() {
+                                        selectedSpeakingLevelId = id;
+                                        _speakingLevel.text = value;
+                                      });
+                                    },
+                                    context: context,
                                   ),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: buildSelectionField(
-                                      context: context,
-                                      controller: _readingLevel,
-                                      label:
-                                          '${AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'reading level')} *',
-                                      items: proficiencyLevels,
-                                      selectedId:
-                                          selectedReadingLevelId, // Pass current selection
-                                      onSelected: (id, value) {
-                                        setState(() {
-                                          selectedReadingLevelId = id;
-                                          _readingLevel.text = value;
-                                        });
-                                      },
-                                    ),
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: buildSelectionField(
+                                    context: context,
+                                    controller: _readingLevel,
+                                    label:
+                                        '${AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'reading level')} *',
+                                    items: proficiencyLevels,
+                                    selectedId:
+                                        selectedReadingLevelId, // Pass current selection
+                                    onSelected: (id, value) {
+                                      setState(() {
+                                        selectedReadingLevelId = id;
+                                        _readingLevel.text = value;
+                                      });
+                                    },
                                   ),
-                                ],
-                              ),
-                              const SizedBox(height: 16),
-
-                              // Writing and Listening Levels
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: buildSelectionField(
-                                      context: context,
-                                      controller: _writtingLevel,
-                                      label:
-                                          '${AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'writting level')} *',
-                                      items: proficiencyLevels,
-                                      selectedId:
-                                          selectedWritingLevelId, // Pass current selection
-                                      onSelected: (id, value) {
-                                        setState(() {
-                                          selectedWritingLevelId = id;
-                                          _writtingLevel.text = value;
-                                        });
-                                      },
-                                    ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+            
+                            // Writing and Listening Levels
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: buildSelectionField(
+                                    context: context,
+                                    controller: _writtingLevel,
+                                    label:
+                                        '${AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'writting level')} *',
+                                    items: proficiencyLevels,
+                                    selectedId:
+                                        selectedWritingLevelId, // Pass current selection
+                                    onSelected: (id, value) {
+                                      setState(() {
+                                        selectedWritingLevelId = id;
+                                        _writtingLevel.text = value;
+                                      });
+                                    },
                                   ),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: buildSelectionField(
-                                      context: context,
-                                      controller: _listeningLevel,
-                                      label:
-                                          '${AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'listenning level')} *',
-                                      items: proficiencyLevels,
-                                      selectedId:
-                                          selectedListeningLevelId, // Pass current selection
-                                      onSelected: (id, value) {
-                                        setState(() {
-                                          selectedListeningLevelId = id;
-                                          _listeningLevel.text = value;
-                                        });
-                                      },
-                                    ),
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: buildSelectionField(
+                                    context: context,
+                                    controller: _listeningLevel,
+                                    label:
+                                        '${AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'listenning level')} *',
+                                    items: proficiencyLevels,
+                                    selectedId:
+                                        selectedListeningLevelId, // Pass current selection
+                                    onSelected: (id, value) {
+                                      setState(() {
+                                        selectedListeningLevelId = id;
+                                        _listeningLevel.text = value;
+                                      });
+                                    },
                                   ),
-                                ],
-                              ),
-                              const SizedBox(height: 16),
-                            ],
-                          ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+                          ],
                         ),
                       ),
                     ),
-            ),
+                  ),
             // bottomNavigationBar: Padding(
             //   padding: const EdgeInsets.all(15),
             //   child: SizedBox(

@@ -307,7 +307,7 @@ class _RequestScreenState extends State<RequestScreen> {
                           dates,
                           style: TextStyle(
                             // color: const Color(0xFF0F172A),
-                            fontSize: 14,
+                            fontSize: 12,
                             // fontFamily: 'Kantumruy Pro',
                             fontWeight: FontWeight.w400,
                             height: 1.50,

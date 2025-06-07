@@ -365,6 +365,7 @@ class _MainLayoutState extends State<MainLayout> {
     return Scaffold(
       
       body: SafeArea(
+        
         top: false,
         child: widget.navigationShell,
       ),

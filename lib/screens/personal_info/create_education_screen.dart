@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:mobile_app/app_lang.dart';
 import 'package:mobile_app/providers/global/setting_provider.dart';
-import 'package:mobile_app/providers/local/personal_info_provider.dart';
 import 'package:mobile_app/providers/local/personalinfo/create_education_provider.dart';
 import 'package:mobile_app/services/personal_info/create_personalinfo_service.dart';
 import 'package:mobile_app/shared/component/bottom_appbar.dart';
@@ -23,11 +22,11 @@ class CreateEducationScreen extends StatefulWidget {
 }
 
 class _CreateEducationScreenState extends State<CreateEducationScreen> {
-  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
-      GlobalKey<RefreshIndicatorState>();
-  Future<void> _refreshData(CreateEducationProvider provider) async {
-    return await provider.getHome();
-  }
+  // final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
+  //     GlobalKey<RefreshIndicatorState>();
+  // Future<void> _refreshData(CreateEducationProvider provider) async {
+  //   return await provider.getHome();
+  // }
 
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _type = TextEditingController();
@@ -144,7 +143,7 @@ class _CreateEducationScreenState extends State<CreateEducationScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('ការស្នើសុំត្រូវបានបញ្ជូនដោយជោគជ័យ')),
           );
-          
+
           context.pop();
         }
       } catch (e) {
@@ -216,168 +215,162 @@ class _CreateEducationScreenState extends State<CreateEducationScreen> {
                 )
               ],
             ),
-            body: RefreshIndicator(
-              key: _refreshIndicatorKey,
-              color: Colors.blue[800],
-              backgroundColor: Colors.white,
-              onRefresh: () => _refreshData(createEducationProvider),
-              child: createEducationProvider.isLoading
-                  ? const Center(child: Text('Loading...'))
-                  : SingleChildScrollView(
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      padding: const EdgeInsets.all(15),
-                      child: Form(
-                        key: _formKey,
-                        child: Column(
-                          children: [
-                            const SizedBox(height: 10),
-                            // Education Type
-                            buildSelectionField(
-                              controller: _type,
-                              label:
-                                  '${AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'user_education_type')} *',
-                              items: educationTypes,
-                              selectedId:
-                                  selectedEducationTypeId, // Pass current selection
-                              onSelected: (id, value) {
-                                setState(() {
-                                  selectedEducationTypeId = id;
-                                  _type.text = value;
-                                });
-                              },
-                              context: context,
-                            ),
-                            const SizedBox(height: 16),
-                            // Education Level
-                            buildSelectionField(
-                              controller: _educationLevel,
-                              label:
-                                  '${AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'user_educationLevel')} *',
-                              items: educationLevels,
-                              selectedId:
-                                  selectedEducationLevelId, // Pass current selection
-                              onSelected: (id, value) {
-                                setState(() {
-                                  selectedEducationLevelId = id;
-                                  _educationLevel.text = value;
-                                });
-                              },
-                              context: context,
-                            ),
-                            const SizedBox(height: 16),
-                            // Certificate
-                            buildSelectionField(
-                              controller: _certificate,
-                              label:
-                                  '${AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'certificate')} *',
-                              items: certificateTypes,
-                              selectedId:
-                                  selectedCertificateTypeId, // Pass current selection
-                              onSelected: (id, value) {
-                                setState(() {
-                                  selectedCertificateTypeId = id;
-                                  _certificate.text = value;
-                                });
-                              },
-                              context: context,
-                            ),
-                            const SizedBox(height: 16),
-                            // Majors
-                            buildSelectionField(
-                              controller: _skill,
-                              label: AppLang.translate(
-                                  lang: settingProvider.lang ?? 'kh',
-                                  key: 'majors'),
-                              items: majors,
-                              selectedId:
-                                  selectedMajorId, // Pass current selection
-                              onSelected: (id, value) {
-                                setState(() {
-                                  selectedMajorId = id;
-                                  _skill.text = value;
-                                });
-                              },
-                              context: context,
-                            ),
-                            const SizedBox(height: 16),
-                            // School
-                            buildSelectionField(
-                              context: context,
-                              controller: _school,
-                              label: AppLang.translate(
-                                  lang: settingProvider.lang ?? 'kh',
-                                  key: 'school'),
-                              items: schools,
-                              selectedId:
-                                  selectedSchoolId, // Pass current selection
-                              onSelected: (id, value) {
-                                setState(() {
-                                  selectedSchoolId = id;
-                                  _school.text = value;
-                                });
-                              },
-                            ),
-                            const SizedBox(height: 16),
-                            // Place Study
-                            buildSelectionField(
-                              context: context,
-                              controller: _place,
-                              label: AppLang.translate(
-                                  lang: settingProvider.lang ?? 'kh',
-                                  key: 'school place'),
-                              items: educationPlaces,
-                              selectedId:
-                                  selectedEducationPlaceId, // Pass current selection
-                              onSelected: (id, value) {
-                                setState(() {
-                                  selectedEducationPlaceId = id;
-                                  _place.text = value;
-                                });
-                              },
-                            ),
-                            const SizedBox(height: 16),
-
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: DateInputField(
-                                    label: 'ថ្ងៃចាប់ផ្តើម',
-                                    hint: 'សូមជ្រើសរើសកាលបរិច្ឆេទ',
-                                    initialDate: DateTime.now(),
-                                    selectedDate: _startDate,
-                                    onDateSelected: (date) {
-                                      setState(() {
-                                        _startDate = date;
-                                      });
-                                    },
-                                  ),
+            body: createEducationProvider.isLoading
+                ? const Center(child: Text('Loading...'))
+                : SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    padding: const EdgeInsets.all(15),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        children: [
+                          const SizedBox(height: 10),
+                          // Education Type
+                          buildSelectionField(
+                            controller: _type,
+                            label:
+                                '${AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'user_education_type')} *',
+                            items: educationTypes,
+                            selectedId:
+                                selectedEducationTypeId, // Pass current selection
+                            onSelected: (id, value) {
+                              setState(() {
+                                selectedEducationTypeId = id;
+                                _type.text = value;
+                              });
+                            },
+                            context: context,
+                          ),
+                          const SizedBox(height: 16),
+                          // Education Level
+                          buildSelectionField(
+                            controller: _educationLevel,
+                            label:
+                                '${AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'user_educationLevel')} *',
+                            items: educationLevels,
+                            selectedId:
+                                selectedEducationLevelId, // Pass current selection
+                            onSelected: (id, value) {
+                              setState(() {
+                                selectedEducationLevelId = id;
+                                _educationLevel.text = value;
+                              });
+                            },
+                            context: context,
+                          ),
+                          const SizedBox(height: 16),
+                          // Certificate
+                          buildSelectionField(
+                            controller: _certificate,
+                            label:
+                                '${AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'certificate')} *',
+                            items: certificateTypes,
+                            selectedId:
+                                selectedCertificateTypeId, // Pass current selection
+                            onSelected: (id, value) {
+                              setState(() {
+                                selectedCertificateTypeId = id;
+                                _certificate.text = value;
+                              });
+                            },
+                            context: context,
+                          ),
+                          const SizedBox(height: 16),
+                          // Majors
+                          buildSelectionField(
+                            controller: _skill,
+                            label: AppLang.translate(
+                                lang: settingProvider.lang ?? 'kh',
+                                key: 'majors'),
+                            items: majors,
+                            selectedId:
+                                selectedMajorId, // Pass current selection
+                            onSelected: (id, value) {
+                              setState(() {
+                                selectedMajorId = id;
+                                _skill.text = value;
+                              });
+                            },
+                            context: context,
+                          ),
+                          const SizedBox(height: 16),
+                          // School
+                          buildSelectionField(
+                            context: context,
+                            controller: _school,
+                            label: AppLang.translate(
+                                lang: settingProvider.lang ?? 'kh',
+                                key: 'school'),
+                            items: schools,
+                            selectedId:
+                                selectedSchoolId, // Pass current selection
+                            onSelected: (id, value) {
+                              setState(() {
+                                selectedSchoolId = id;
+                                _school.text = value;
+                              });
+                            },
+                          ),
+                          const SizedBox(height: 16),
+                          // Place Study
+                          buildSelectionField(
+                            context: context,
+                            controller: _place,
+                            label: AppLang.translate(
+                                lang: settingProvider.lang ?? 'kh',
+                                key: 'school place'),
+                            items: educationPlaces,
+                            selectedId:
+                                selectedEducationPlaceId, // Pass current selection
+                            onSelected: (id, value) {
+                              setState(() {
+                                selectedEducationPlaceId = id;
+                                _place.text = value;
+                              });
+                            },
+                          ),
+                          const SizedBox(height: 16),
+            
+                          Row(
+                            children: [
+                              Expanded(
+                                child: DateInputField(
+                                  label: 'ថ្ងៃចាប់ផ្តើម',
+                                  hint: 'សូមជ្រើសរើសកាលបរិច្ឆេទ',
+                                  initialDate: DateTime.now(),
+                                  selectedDate: _startDate,
+                                  onDateSelected: (date) {
+                                    setState(() {
+                                      _startDate = date;
+                                    });
+                                  },
                                 ),
-                                SizedBox(
-                                  width: 16,
+                              ),
+                              SizedBox(
+                                width: 16,
+                              ),
+                              Expanded(
+                                child: DateInputField(
+                                  label: 'ថ្ងៃបញ្ចប់',
+                                  hint: 'សូមជ្រើសរើសកាលបរិច្ឆេទ',
+                                  initialDate: DateTime.now(),
+                                  selectedDate: _endDate,
+                                  onDateSelected: (date) {
+                                    setState(() {
+                                      _endDate = date;
+                                    });
+                                  },
                                 ),
-                                Expanded(
-                                  child: DateInputField(
-                                    label: 'ថ្ងៃបញ្ចប់',
-                                    hint: 'សូមជ្រើសរើសកាលបរិច្ឆេទ',
-                                    initialDate: DateTime.now(),
-                                    selectedDate: _endDate,
-                                    onDateSelected: (date) {
-                                      setState(() {
-                                        _endDate = date;
-                                      });
-                                    },
-                                  ),
-                                ),
-                              ],
-                            ),
-
-                            // const SizedBox(
-                            //     height: 30), // Extra space before button
-                          ],
-                        ),
+                              ),
+                            ],
+                          ),
+            
+                          // const SizedBox(
+                          //     height: 30), // Extra space before button
+                        ],
                       ),
                     ),
-            ),
+                  ),
             // bottomNavigationBar: Padding(
             //   padding: const EdgeInsets.all(15),
             //   child: SizedBox(
