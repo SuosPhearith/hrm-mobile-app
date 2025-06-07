@@ -565,7 +565,7 @@ class CheckInOutCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12.0),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(color: HColors.darkgrey.withOpacity(0.1)),
       ),
       child: Row(
         children: [

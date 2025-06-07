@@ -3,28 +3,33 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile_app/app_lang.dart';
 import 'package:mobile_app/providers/global/setting_provider.dart';
+import 'package:mobile_app/providers/local/personal_info_provider.dart';
 
 import 'package:mobile_app/providers/local/personalinfo/update_language_provider.dart';
 import 'package:mobile_app/services/personal_info/create_personalinfo_service.dart';
+import 'package:mobile_app/shared/component/build_selection.dart';
 import 'package:mobile_app/utils/help_util.dart';
+import 'package:mobile_app/widgets/custom_header.dart';
 import 'package:mobile_app/widgets/helper.dart';
 import 'package:provider/provider.dart';
 
 class UpdateLanguageLevelScreen extends StatefulWidget {
-  const UpdateLanguageLevelScreen({super.key, this.id, required this.userLanguageId});
+  const UpdateLanguageLevelScreen(
+      {super.key, this.id, required this.userLanguageId});
   final String? id;
   final String userLanguageId;
   @override
-  State<UpdateLanguageLevelScreen> createState() => _UpdateLanguageLevelScreenState();
+  State<UpdateLanguageLevelScreen> createState() =>
+      _UpdateLanguageLevelScreenState();
 }
 
 class _UpdateLanguageLevelScreenState extends State<UpdateLanguageLevelScreen> {
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
       GlobalKey<RefreshIndicatorState>();
-  
+
   // Add this missing variable
   bool _isDataLoaded = false;
-  
+
   Future<void> _refreshData(UpdateLanguageProvider provider) async {
     return await provider.getHome();
   }
@@ -72,7 +77,8 @@ class _UpdateLanguageLevelScreenState extends State<UpdateLanguageLevelScreen> {
   }
 
   // Corrected method to load existing language data
-  void _loadExistingData(UpdateLanguageProvider provider, SettingProvider settingProvider) {
+  void _loadExistingData(
+      UpdateLanguageProvider provider, SettingProvider settingProvider) {
     if (_isDataLoaded || provider.data == null) return;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -83,38 +89,59 @@ class _UpdateLanguageLevelScreenState extends State<UpdateLanguageLevelScreen> {
 
       setState(() {
         final currentLang = settingProvider.lang ?? 'kh';
-        
+
         // Set language field
-        _langauge.text = currentLang == 'kh' 
-            ? (languageData['language']?['name_kh'] ?? languageData['language']?['name_en'] ?? '')
-            : (languageData['language']?['name_en'] ?? languageData['language']?['name_kh'] ?? '');
-        
+        _langauge.text = currentLang == 'kh'
+            ? (languageData['language']?['name_kh'] ??
+                languageData['language']?['name_en'] ??
+                '')
+            : (languageData['language']?['name_en'] ??
+                languageData['language']?['name_kh'] ??
+                '');
+
         // Set speaking level
         _speakingLevel.text = currentLang == 'kh'
-            ? (languageData['speaking_level']?['name_kh'] ?? languageData['speaking_level']?['name_en'] ?? '')
-            : (languageData['speaking_level']?['name_en'] ?? languageData['speaking_level']?['name_kh'] ?? '');
-            
+            ? (languageData['speaking_level']?['name_kh'] ??
+                languageData['speaking_level']?['name_en'] ??
+                '')
+            : (languageData['speaking_level']?['name_en'] ??
+                languageData['speaking_level']?['name_kh'] ??
+                '');
+
         // Set reading level
         _readingLevel.text = currentLang == 'kh'
-            ? (languageData['reading_level']?['name_kh'] ?? languageData['reading_level']?['name_en'] ?? '')
-            : (languageData['reading_level']?['name_en'] ?? languageData['reading_level']?['name_kh'] ?? '');
-            
+            ? (languageData['reading_level']?['name_kh'] ??
+                languageData['reading_level']?['name_en'] ??
+                '')
+            : (languageData['reading_level']?['name_en'] ??
+                languageData['reading_level']?['name_kh'] ??
+                '');
+
         // Set writing level
         _writtingLevel.text = currentLang == 'kh'
-            ? (languageData['writing_level']?['name_kh'] ?? languageData['writing_level']?['name_en'] ?? '')
-            : (languageData['writing_level']?['name_en'] ?? languageData['writing_level']?['name_kh'] ?? '');
-            
+            ? (languageData['writing_level']?['name_kh'] ??
+                languageData['writing_level']?['name_en'] ??
+                '')
+            : (languageData['writing_level']?['name_en'] ??
+                languageData['writing_level']?['name_kh'] ??
+                '');
+
         // Set listening level
         _listeningLevel.text = currentLang == 'kh'
-            ? (languageData['listening_level']?['name_kh'] ?? languageData['listening_level']?['name_en'] ?? '')
-            : (languageData['listening_level']?['name_en'] ?? languageData['listening_level']?['name_kh'] ?? '');
+            ? (languageData['listening_level']?['name_kh'] ??
+                languageData['listening_level']?['name_en'] ??
+                '')
+            : (languageData['listening_level']?['name_en'] ??
+                languageData['listening_level']?['name_kh'] ??
+                '');
 
         // Set selected IDs
         selectedLanguageId = languageData['language_id']?.toString();
         selectedSpeakingLevelId = languageData['speaking_level_id']?.toString();
         selectedReadingLevelId = languageData['reading_level_id']?.toString();
         selectedWritingLevelId = languageData['writing_level_id']?.toString();
-        selectedListeningLevelId = languageData['listening_level_id']?.toString();
+        selectedListeningLevelId =
+            languageData['listening_level_id']?.toString();
 
         _isDataLoaded = true;
       });
@@ -148,7 +175,7 @@ class _UpdateLanguageLevelScreenState extends State<UpdateLanguageLevelScreen> {
             key: 'Are you sure to update'), // 'update'
         DialogType.primary, () async {
       try {
-        await _service.updateUserLanguage(
+       final res=  await _service.updateUserLanguage(
           userId: widget.id ?? '',
           userLanguageId: widget.userLanguageId,
           languageId: selectedLanguageId!,
@@ -160,8 +187,11 @@ class _UpdateLanguageLevelScreenState extends State<UpdateLanguageLevelScreen> {
         _clearAllControllers();
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('ការកែប្រែត្រូវបានរក្សាទុកដោយជោគជ័យ')), // Changed message
+            const SnackBar(
+                content: Text(
+                    'ការកែប្រែត្រូវបានរក្សាទុកដោយជោគជ័យ')), // Changed message
           );
+          Provider.of<PersonalInfoProvider>(context,listen: false).setNewLanguage(res);
           context.pop();
         }
       } catch (e) {
@@ -181,13 +211,14 @@ class _UpdateLanguageLevelScreenState extends State<UpdateLanguageLevelScreen> {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-        create: (_) => UpdateLanguageProvider(userId: widget.id!, languageId:widget.userLanguageId), // Load existing data
+        create: (_) => UpdateLanguageProvider(
+            userId: widget.id!,
+            languageId: widget.userLanguageId), // Load existing data
         child: Consumer2<UpdateLanguageProvider, SettingProvider>(
             builder: (context, provider, settingProvider, child) {
-          
           // Load existing data when provider data is available
           _loadExistingData(provider, settingProvider);
-          
+
           final languages = _buildEducationSelectionMap(
               apiData: provider.dataSetup,
               dataKey: 'languages',
@@ -197,11 +228,25 @@ class _UpdateLanguageLevelScreenState extends State<UpdateLanguageLevelScreen> {
               dataKey: 'language_levels',
               settingProvider: settingProvider);
           return Scaffold(
-            backgroundColor: Colors.grey[100],
+            backgroundColor: Colors.white,
             appBar: AppBar(
-              title: Text(
-                  AppLang.translate(lang: settingProvider.lang?? 'kh', key: 'user_info_language_update')), 
+              title: Text(AppLang.translate(
+                  lang: settingProvider.lang ?? 'kh',
+                  key: 'user_info_language_update')),
               centerTitle: true,
+              actions: [
+                Padding(
+                  padding: EdgeInsets.all(8),
+                  child: InkWell(
+                    onTap: () => _handleSubmit(),
+                    child: Icon(
+                      Icons.check,
+                      color: Colors.blueAccent,
+                    ),
+                  ),
+                )
+              ],
+              bottom: CustomHeader(),
             ),
             body: RefreshIndicator(
               key: _refreshIndicatorKey,
@@ -219,7 +264,8 @@ class _UpdateLanguageLevelScreenState extends State<UpdateLanguageLevelScreen> {
                           child: Column(
                             children: [
                               // Language Selection
-                              _buildSelectionField(
+                              buildSelectionField(
+                                context: context,
                                 controller: _langauge,
                                 label:
                                     '${AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'user_info_language')} *',
@@ -240,7 +286,8 @@ class _UpdateLanguageLevelScreenState extends State<UpdateLanguageLevelScreen> {
                               Row(
                                 children: [
                                   Expanded(
-                                    child: _buildSelectionField(
+                                    child: buildSelectionField(
+                                      context: context,
                                       controller: _speakingLevel,
                                       label:
                                           '${AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'speaking level')} *',
@@ -257,7 +304,8 @@ class _UpdateLanguageLevelScreenState extends State<UpdateLanguageLevelScreen> {
                                   ),
                                   const SizedBox(width: 8),
                                   Expanded(
-                                    child: _buildSelectionField(
+                                    child: buildSelectionField(
+                                      context: context,
                                       controller: _readingLevel,
                                       label:
                                           '${AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'reading level')} *',
@@ -280,7 +328,8 @@ class _UpdateLanguageLevelScreenState extends State<UpdateLanguageLevelScreen> {
                               Row(
                                 children: [
                                   Expanded(
-                                    child: _buildSelectionField(
+                                    child: buildSelectionField(
+                                      context: context,
                                       controller: _writtingLevel,
                                       label:
                                           '${AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'writting level')} *',
@@ -297,7 +346,8 @@ class _UpdateLanguageLevelScreenState extends State<UpdateLanguageLevelScreen> {
                                   ),
                                   const SizedBox(width: 8),
                                   Expanded(
-                                    child: _buildSelectionField(
+                                    child: buildSelectionField(
+                                      context: context,
                                       controller: _listeningLevel,
                                       label:
                                           '${AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'listenning level')} *',
@@ -338,7 +388,8 @@ class _UpdateLanguageLevelScreenState extends State<UpdateLanguageLevelScreen> {
                   },
                   child: Text(
                     AppLang.translate(
-                        lang: settingProvider.lang ?? 'kh', key: 'update'), // Changed from 'create'
+                        lang: settingProvider.lang ?? 'kh',
+                        key: 'update'), // Changed from 'create'
                     style: const TextStyle(fontSize: 16, color: Colors.white),
                   ),
                 ),
@@ -378,153 +429,5 @@ class _UpdateLanguageLevelScreenState extends State<UpdateLanguageLevelScreen> {
     }
 
     return result;
-  }
-
-  // Reusable Selection Field widget
-  Widget _buildSelectionField({
-    required TextEditingController controller,
-    required String label,
-    required Map<String, String> items,
-    required void Function(String id, String value) onSelected,
-    String? selectedId, // Add selectedId parameter
-  }) {
-    return TextFormField(
-      controller: controller,
-      readOnly: true,
-      onTap: () async {
-        await _showSelectionBottomSheet(
-          context: context,
-          title: label,
-          items: items,
-          onSelected: onSelected,
-          selectedId: selectedId, // Pass current selection
-        );
-      },
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: TextStyle(color: Colors.blueGrey),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.0),
-          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.0),
-          borderSide: BorderSide(color: Colors.blueGrey),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.0),
-          borderSide: BorderSide(
-              color: Theme.of(context).colorScheme.primary, width: 1.0),
-        ),
-        suffixIcon: Icon(Icons.arrow_drop_down,
-            color: Theme.of(context).colorScheme.primary),
-        filled: true,
-      ),
-    );
-  }
-
-  Future<void> _showSelectionBottomSheet({
-    required BuildContext context,
-    required String title,
-    required Map<String, String> items,
-    required Function(String id, String value) onSelected,
-    String? selectedId, // Add selectedId parameter
-  }) async {
-    await showModalBottomSheet(
-      context: context,
-      builder: (context) {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      title,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16.0,
-                  vertical: 12.0,
-                ),
-                child: ListView.separated(
-                  itemCount: items.length,
-                  separatorBuilder: (context, index) =>
-                      const SizedBox(height: 8.0),
-                  itemBuilder: (context, index) {
-                    final entry = items.entries.elementAt(index);
-                    final isSelected = selectedId == entry.key;
-
-                    return Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        onTap: () {
-                          onSelected(entry.key, entry.value);
-                          Navigator.pop(context);
-                        },
-                        borderRadius: BorderRadius.circular(16.0),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.surface,
-                            borderRadius: BorderRadius.circular(16.0),
-                            border: Border.all(
-                              color: isSelected
-                                  ? Theme.of(context).colorScheme.primary
-                                  : Colors.grey,
-                              width: isSelected ? 1.5 : 1.0,
-                            ),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 20.0,
-                              vertical: 16.0,
-                            ),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    entry.value,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyLarge
-                                        ?.copyWith(
-                                          fontWeight: FontWeight.w500,
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .onSurface,
-                                        ),
-                                  ),
-                                ),
-                                if (isSelected)
-                                  Icon(
-                                    Icons.check_circle,
-                                    color: Colors.green,
-                                    size: 24.0,
-                                  )
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ),
-          ],
-        );
-      },
-    );
   }
 }

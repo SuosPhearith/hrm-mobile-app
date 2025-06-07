@@ -1,10 +1,15 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:mobile_app/app_lang.dart';
 import 'package:mobile_app/providers/global/setting_provider.dart';
+import 'package:mobile_app/providers/local/personal_info_provider.dart';
 import 'package:mobile_app/providers/local/personalinfo/create_education_provider.dart';
 import 'package:mobile_app/services/personal_info/create_personalinfo_service.dart';
+import 'package:mobile_app/shared/component/bottom_appbar.dart';
+import 'package:mobile_app/shared/component/build_selection.dart';
+import 'package:mobile_app/shared/date/field_date.dart';
 import 'package:mobile_app/utils/help_util.dart';
 import 'package:mobile_app/widgets/helper.dart';
 import 'package:provider/provider.dart';
@@ -25,8 +30,6 @@ class _CreateEducationScreenState extends State<CreateEducationScreen> {
   }
 
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _dateIn = TextEditingController();
-  final TextEditingController _dateOut = TextEditingController();
   final TextEditingController _type = TextEditingController();
   final TextEditingController _certificate = TextEditingController();
   final TextEditingController _educationLevel = TextEditingController();
@@ -44,13 +47,12 @@ class _CreateEducationScreenState extends State<CreateEducationScreen> {
   String? selectedMajorId;
   String? selectedSchoolId;
   String? selectedEducationPlaceId;
-
+  DateTime? _startDate;
+  DateTime? _endDate;
   @override
   void dispose() {
-    _dateIn.dispose();
     _type.dispose();
     _educationLevel.dispose();
-    _dateOut.dispose();
     _certificate.dispose();
     _skill.dispose();
     _school.dispose();
@@ -58,21 +60,20 @@ class _CreateEducationScreenState extends State<CreateEducationScreen> {
     super.dispose();
   }
 
-  Future<void> _selectDate(TextEditingController controller) async {
-    DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(1900),
-      lastDate: DateTime(2100),
-    );
-    if (picked != null) {
-      setState(() {
-        controller.text = "${picked.toLocal()}".split(' ')[0];
-      });
-    }
-  }
+  // Future<void> _selectDate(TextEditingController controller) async {
+  //   DateTime? picked = await showDatePicker(
+  //     context: context,
+  //     initialDate: DateTime.now(),
+  //     firstDate: DateTime(1900),
+  //     lastDate: DateTime(2100),
+  //   );
+  //   if (picked != null) {
+  //     setState(() {
+  //       controller.text = "${picked.toLocal()}".split(' ')[0];
+  //     });
+  //   }
+  // }
 
-  
   void _handleSubmit() async {
     // First validate the form fields
     if (!_formKey.currentState!.validate()) {
@@ -88,10 +89,10 @@ class _CreateEducationScreenState extends State<CreateEducationScreen> {
           selectedEducationLevelId!.isEmpty) {
         return 'Please select education level';
       }
-      if (_dateIn.text.isEmpty) {
+      if (_startDate == null) {
         return 'Start Date is required';
       }
-      if (_dateOut.text.isEmpty) {
+      if (_endDate == null) {
         return 'End Date is required';
       }
       return null;
@@ -125,7 +126,7 @@ class _CreateEducationScreenState extends State<CreateEducationScreen> {
             key: 'Are you sure to create'),
         DialogType.primary, () async {
       try {
-        await _service.createUserEducation(
+        final res=  await _service.createUserEducation(
           userId: widget.id ?? '',
           educationTypeId: selectedEducationTypeId!,
           educationLevelId: selectedEducationLevelId!,
@@ -133,8 +134,8 @@ class _CreateEducationScreenState extends State<CreateEducationScreen> {
           majorId: selectedMajorId ?? '',
           schoolId: selectedSchoolId ?? '',
           educationPlaceId: selectedEducationPlaceId ?? '',
-          studyAt: _dateIn.text,
-          graduateAt: _dateOut.text,
+          studyAt: DateFormat('yyyy-MM-dd').format(_startDate!),
+          graduateAt: DateFormat('yyyy-MM-dd').format(_endDate!),
           note: null,
           attachmentId: null,
         );
@@ -143,8 +144,7 @@ class _CreateEducationScreenState extends State<CreateEducationScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('ការស្នើសុំត្រូវបានបញ្ជូនដោយជោគជ័យ')),
           );
-          // _clearAllFields();
-
+          
           context.pop();
         }
       } catch (e) {
@@ -197,11 +197,24 @@ class _CreateEducationScreenState extends State<CreateEducationScreen> {
               settingProvider: settingProvider);
 
           return Scaffold(
-            backgroundColor: Colors.grey[100],
+            backgroundColor: Colors.white,
             appBar: AppBar(
               title: Text(AppLang.translate(
                   lang: 'kh', key: 'user_info_education_add')),
               centerTitle: true,
+              bottom: CustomHeader(),
+              actions: [
+                Padding(
+                  padding: EdgeInsets.all(8),
+                  child: InkWell(
+                    onTap: () => _handleSubmit(),
+                    child: Icon(
+                      Icons.check,
+                      color: Colors.blueAccent,
+                    ),
+                  ),
+                )
+              ],
             ),
             body: RefreshIndicator(
               key: _refreshIndicatorKey,
@@ -219,7 +232,7 @@ class _CreateEducationScreenState extends State<CreateEducationScreen> {
                           children: [
                             const SizedBox(height: 10),
                             // Education Type
-                            _buildSelectionField(
+                            buildSelectionField(
                               controller: _type,
                               label:
                                   '${AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'user_education_type')} *',
@@ -232,10 +245,11 @@ class _CreateEducationScreenState extends State<CreateEducationScreen> {
                                   _type.text = value;
                                 });
                               },
+                              context: context,
                             ),
                             const SizedBox(height: 16),
                             // Education Level
-                            _buildSelectionField(
+                            buildSelectionField(
                               controller: _educationLevel,
                               label:
                                   '${AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'user_educationLevel')} *',
@@ -248,10 +262,11 @@ class _CreateEducationScreenState extends State<CreateEducationScreen> {
                                   _educationLevel.text = value;
                                 });
                               },
+                              context: context,
                             ),
                             const SizedBox(height: 16),
                             // Certificate
-                            _buildSelectionField(
+                            buildSelectionField(
                               controller: _certificate,
                               label:
                                   '${AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'certificate')} *',
@@ -264,10 +279,11 @@ class _CreateEducationScreenState extends State<CreateEducationScreen> {
                                   _certificate.text = value;
                                 });
                               },
+                              context: context,
                             ),
                             const SizedBox(height: 16),
                             // Majors
-                            _buildSelectionField(
+                            buildSelectionField(
                               controller: _skill,
                               label: AppLang.translate(
                                   lang: settingProvider.lang ?? 'kh',
@@ -281,10 +297,12 @@ class _CreateEducationScreenState extends State<CreateEducationScreen> {
                                   _skill.text = value;
                                 });
                               },
+                              context: context,
                             ),
                             const SizedBox(height: 16),
                             // School
-                            _buildSelectionField(
+                            buildSelectionField(
+                              context: context,
                               controller: _school,
                               label: AppLang.translate(
                                   lang: settingProvider.lang ?? 'kh',
@@ -301,7 +319,8 @@ class _CreateEducationScreenState extends State<CreateEducationScreen> {
                             ),
                             const SizedBox(height: 16),
                             // Place Study
-                            _buildSelectionField(
+                            buildSelectionField(
+                              context: context,
                               controller: _place,
                               label: AppLang.translate(
                                   lang: settingProvider.lang ?? 'kh',
@@ -318,117 +337,35 @@ class _CreateEducationScreenState extends State<CreateEducationScreen> {
                             ),
                             const SizedBox(height: 16),
 
-                            // Date Picker Row
                             Row(
                               children: [
                                 Expanded(
-                                  child: TextFormField(
-                                    controller: _dateIn,
-                                    readOnly: true,
-                                    decoration: InputDecoration(
-                                      labelText: AppLang.translate(
-                                          lang: settingProvider.lang ?? 'kh',
-                                          key: 'enroll date'),
-                                      border: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(12.0),
-                                        borderSide: BorderSide(
-                                            color: Colors
-                                                .blueGrey), // Normal border color
-                                      ),
-                                      enabledBorder: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(12.0),
-                                        borderSide: BorderSide(
-                                            color: Colors
-                                                .blueGrey), // Enabled but not focused
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(12.0),
-                                        borderSide: BorderSide(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .primary, // Focused border color
-                                          width: 2.0,
-                                        ),
-                                      ),
-                                      errorBorder: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(12.0),
-                                        borderSide: BorderSide(
-                                            color: Colors.red), // Error state
-                                      ),
-                                      focusedErrorBorder: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(12.0),
-                                        borderSide: BorderSide(
-                                          color:
-                                              Colors.red, // Focused error state
-                                          width: 2.0,
-                                        ),
-                                      ),
-                                      suffixIcon: IconButton(
-                                        icon: const Icon(Icons.calendar_today),
-                                        onPressed: () => _selectDate(_dateIn),
-                                      ),
-                                    ),
+                                  child: DateInputField(
+                                    label: 'ថ្ងៃចាប់ផ្តើម',
+                                    hint: 'សូមជ្រើសរើសកាលបរិច្ឆេទ',
+                                    initialDate: DateTime.now(),
+                                    selectedDate: _startDate,
+                                    onDateSelected: (date) {
+                                      setState(() {
+                                        _startDate = date;
+                                      });
+                                    },
                                   ),
                                 ),
-                                const SizedBox(width: 8),
+                                SizedBox(
+                                  width: 16,
+                                ),
                                 Expanded(
-                                  child: TextFormField(
-                                    controller: _dateOut,
-                                    readOnly: true,
-                                    decoration: InputDecoration(
-                                      labelText: AppLang.translate(
-                                        lang: settingProvider.lang ?? 'kh',
-                                        key: 'graduated date',
-                                      ),
-                                      border: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(12.0),
-                                        borderSide: BorderSide(
-                                            color: Colors
-                                                .blueGrey), // Normal border color
-                                      ),
-                                      enabledBorder: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(12.0),
-                                        borderSide: BorderSide(
-                                            color: Colors
-                                                .blueGrey), // Enabled but not focused
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(12.0),
-                                        borderSide: BorderSide(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .primary, // Focused border color
-                                          width: 2.0,
-                                        ),
-                                      ),
-                                      errorBorder: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(12.0),
-                                        borderSide: BorderSide(
-                                            color: Colors.red), // Error state
-                                      ),
-                                      focusedErrorBorder: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(12.0),
-                                        borderSide: BorderSide(
-                                          color:
-                                              Colors.red, // Focused error state
-                                          width: 2.0,
-                                        ),
-                                      ),
-                                      suffixIcon: IconButton(
-                                        icon: const Icon(Icons.calendar_today),
-                                        onPressed: () => _selectDate(_dateOut),
-                                      ),
-                                    ),
+                                  child: DateInputField(
+                                    label: 'ថ្ងៃបញ្ចប់',
+                                    hint: 'សូមជ្រើសរើសកាលបរិច្ឆេទ',
+                                    initialDate: DateTime.now(),
+                                    selectedDate: _endDate,
+                                    onDateSelected: (date) {
+                                      setState(() {
+                                        _endDate = date;
+                                      });
+                                    },
                                   ),
                                 ),
                               ],
@@ -441,29 +378,29 @@ class _CreateEducationScreenState extends State<CreateEducationScreen> {
                       ),
                     ),
             ),
-            bottomNavigationBar: Padding(
-              padding: const EdgeInsets.all(15),
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    backgroundColor: Colors.blue[900],
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                  ),
-                  onPressed: () {
-                    _handleSubmit();
-                  },
-                  child: Text(
-                    AppLang.translate(
-                        lang: settingProvider.lang ?? 'kh', key: 'create'),
-                    style: TextStyle(fontSize: 16, color: Colors.white),
-                  ),
-                ),
-              ),
-            ),
+            // bottomNavigationBar: Padding(
+            //   padding: const EdgeInsets.all(15),
+            //   child: SizedBox(
+            //     width: double.infinity,
+            //     child: ElevatedButton(
+            //       style: ElevatedButton.styleFrom(
+            //         padding: const EdgeInsets.symmetric(vertical: 12),
+            //         backgroundColor: Colors.blue[900],
+            //         shape: RoundedRectangleBorder(
+            //           borderRadius: BorderRadius.circular(30),
+            //         ),
+            //       ),
+            //       onPressed: () {
+            //         _handleSubmit();
+            //       },
+            //       child: Text(
+            //         AppLang.translate(
+            //             lang: settingProvider.lang ?? 'kh', key: 'create'),
+            //         style: TextStyle(fontSize: 16, color: Colors.white),
+            //       ),
+            //     ),
+            //   ),
+            // ),
           );
         }));
   }
@@ -498,158 +435,5 @@ class _CreateEducationScreenState extends State<CreateEducationScreen> {
     }
 
     return result;
-  }
-
-  // Reusable Selection Field widget
-  Widget _buildSelectionField({
-    required TextEditingController controller,
-    required String label,
-    required Map<String, String> items,
-    required void Function(String id, String value) onSelected,
-    String? selectedId, // Add selectedId parameter
-  }) {
-    return TextFormField(
-      controller: controller,
-      readOnly: true,
-      onTap: () async {
-        await _showSelectionBottomSheet(
-          context: context,
-          title: label,
-          items: items,
-          onSelected: onSelected,
-          //  selectedId: selectedEducationTypeId, // Pass current selection
-          selectedId: selectedId, // Pass current selection
-        );
-      },
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: TextStyle(color: Colors.blueGrey),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.0),
-          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.0),
-          borderSide: BorderSide(color: Colors.blueGrey),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.0),
-          borderSide: BorderSide(
-              color: Theme.of(context).colorScheme.primary, width: 1.0),
-        ),
-        suffixIcon: Icon(Icons.arrow_drop_down,
-            color: Theme.of(context).colorScheme.primary),
-        filled: true,
-      ),
-    );
-  }
-
-  Future<void> _showSelectionBottomSheet({
-    required BuildContext context,
-    required String title,
-    required Map<String, String> items,
-    required Function(String id, String value) onSelected,
-    String? selectedId, // Add selectedId parameter
-  }) async {
-    await showModalBottomSheet(
-      context: context,
-      builder: (context) {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      title,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                  // IconButton(
-                  //   icon: const Icon(Icons.close),
-                  //   onPressed: () => Navigator.pop(context),
-                  // ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16.0,
-                  vertical: 12.0,
-                ),
-                child: ListView.separated(
-                  itemCount: items.length,
-                  separatorBuilder: (context, index) =>
-                      const SizedBox(height: 8.0),
-                  itemBuilder: (context, index) {
-                    final entry = items.entries.elementAt(index);
-                    final isSelected = selectedId == entry.key;
-
-                    return Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        onTap: () {
-                          onSelected(entry.key, entry.value);
-                          Navigator.pop(context);
-                        },
-                        borderRadius: BorderRadius.circular(16.0),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.surface,
-                            borderRadius: BorderRadius.circular(16.0),
-                            border: Border.all(
-                              color: isSelected
-                                  ? Theme.of(context).colorScheme.primary
-                                  : Colors.grey,
-                              width: isSelected ? 1.5 : 1.0,
-                            ),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 20.0,
-                              vertical: 16.0,
-                            ),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    entry.value,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyLarge
-                                        ?.copyWith(
-                                          fontWeight: FontWeight.w500,
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .onSurface,
-                                        ),
-                                  ),
-                                ),
-                                if (isSelected)
-                                  Icon(
-                                    Icons.check_circle,
-                                    color: Colors.green,
-                                    size: 24.0,
-                                  )
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ),
-          ],
-        );
-      },
-    );
   }
 }

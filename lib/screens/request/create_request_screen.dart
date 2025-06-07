@@ -12,8 +12,7 @@ import 'package:mobile_app/providers/local/request/create_request_provider.dart'
 import 'package:mobile_app/services/request/create_request_service.dart';
 import 'package:mobile_app/shared/color/colors.dart';
 import 'package:mobile_app/shared/component/bottom_appbar.dart';
-import 'package:mobile_app/shared/date/calendar_picker.dart';
-import 'package:mobile_app/shared/date/kh_date_formmat.dart';
+import 'package:mobile_app/shared/date/field_date.dart';
 import 'package:mobile_app/shared/image/full_screen.dart';
 // import 'package:mobile_app/shared/component/show_confirm_dialog.dart';
 import 'package:mobile_app/utils/help_util.dart';
@@ -386,6 +385,7 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
                                     Expanded(
                                       child: DateInputField(
                                         label: 'ថ្ងៃចាប់ផ្តើម',
+                                        hint: 'សូមជ្រើសរើសកាលបរិច្ឆេទ',
                                         initialDate: DateTime.now(),
                                         selectedDate: _startDate,
                                         onDateSelected: (date) {
@@ -401,6 +401,7 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
                                     Expanded(
                                       child: DateInputField(
                                         label: 'ថ្ងៃបញ្ចប់',
+                                          hint: 'សូមជ្រើសរើសកាលបរិច្ឆេទ',
                                         initialDate: DateTime.now(),
                                         selectedDate: _endDate,
                                         onDateSelected: (date) {
@@ -484,7 +485,7 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
                                               _showBottomSheetFile(context);
                                             },
                                             child: Icon(
-                                              Icons.file_copy,
+                                              Icons.attach_file_outlined,
                                               color: HColors.darkgrey,
                                             ),
                                           ),
@@ -809,148 +810,79 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
     showModalBottomSheet(
       context: context,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(5)),
       ),
+      
       builder: (context) {
-        return Wrap(
-          children: [
-            // ListTile(
-            //   leading: Icon(
-            //     Icons.camera_alt,
-            //     color: HColors.darkgrey,
-            //   ),
-            //   title: EText(text: "កាមេរ៉ា"),
-            //   onTap: () {
-            //     // Handle camera usage here (use image_picker package)
-            //     Navigator.pop(context);
-            //   },
-            // ),
-            ListTile(
-              leading: Icon(
-                Icons.abc,
-                color: HColors.darkgrey,
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8,vertical: 8),
+          child: Wrap(
+            children: [
+              // ListTile(
+              //   leading: Icon(
+              //     Icons.camera_alt,
+              //     color: HColors.darkgrey,
+              //   ),
+              //   title: EText(text: "កាមេរ៉ា"),
+              //   onTap: () {
+              //     // Handle camera usage here (use image_picker package)
+              //     Navigator.pop(context);
+              //   },
+              // ),
+              ListTile(
+                leading: Icon(
+                  Icons.folder_open_outlined,
+                  color: HColors.darkgrey,
+                ),
+                title: Text('ជ្រើសរើសពីម៉ាសុីន'),
+                onTap: () async {
+                  final picker = ImagePicker();
+                  final List<XFile> pickedImages = await picker.pickMultiImage();
+          
+                  if (pickedImages.isNotEmpty) {
+                    _addImagesToSelectedFiles(pickedImages);
+                  }
+          
+                  Navigator.pop(context); // Close bottom sheet
+                },
               ),
-              title: Text('ជ្រើសរើសពីម៉ាសុីន'),
-              onTap: () async {
-                final picker = ImagePicker();
-                final List<XFile> pickedImages = await picker.pickMultiImage();
-
-                if (pickedImages.isNotEmpty) {
-                  _addImagesToSelectedFiles(pickedImages);
-                }
-
-                Navigator.pop(context); // Close bottom sheet
-              },
-            ),
-            // ListTile(
-            //   leading: Icon(
-            //     Icons.folder_open_outlined,
-            //     color: HColors.darkgrey,
-            //   ),
-            //   title: EText(text: "ឯកសារអង្គភាព"),
-            //   onTap: () {
-            //     // Handle folder picking (if needed)
-            //     Navigator.pop(context);
-            //   },
-            // ),
-            ListTile(
-              leading: Icon(Icons.folder_open, color: HColors.darkgrey),
-              title: Text("ជ្រើសរើសរូបពីឯកសារខ្ញុំ"),
-              onTap: () async {
-                // Use FilePicker to pick files
-                final result = await FilePicker.platform.pickFiles(
-                  allowMultiple: true, // Allow multiple file selection
-                );
-                if (result != null) {
-                  setState(() {
-                    // Assuming _selectedFiles is a List of PlatformFile
-                    _selectedFiles.addAll(result.files);
-                  });
-                }
-                Navigator.pop(context);
-              },
-            ),
-          ],
+              // ListTile(
+              //   leading: Icon(
+              //     Icons.folder_open_outlined,
+              //     color: HColors.darkgrey,
+              //   ),
+              //   title: EText(text: "ឯកសារអង្គភាព"),
+              //   onTap: () {
+              //     // Handle folder picking (if needed)
+              //     Navigator.pop(context);
+              //   },
+              // ),
+              ListTile(
+                leading: Icon(Icons.attach_file, color: HColors.darkgrey),
+                title: Text("ជ្រើសរើសរូបពីឯកសារខ្ញុំ"),
+                onTap: () async {
+                  // Use FilePicker to pick files
+                  final result = await FilePicker.platform.pickFiles(
+                    allowMultiple: true, // Allow multiple file selection
+                  );
+                  if (result != null) {
+                    setState(() {
+                      // Assuming _selectedFiles is a List of PlatformFile
+                      _selectedFiles.addAll(result.files);
+                    });
+                  }
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
         );
       },
     );
   }
 }
 
-class DateInputField extends StatelessWidget {
-  final String label;
-  final DateTime initialDate;
-  final DateTime? selectedDate;
-  final Function(DateTime) onDateSelected;
 
-  const DateInputField({
-    super.key,
-    required this.label,
-    required this.initialDate,
-    required this.onDateSelected,
-    this.selectedDate,
-  });
-  void _openDatePicker(BuildContext context) async {
-    final result = await showModalBottomSheet<DateTime>(
-      context: context,
-      isScrollControlled: true,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      builder: (context) => Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: CustomSingleDatePicker(initialDate: selectedDate),
-      ),
-    );
-
-    if (result != null) {
-      onDateSelected(result);
-      // print("Selected date: $result");
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return TextField(
-      readOnly: true,
-      onTap: () => _openDatePicker(context),
-      controller: TextEditingController(
-        text: selectedDate != null
-            ? KhmerDateFormatter.format(selectedDate!)
-            : '',
-      ),
-      decoration: InputDecoration(
-        labelText: label,
-        hintText: 'សូមជ្រើសរើសកាលបរិច្ឆេទ',
-        suffixIcon: Icon(Icons.calendar_today, color: HColors.darkgrey),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide(color: HColors.darkgrey, width: 1),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide(color: Colors.grey[300]!, width: 1),
-        ),
-        filled: true,
-        fillColor: Colors.white,
-        labelStyle: TextStyle(
-          color: HColors.darkgrey,
-          fontWeight: FontWeight.w500,
-        ),
-        hintStyle: TextStyle(
-          color: HColors.darkgrey,
-        ),
-      ),
-      style: const TextStyle(
-        fontSize: 16,
-        // color: Colors.black87,
-      ),
-    );
-  }
-}
 
 class DescriptionTextField extends StatelessWidget {
   final TextEditingController controller;
@@ -998,7 +930,7 @@ class DescriptionTextField extends StatelessWidget {
             fillColor: Colors.white,
             labelStyle: TextStyle(
               color: HColors.darkgrey,
-              fontWeight: FontWeight.w500,
+              fontWeight: FontWeight.w400,
             ),
             hintStyle: TextStyle(
               color: HColors.darkgrey,

@@ -17,6 +17,25 @@ class PersonalInfoProvider extends ChangeNotifier {
   ResponseStructure<Map<String, dynamic>>? get data => _data;
 
   // Setters
+  void setNewLanguage(Map<String, dynamic> data) {
+    // if (_data?.data != null && _data!.data['user']['user_languages'] is List) {
+    //   // Cast to List and add the new education data
+    //   List<dynamic> languages =
+    //       _data?.data['user']['user_languages'] as List<dynamic>;
+    //   languages.add(data);
+
+    //   // Notify listeners about the change
+    //   notifyListeners();
+    // }
+     if (_data?.data != null && _data!.data['user']['user_languages'] is List) {
+      // Cast to List and add the new education data
+      List<dynamic> educations = _data!.data['user']['user_languages'] as List<dynamic>;
+      educations.add(data);
+      
+      // Notify listeners about the change
+      notifyListeners();
+    }
+  }
 
   // Initialize
   PersonalInfoProvider() {

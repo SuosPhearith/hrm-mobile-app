@@ -72,7 +72,8 @@ class _CustomSingleDatePickerState extends State<CustomSingleDatePicker> {
          Divider(color: HColors.darkgrey.withOpacity(0.3),),
         CalendarDatePicker(
           initialDate: selectedDate ?? DateTime.now(),
-          firstDate: DateTime(2020),
+          firstDate: DateTime(1900),
+
           lastDate: DateTime(2030),
           onDateChanged: (date) {
             setState(() {

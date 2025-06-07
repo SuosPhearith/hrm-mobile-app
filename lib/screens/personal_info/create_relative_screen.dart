@@ -1,11 +1,16 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:mobile_app/app_lang.dart';
 import 'package:mobile_app/providers/global/setting_provider.dart';
 import 'package:mobile_app/providers/local/personalinfo/create_relative_provider.dart';
 import 'package:mobile_app/services/personal_info/create_personalinfo_service.dart';
+import 'package:mobile_app/shared/component/build_selection.dart';
+import 'package:mobile_app/shared/component/build_text_filed.dart';
+import 'package:mobile_app/shared/date/field_date.dart';
 import 'package:mobile_app/utils/help_util.dart';
+import 'package:mobile_app/widgets/custom_header.dart';
 import 'package:mobile_app/widgets/helper.dart';
 import 'package:provider/provider.dart';
 
@@ -45,6 +50,7 @@ class _CreateRelativeScreenState extends State<CreateRelativeScreen> {
   String? selectedGender;
   String? selectedProvince;
   String? selectedDistrict;
+  DateTime? dob;
 
   void _handleSubmit() async {
     if (!_formKey.currentState!.validate()) return;
@@ -77,9 +83,7 @@ class _CreateRelativeScreenState extends State<CreateRelativeScreen> {
           nameKh: _firstNameController.text.trim(),
           nameEn: _lastNameController.text.trim(),
           sexId: selectedGender ?? '',
-          dob: _dobController.text.isNotEmpty
-              ? _dobController.text.trim()
-              : null,
+          dob: DateFormat('yyyy-MM-dd').format(dob!),
           familyRoleId: selectedRelativeTypeId,
           job: _jobController.text.trim().isNotEmpty
               ? _jobController.text.trim()
@@ -96,7 +100,7 @@ class _CreateRelativeScreenState extends State<CreateRelativeScreen> {
             const SnackBar(content: Text('ការស្នើសុំត្រូវបានបញ្ជូនដោយជោគជ័យ')),
           );
           _clearAllFields();
-          
+
           context.pop();
         }
       } catch (e) {
@@ -145,18 +149,6 @@ class _CreateRelativeScreenState extends State<CreateRelativeScreen> {
     // print("🧹 All form fields cleared");
   }
 
-  Future<void> _selectDate() async {
-    DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(1900),
-      lastDate: DateTime.now(),
-    );
-    if (picked != null) {
-      _dobController.text = "${picked.toLocal()}".split(' ')[0];
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
@@ -166,11 +158,24 @@ class _CreateRelativeScreenState extends State<CreateRelativeScreen> {
           final relativeTypes =
               _buildRelativeTypes(createRelativeProvider, settingProvider);
           return Scaffold(
-            backgroundColor: Colors.grey[100],
+            backgroundColor: Colors.white,
             appBar: AppBar(
               title: Text(
                   AppLang.translate(lang: 'kh', key: 'user_info_family_add')),
               centerTitle: true,
+              actions: [
+                Padding(
+                  padding: EdgeInsets.all(8),
+                  child: InkWell(
+                    onTap: () => _handleSubmit(),
+                    child: Icon(
+                      Icons.check,
+                      color: Colors.blueAccent,
+                    ),
+                  ),
+                )
+              ],
+              bottom: CustomHeader(),
             ),
             body: RefreshIndicator(
               key: _refreshIndicatorKey,
@@ -189,12 +194,14 @@ class _CreateRelativeScreenState extends State<CreateRelativeScreen> {
                           children: [
                             const SizedBox(height: 16.0),
                             // Relative Type
-                            _buildSelectionField(
+                            buildSelectionField(
+                              context: context,
                               controller: _relativeTypeController,
                               label: AppLang.translate(
                                   lang: settingProvider.lang ?? 'kh',
                                   key: 'relative_type'),
                               items: relativeTypes,
+                              selectedId: selectedRelativeTypeId,
                               onSelected: (id, value) {
                                 setState(() {
                                   selectedRelativeTypeId = id;
@@ -208,10 +215,7 @@ class _CreateRelativeScreenState extends State<CreateRelativeScreen> {
                               AppLang.translate(
                                   lang: settingProvider.lang ?? 'kh',
                                   key: 'user_info_sex'),
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyLarge
-                                  ?.copyWith(fontWeight: FontWeight.w600),
+                              style: TextStyle(fontWeight: FontWeight.w500),
                             ),
                             const SizedBox(height: 8.0),
                             Row(
@@ -250,7 +254,8 @@ class _CreateRelativeScreenState extends State<CreateRelativeScreen> {
                             ),
                             const SizedBox(height: 24.0),
                             // Name (Khmer)
-                            _buildTextField(
+                            buildTextField(
+                              context: context,
                               controller: _firstNameController,
                               label:
                                   '${AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'user_info_kh_name')} *',
@@ -262,7 +267,8 @@ class _CreateRelativeScreenState extends State<CreateRelativeScreen> {
                             ),
                             const SizedBox(height: 24.0),
                             // Name (Latin)
-                            _buildTextField(
+                            buildTextField(
+                              context: context,
                               controller: _lastNameController,
                               label:
                                   '${AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'user_info_en_name')} *',
@@ -274,17 +280,30 @@ class _CreateRelativeScreenState extends State<CreateRelativeScreen> {
                             ),
                             const SizedBox(height: 24.0),
                             // Date of Birth
-                            _buildTextField(
-                              controller: _dobController,
+                            // _buildTextField(
+                            //   controller: _dobController,
+                            //   label: AppLang.translate(
+                            //       lang: settingProvider.lang ?? 'kh',
+                            //       key: 'dob'),
+                            //   readOnly: true,
+                            //   onTap: _selectDate,
+                            //   suffixIcon: IconButton(
+                            //     icon: const Icon(Icons.calendar_today_rounded),
+                            //     onPressed: _selectDate,
+                            //   ),
+                            // ),
+                            DateInputField(
                               label: AppLang.translate(
                                   lang: settingProvider.lang ?? 'kh',
-                                  key: 'dob'),
-                              readOnly: true,
-                              onTap: _selectDate,
-                              suffixIcon: IconButton(
-                                icon: const Icon(Icons.calendar_today_rounded),
-                                onPressed: _selectDate,
-                              ),
+                                  key: 'user_info_date_of_birth'),
+                              hint: 'សូមជ្រើសរើសកាលបរិច្ឆេទ',
+                              initialDate: DateTime.now(),
+                              selectedDate: dob,
+                              onDateSelected: (date) {
+                                setState(() {
+                                  dob = date;
+                                });
+                              },
                             ),
                             const SizedBox(height: 24.0),
                             // // Job
@@ -318,7 +337,8 @@ class _CreateRelativeScreenState extends State<CreateRelativeScreen> {
                             // ),
 
                             // Name (Khmer)
-                            _buildTextField(
+                            buildTextField(
+                              context: context,
                               controller: _jobController,
                               label: AppLang.translate(
                                   lang: settingProvider.lang ?? 'kh',
@@ -331,7 +351,8 @@ class _CreateRelativeScreenState extends State<CreateRelativeScreen> {
                             ),
                             const SizedBox(height: 24.0),
                             // Name (Latin)
-                            _buildTextField(
+                            buildTextField(
+                              context: context,
                               controller: _workPlaceController,
                               label: AppLang.translate(
                                   lang: settingProvider.lang ?? 'kh',
@@ -348,30 +369,30 @@ class _CreateRelativeScreenState extends State<CreateRelativeScreen> {
                       ),
                     ),
             ),
-            bottomNavigationBar: // Submit Button
-                Padding(
-              padding: const EdgeInsets.all(15),
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    backgroundColor: Colors.blue[900],
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  onPressed: () {
-                    _handleSubmit();
-                  },
-                  child: Text(
-                    AppLang.translate(
-                        lang: settingProvider.lang ?? 'kh', key: 'create'),
-                    style: TextStyle(fontSize: 16, color: Colors.white),
-                  ),
-                ),
-              ),
-            ),
+            // bottomNavigationBar: // Submit Button
+            //     Padding(
+            //   padding: const EdgeInsets.all(15),
+            //   child: SizedBox(
+            //     width: double.infinity,
+            //     child: ElevatedButton(
+            //       style: ElevatedButton.styleFrom(
+            //         padding: const EdgeInsets.symmetric(vertical: 12),
+            //         backgroundColor: Colors.blue[900],
+            //         shape: RoundedRectangleBorder(
+            //           borderRadius: BorderRadius.circular(12),
+            //         ),
+            //       ),
+            //       onPressed: () {
+            //         _handleSubmit();
+            //       },
+            //       child: Text(
+            //         AppLang.translate(
+            //             lang: settingProvider.lang ?? 'kh', key: 'create'),
+            //         style: TextStyle(fontSize: 16, color: Colors.white),
+            //       ),
+            //     ),
+            //   ),
+            // ),
           );
         }));
   }
@@ -434,175 +455,4 @@ class _CreateRelativeScreenState extends State<CreateRelativeScreen> {
   //   '3': 'ក្រុមហ៊ុនឯកជន',
   //   '4': 'អង្គការអន្តរជាតិ',
   // };
-
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String label,
-    String? Function(String?)? validator,
-    bool readOnly = false,
-    VoidCallback? onTap,
-    Widget? suffixIcon,
-    int maxLines = 1,
-  }) {
-    return TextFormField(
-      controller: controller,
-      readOnly: readOnly,
-      onTap: onTap,
-      validator: validator,
-      maxLines: maxLines,
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: TextStyle(color: Colors.blueGrey),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.0),
-          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.0),
-          borderSide: BorderSide(color: Colors.blueGrey),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.0),
-          borderSide: BorderSide(
-              color: Theme.of(context).colorScheme.primary, width: 2.0),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.0),
-          borderSide: BorderSide(color: Theme.of(context).colorScheme.error),
-        ),
-        suffixIcon: suffixIcon,
-        filled: true,
-      ),
-    );
-  }
-
-  // Reusable Selection Field widget
-  Widget _buildSelectionField({
-    required TextEditingController controller,
-    required String label,
-    required Map<String, String> items,
-    required void Function(String id, String value) onSelected,
-  }) {
-    return TextFormField(
-      controller: controller,
-      readOnly: true,
-      onTap: () async {
-        await _showSelectionBottomSheet(
-          context: context,
-          title: label,
-          items: items,
-          onSelected: onSelected,
-        );
-      },
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: TextStyle(color: Colors.blueGrey),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.0),
-          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.0),
-          borderSide: BorderSide(color: Colors.blueGrey),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.0),
-          borderSide: BorderSide(
-              color: Theme.of(context).colorScheme.primary, width: 1.0),
-        ),
-        suffixIcon: Icon(Icons.arrow_drop_down,
-            color: Theme.of(context).colorScheme.primary),
-        filled: true,
-      ),
-    );
-  }
-
-  //bottom sheet selector
-  Future<void> _showSelectionBottomSheet({
-    required BuildContext context,
-    required String title,
-    required Map<String, String> items,
-    required Function(String id, String value) onSelected,
-  }) async {
-    await showModalBottomSheet(
-      context: context,
-      builder: (context) {
-        return Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Text(
-                title,
-                style:
-                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 16.0, vertical: 12.0),
-                child: ListView.separated(
-                  itemCount: items.length,
-                  separatorBuilder: (context, index) =>
-                      const SizedBox(height: 8.0),
-                  itemBuilder: (context, index) {
-                    final entry = items.entries.elementAt(index);
-                    return Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        onTap: () {
-                          onSelected(entry.key, entry.value);
-                          Navigator.pop(context);
-                        },
-                        borderRadius: BorderRadius.circular(16.0),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.surface,
-                            borderRadius: BorderRadius.circular(16.0),
-                            border: Border.all(
-                              color: Colors.grey,
-                              width: 1.0,
-                            ),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 20.0,
-                              vertical: 16.0,
-                            ),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    entry.value,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyLarge
-                                        ?.copyWith(
-                                          fontWeight: FontWeight.w500,
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .onSurface,
-                                        ),
-                                  ),
-                                ),
-                                Icon(
-                                  Icons.arrow_forward_ios_rounded,
-                                  size: 16.0,
-                                  color: Colors.grey,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            )
-          ],
-        );
-      },
-    );
-  }
 }
