@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:mobile_app/shared/color/colors.dart';
 import 'package:mobile_app/widgets/custom_header.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:intl/intl.dart';
+
 import 'package:intl/date_symbol_data_local.dart';
 
-class HollidayScreen extends StatefulWidget {
-  const HollidayScreen({super.key});
+class HolidayScreen extends StatefulWidget {
+  const HolidayScreen({super.key});
 
   @override
-  State<HollidayScreen> createState() => _HollidayScreenState();
+  State<HolidayScreen> createState() => _HolidayScreenState();
 }
 
-class _HollidayScreenState extends State<HollidayScreen> {
+class _HolidayScreenState extends State<HolidayScreen> {
   CalendarFormat _calendarFormat = CalendarFormat.month;
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
@@ -50,6 +52,7 @@ class _HollidayScreenState extends State<HollidayScreen> {
       body: Column(
         children: [
           TableCalendar(
+            
             firstDay: DateTime.utc(2025, 1, 1),
             lastDay: DateTime.utc(2025, 12, 31),
             focusedDay: _focusedDay,
@@ -61,13 +64,13 @@ class _HollidayScreenState extends State<HollidayScreen> {
                 _focusedDay = focusedDay;
               });
             },
-            onFormatChanged: (format) {
-              if (_calendarFormat != format) {
-                setState(() {
-                  _calendarFormat = format;
-                });
-              }
-            },
+            // onFormatChanged: (format) {
+            //   if (_calendarFormat != format) {
+            //     setState(() {
+            //       _calendarFormat = format;
+            //     });
+            //   }
+            // },
             onPageChanged: (focusedDay) {
               setState(() {
                 _focusedDay = focusedDay;
@@ -79,10 +82,10 @@ class _HollidayScreenState extends State<HollidayScreen> {
                 color: Colors.blue.shade300,
                 shape: BoxShape.circle,
               ),
-              selectedDecoration: BoxDecoration(
-                color: Colors.blue.shade700,
-                shape: BoxShape.circle,
-              ),
+              // selectedDecoration: BoxDecoration(
+              //   color: Colors.blue.shade700,
+              //   shape: BoxShape.circle,
+              // ),
               holidayTextStyle: const TextStyle(color: Colors.red),
             ),
             holidayPredicate: (day) {
@@ -105,6 +108,7 @@ class _HollidayScreenState extends State<HollidayScreen> {
                 );
               },
             ),
+            
           ),
           const SizedBox(height: 20),
           Expanded(
@@ -137,17 +141,50 @@ class _HollidayScreenState extends State<HollidayScreen> {
             itemBuilder: (context, index) {
               final holiday = monthHolidays[index];
               return Container(
-                margin: const EdgeInsets.symmetric(vertical: 4),
-                decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16.0),
-                    border: Border.all(width: 1, color: Colors.grey)),
-                child: ListTile(
-                  leading: const Icon(Icons.celebration, color: Colors.blue),
-                  title: Text(holiday.value.first),
-                  subtitle: Text(
-                    DateFormat.yMMMMd('km_KH').format(holiday.key),
-                  ),
+                margin: const EdgeInsets.only(bottom: 8.0),
+                child: Row(
+                  children: [
+                    SizedBox(
+                      width: 60,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text(
+                            DateFormat.E('km_KH').format(holiday.key), // Day of week in Khmer (អង្គារ, ពុធ, etc.)
+                            style: const TextStyle(
+                              fontSize: 12,
+                              // color: Colors.grey,
+                            ),
+                          ),
+                          Text(
+                            '${holiday.key.day}', // Day number
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: HColors.bluegreen,
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          holiday.value.first,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               );
             },

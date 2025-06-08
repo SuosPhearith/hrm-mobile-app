@@ -16,14 +16,28 @@ class ScanScreen extends StatefulWidget {
 }
 
 class ScanScreenState extends State<ScanScreen> {
- DateTime? sselectedMonth;
+  DateTime? sselectedMonth;
   DateTime? _startDate;
   DateTime? _endDate;
 
   // New variables for the updated date picker
   int selectedYear = DateTime.now().year;
   int selectedMonth = DateTime.now().month - 1; // 0-based for khmerMonths
-  String displayMonth = '';
+  late String displayMonth;
+  @override
+  void initState() {
+    super.initState();
+    // Initialize with current month and year
+    final now = DateTime.now();
+    selectedYear = now.year;
+    selectedMonth = now.month - 1; // 0-based index for khmerMonths
+    displayMonth = khmerMonths[selectedMonth];
+    sselectedMonth = DateTime(selectedYear, now.month, 1);
+    _startDate = sselectedMonth;
+    _endDate = DateTime(
+        selectedYear, now.month, getLastDayOfMonth(selectedYear, now.month));
+  }
+
   final List<String> khmerMonths = [
     'មករា',
     'កុម្ភៈ',
@@ -39,21 +53,21 @@ class ScanScreenState extends State<ScanScreen> {
     'ធ្នូ',
   ];
 
-  @override
-  void initState() {
-    super.initState();
-    // Use current month as default
-    final now = DateTime.now();
-    sselectedMonth = now;
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   // Use current month as default
+  //   final now = DateTime.now();
+  //   sselectedMonth = now;
 
-    // Set start date to first day of current month
-    _startDate = DateTime(now.year, now.month, 1);
-    // Set end date to last day of current month
-    _endDate = DateTime(now.year, now.month + 1, 0);
+  //   // Set start date to first day of current month
+  //   _startDate = DateTime(now.year, now.month, 1);
+  //   // Set end date to last day of current month
+  //   _endDate = DateTime(now.year, now.month + 1, 0);
 
-    selectedYear = now.year;
-    selectedMonth = now.month - 1;
-  }
+  //   selectedYear = now.year;
+  //   selectedMonth = now.month - 1;
+  // }
 
   int getLastDayOfMonth(int year, int month) {
     return DateTime(year, month + 1, 0).day;
@@ -86,9 +100,7 @@ class ScanScreenState extends State<ScanScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    displayMonth.isEmpty
-                        ? "ស្កេន"
-                        : "ស្កេន - $displayMonth",
+                    displayMonth.isEmpty ? "ស្កេន" : "ស្កេន - $displayMonth",
                     style: const TextStyle(
                       fontWeight: FontWeight.w500,
                       // color: Colors.black,
@@ -155,7 +167,7 @@ class ScanScreenState extends State<ScanScreen> {
                               //   },
                               // ),
                               scanProvider.data!.data.results.isEmpty
-                                  ? Text("No Data Found")
+                                  ? Center(child: Text("គ្មានទិន្នន័យ"))
                                   : SizedBox(),
                               ...scanProvider.data?.data.results.map((record) {
                                     final result = parseDateTime(getSafeString(

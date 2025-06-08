@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_app/providers/global/setting_provider.dart';
 import 'package:mobile_app/providers/local/evaluate_provider.dart';
+import 'package:mobile_app/shared/color/colors.dart';
 import 'package:mobile_app/shared/component/bottom_appbar.dart';
+
 import 'package:provider/provider.dart';
 
 class EvaluateScreen extends StatefulWidget {
@@ -18,78 +20,270 @@ class _EvaluateScreenState extends State<EvaluateScreen> {
     return await provider.getHome();
   }
 
+  DateTime? sselectedMonth;
+  DateTime? _startDate;
+  DateTime? _endDate;
+
+  // Variables for year picker
+  int selectedYear = DateTime.now().year;
+  late String displayYear;
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize with current year
+    final now = DateTime.now();
+    selectedYear = now.year;
+    displayYear = selectedYear.toString();
+    sselectedMonth = DateTime(selectedYear, 1, 1);
+    _startDate = sselectedMonth;
+    _endDate = DateTime(selectedYear, 12, 31);
+  }
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-        create: (_) => EvaluationProvider(),
-        child: Consumer2<EvaluationProvider, SettingProvider>(
-            builder: (context, evaluationProvider, settingProvider, child) {
+      create: (_) => EvaluationProvider(),
+      child: Consumer2<EvaluationProvider, SettingProvider>(
+        builder: (context, evaluationProvider, settingProvider, child) {
           return RefreshIndicator(
-             key: _refreshIndicatorKey,
-                  color: Colors.blue[800],
-                  backgroundColor: Colors.white,
-                  onRefresh: () => _refreshData(evaluationProvider),
+            key: _refreshIndicatorKey,
+            color: Colors.blue[800],
+            backgroundColor: Colors.white,
+            onRefresh: () => _refreshData(evaluationProvider),
             child: Scaffold(
-                backgroundColor: Colors.white,
-                appBar: AppBar(
-                  title: Text(
-                    'វាយតម្លៃ',
-                    style: TextStyle(fontWeight: FontWeight.w500),
+              backgroundColor: Colors.white,
+              appBar: AppBar(
+                title: GestureDetector(
+                  onTap: () {
+                    _showYearPicker(context, evaluationProvider);
+                  },
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        "ប្រចាំថ្ងៃ - $displayYear",
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 20,
+                        ),
+                      ),
+                      const SizedBox(width: 4.0),
+                      Icon(Icons.arrow_drop_down, color: HColors.darkgrey),
+                    ],
                   ),
-                  centerTitle: true,
-                  bottom: CustomHeader(),
                 ),
-                body: evaluationProvider.isLoading
-                    ? Center(
-                        child: Text("Loading..."),
-                      )
-                    : SingleChildScrollView(
+                centerTitle: true,
+                backgroundColor: Colors.white,
+                elevation: 0,
+                actions: [
+                  IconButton(
+                    icon: const Icon(
+                      Icons.sync,
+                      color: HColors.darkgrey,
+                      size: 28.0,
+                    ),
+                    onPressed: () {
+                      final startDate =
+                          '${selectedYear.toString().padLeft(4, '0')}-01-01';
+                      final endDate =
+                          '${selectedYear.toString().padLeft(4, '0')}-12-31';
+
+                      evaluationProvider.getHome(
+                        startDate: startDate,
+                        endDate: endDate,
+                      );
+                    },
+                    splashRadius: 20.0,
+                  ),
+                ],
+                bottom: CustomHeader(),
+              ),
+              body: evaluationProvider.isLoading
+                  ? Center(
+                      child: Text("Loading..."),
+                    )
+                  : SingleChildScrollView(
                       physics: AlwaysScrollableScrollPhysics(),
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Column(
-                            children: List.generate(
-                              (evaluationProvider.evaluationListData
-                                      ?.data['results'] as List)
-                                  .length,
-                              (index) {
-                                final result = evaluationProvider
-                                            .evaluationListData?.data['results']
-                                        [index] as Map<String, dynamic>? ??
-                                    {};
-                                final rawPresentHour = result['present_hour'];
-                                final presentHour = (rawPresentHour is double)
-                                    ? rawPresentHour.toStringAsFixed(0)
-                                    : rawPresentHour.toString();
-                                final rawMissionHour = result['mission_hour'];
-                                final missionHour = (rawMissionHour is double)
-                                    ? rawMissionHour.toStringAsFixed(0)
-                                    : rawMissionHour.toString();
-                                final absenceHour =
-                                    (result['absence_hour'] ?? 0).toString();
-                                final date = (result['date'] ?? '-').toString();
-                                final finalGrade =
-                                    (result['final_grade'] ?? '-').toString();
-                            
-                                return Padding(
-                                  padding: const EdgeInsets.only(bottom: 12.0),
-                                  child: _buildevaluationCard(
-                                      presentHour: presentHour,
-                                      absenceHour: absenceHour,
-                                      missionHour: missionHour,
-                                      date: date,
-                                      finalGrade: finalGrade),
-                                );
-                              },
-                            ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          children: List.generate(
+                            (evaluationProvider.evaluationListData
+                                    ?.data['results'] as List)
+                                .length,
+                            (index) {
+                              final result = evaluationProvider
+                                          .evaluationListData?.data['results']
+                                      [index] as Map<String, dynamic>? ??
+                                  {};
+                              final rawPresentHour = result['present_hour'];
+                              final presentHour = (rawPresentHour is double)
+                                  ? rawPresentHour.toStringAsFixed(0)
+                                  : rawPresentHour.toString();
+                              final rawMissionHour = result['mission_hour'];
+                              final missionHour = (rawMissionHour is double)
+                                  ? rawMissionHour.toStringAsFixed(0)
+                                  : rawMissionHour.toString();
+                              final absenceHour =
+                                  (result['absence_hour'] ?? 0).toString();
+                              final date = (result['date'] ?? '-').toString();
+                              final finalGrade =
+                                  (result['final_grade'] ?? '-').toString();
+
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 12.0),
+                                child: _buildevaluationCard(
+                                  presentHour: presentHour,
+                                  absenceHour: absenceHour,
+                                  missionHour: missionHour,
+                                  date: date,
+                                  finalGrade: finalGrade,
+                                ),
+                              );
+                            },
                           ),
                         ),
-                      )),
+                      ),
+                    ),
+            ),
           );
-        }));
+        },
+      ),
+    );
+  }
+
+  void _showYearPicker(BuildContext context, EvaluationProvider provider) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      backgroundColor: Colors.white,
+      builder: (_) => YearPickerContent(
+        initialYear: selectedYear,
+        onConfirm: (year) {
+          final startDate = '${year.toString().padLeft(4, '0')}-01-01';
+          final endDate = '${year.toString().padLeft(4, '0')}-12-31';
+
+          setState(() {
+            selectedYear = year;
+            displayYear = year.toString();
+            sselectedMonth = DateTime(year, 1, 1);
+            _startDate = DateTime(year, 1, 1);
+            _endDate = DateTime(year, 12, 31);
+          });
+
+          provider.getHome(
+            startDate: startDate,
+            endDate: endDate,
+          );
+        },
+      ),
+    );
   }
 }
 
+// Updated YearPickerContent widget with YearPicker and no dividers
+class YearPickerContent extends StatefulWidget {
+  final int initialYear;
+  final Function(int year) onConfirm;
+
+  const YearPickerContent({
+    super.key,
+    required this.initialYear,
+    required this.onConfirm,
+  });
+
+  @override
+  _YearPickerContentState createState() => _YearPickerContentState();
+}
+
+class _YearPickerContentState extends State<YearPickerContent> {
+  late int tempYear;
+
+  @override
+  void initState() {
+    super.initState();
+    tempYear = widget.initialYear;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 24, 16, 32),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            'ជ្រើសរើសឆ្នាំ',
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              fontFamily: 'Kantumruy Pro',
+            ),
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            height: 200,
+            child: Theme(
+              data: Theme.of(context).copyWith(
+                dividerTheme: DividerThemeData(
+                  color: HColors.darkgrey.withOpacity(0.1), // Hide dividers
+                ),
+              ),
+              child: YearPicker(
+                firstDate: DateTime(2000),
+                lastDate: DateTime.now(),
+                selectedDate: DateTime(tempYear),
+                onChanged: (DateTime dateTime) {
+                  setState(() {
+                    tempYear = dateTime.year;
+                  });
+                },
+              ),
+            ),
+          ),
+          const SizedBox(height: 24),
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton(
+                  style: OutlinedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                  ),
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text(
+                    "បិត",
+                    style: TextStyle(fontSize: 12, color: Colors.black),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: HColors.blue,
+                  ),
+                  onPressed: () {
+                    widget.onConfirm(tempYear);
+                    Navigator.pop(context);
+                  },
+                  child: const Text(
+                    "យល់ព្រម",
+                    style: TextStyle(fontSize: 12, color: Colors.white),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// Existing _buildevaluationCard and _buildStatusItem (unchanged)
 Widget _buildevaluationCard({
   required String presentHour,
   required String absenceHour,
@@ -111,7 +305,6 @@ Widget _buildevaluationCard({
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Left Column
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -149,8 +342,6 @@ Widget _buildevaluationCard({
                 )
               ],
             ),
-
-            // Grade Circle
             Container(
               width: 40,
               height: 40,
@@ -172,18 +363,6 @@ Widget _buildevaluationCard({
           ],
         ),
       ),
-
-      // // Subtle decorative image at bottom right
-      // Positioned(
-      //   bottom: 5,
-      //   right: -5,
-      //   child: Image.asset(
-      //     'lib/assets/images/f.png',
-      //     width: 25,
-      //     height: 25,
-      //     fit: BoxFit.fill,
-      //   ),
-      // ),
     ],
   );
 }

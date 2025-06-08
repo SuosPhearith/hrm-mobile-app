@@ -7,11 +7,15 @@ import 'package:mobile_app/utils/help_util.dart';
 
 class RequestService {
   Future<ResponseStructure<PaginationStructure<Map<String, dynamic>>>>
-      request() async {
+      request(
+        {String? startDate, String? endDate}
+      ) async {
     try {
+      print(startDate);
       final response = await DioClient.dio.get(
-        "/user/home/request?limit=30",
+        "/user/home/request?limit=50&offset=0&start_date=$startDate&end_date=$endDate",
       );
+
       return ResponseStructure<
           PaginationStructure<Map<String, dynamic>>>.fromJson(
         response.data as Map<String, dynamic>,

@@ -8,7 +8,6 @@ import 'package:mobile_app/providers/local/home_provider.dart';
 import 'package:mobile_app/shared/color/colors.dart';
 import 'package:mobile_app/utils/help_util.dart';
 import 'package:mobile_app/widgets/custom_progress_bar.dart';
-import 'package:mobile_app/widgets/skeleton.dart';
 import 'package:mobile_app/widgets/skeleton/home_skeleton.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:provider/provider.dart';
@@ -90,87 +89,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-// // Widget for user profile header
-// class UserProfileHeader extends StatelessWidget {
-//   final AuthProvider authProvider;
-
-//   const UserProfileHeader({super.key, required this.authProvider});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     final lang = Provider.of<SettingProvider>(context).lang;
-//     return Padding(
-//       padding: const EdgeInsets.all(16.0),
-//       child: Row(
-//         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//         children: [
-//           Flexible(
-//             child: Row(
-//               children: [
-//                 ClipOval(
-//                   child: Image.network(
-//                     '${authProvider.profile?.data['user']['avatar']['file_domain']}${authProvider.profile?.data['user']['avatar']['uri']}', // Replace with actual URL
-//                     width: 40.0,
-//                     height: 40.0,
-//                     fit: BoxFit.cover,
-//                     errorBuilder: (context, error, stackTrace) => Container(
-//                       width: 40.0,
-//                       height: 40.0,
-//                       decoration: BoxDecoration(
-//                         shape: BoxShape.circle,
-//                         color: Colors.grey[600],
-//                       ),
-//                       child: const Center(
-//                         child:
-//                             Icon(Icons.person, size: 30.0, color: Colors.white),
-//                       ),
-//                     ),
-//                   ),
-//                 ),
-//                 const SizedBox(width: 6.0),
-//                 Flexible(
-//                   child: Column(
-//                     crossAxisAlignment: CrossAxisAlignment.start,
-//                     children: [
-//                       Text(
-//                         AppLang.translate(
-//                             data: authProvider.profile?.data['user'],
-//                             lang: lang ?? 'kh'),
-//                         style: TextStyle(
-//                           fontSize:
-//                               Theme.of(context).textTheme.bodyLarge!.fontSize,
-//                           fontWeight: FontWeight.w500,
-//                         ),
-//                       ),
-//                       Text(
-//                         AppLang.translate(
-//                             data: authProvider.profile?.data['user']['roles'][0]
-//                                 ['role'],
-//                             lang: lang ?? 'kh'),
-//                         style: TextStyle(
-//                           fontSize:
-//                               Theme.of(context).textTheme.bodySmall!.fontSize,
-//                         ),
-//                         overflow: TextOverflow.ellipsis,
-//                       ),
-//                     ],
-//                   ),
-//                 ),
-//               ],
-//             ),
-//           ),
-//           Row(
-//             children: [
-//               _IconButton(icon: Icons.download, onPressed: null),
-//               const SizedBox(width: 8.0),
-//               _IconButton(icon: Icons.notifications, onPressed: null),
-//             ],
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }
 // Widget for user profile header
 class UserProfileHeader extends StatelessWidget {
   final AuthProvider authProvider;
@@ -180,64 +98,7 @@ class UserProfileHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final lang = Provider.of<SettingProvider>(context).lang;
-    // return Padding(
-    //   padding: const EdgeInsets.all(16.0),
-    // child: Row(
-    //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    //   children: [
-    //     Flexible(
-    //       child: Row(
-    //         children: [
-    //           Container(
-    //             width: 40.0,
-    //             height: 40.0,
-    //             decoration: BoxDecoration(
-    //               shape: BoxShape.circle,
-    //               color: HColors.darkgrey.withOpacity(0.7),
-    //             ),
-    //             child: const Center(
-    //               child: Icon(Icons.person, size: 30.0, color: Colors.white),
-    //             ),
-    //           ),
-    //           const SizedBox(width: 6.0),
-    //           Flexible(
-    //             child: Column(
-    //               crossAxisAlignment: CrossAxisAlignment.start,
-    //               children: [
-    //                 Text(
-    //                   AppLang.translate(
-    //                       data: homeProvider.name, lang: lang ?? 'kh'),
-    //                   style: TextStyle(
-    //                     fontSize:
-    //                         Theme.of(context).textTheme.bodyLarge!.fontSize,
-    //                     fontWeight: FontWeight.w500,
-    //                   ),
-    //                 ),
-    //                 Text(
-    //                   AppLang.translate(
-    //                       data: homeProvider.department, lang: lang ?? 'kh'),
-    //                   style: TextStyle(
-    //                     fontSize:
-    //                         Theme.of(context).textTheme.bodySmall!.fontSize,
-    //                   ),
-    //                   overflow: TextOverflow.ellipsis,
-    //                 ),
-    //               ],
-    //             ),
-    //           ),
-    //         ],
-    //       ),
-    //     ),
-    // Row(
-    //   children: [
-    //     _IconButton(icon: Icons.download, onPressed: null),
-    //     const SizedBox(width: 8.0),
-    //     _IconButton(icon: Icons.notifications, onPressed: null),
-    //   ],
-    // ),
-    //     ],
-    //   ),
-    // );
+    
     return AppBar(
       // backgroundColor: Colors.transparent,
       scrolledUnderElevation: 0,
@@ -436,6 +297,150 @@ class DailyMonthlyView extends StatelessWidget {
 }
 
 // Widget for daily view
+// class DailyView extends StatelessWidget {
+//   final HomeProvider homeProvider;
+//   final String Function(String) formatDateToDDMMYY;
+
+//   const DailyView({
+//     super.key,
+//     required this.homeProvider,
+//     required this.formatDateToDDMMYY,
+//   });
+
+//   @override
+//   Widget build(BuildContext context) {
+//     final lang = Provider.of<SettingProvider>(context).lang;
+//     return Container(
+//       padding: const EdgeInsets.all(13.0),
+//       decoration: ShapeDecoration(
+//         color: Colors.white,
+//         shape: RoundedRectangleBorder(
+//           side: BorderSide(width: 1, color: const Color(0xFFCBD5E1)),
+//           borderRadius: BorderRadius.circular(12),
+//         ),
+//       ),
+//       child: Column(
+//         crossAxisAlignment: CrossAxisAlignment.start,
+//         children: [
+//           Row(
+//             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//             children: [
+//               Text(
+//                 AppLang.translate(key: 'home_today', lang: lang ?? 'kh'),
+//                 style: TextStyle(
+//                   fontSize: Theme.of(context).textTheme.bodyLarge!.fontSize,
+//                   fontWeight: FontWeight.w500,
+//                   color: Colors.blue[900],
+//                 ),
+//               ),
+//               Container(
+//                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+//                 decoration: ShapeDecoration(
+//                   color: const Color(0x0C1E293B),
+//                   shape: RoundedRectangleBorder(
+//                     borderRadius: BorderRadius.circular(8),
+//                   ),
+//                 ),
+//                 child: Row(
+//                   children: [
+//                     Text(
+//                       '03-03-2025',
+//                       style: TextStyle(
+//                         color: const Color(0xFF64748B),
+//                         fontSize: 12,
+//                         fontFamily: 'Kantumruy Pro',
+//                         fontWeight: FontWeight.w400,
+//                       ),
+//                     ),
+//                     SizedBox(width: 4),
+//                     Icon(Icons.calendar_today,
+//                         size: 16, color: const Color(0xFF64748B)),
+//                   ],
+//                 ),
+//               ),
+//             ],
+//           ),
+//           const SizedBox(height: 16.0),
+//           Row(
+//             crossAxisAlignment: CrossAxisAlignment.center,
+//             children: [
+//               CircularPercentIndicator(
+//                 radius: 50.0,
+//                 lineWidth: 8.0,
+//                 percent: clampToZeroOne(double.tryParse(homeProvider
+//                         .scanByDayData?.data['percentage']
+//                         ?.toString() ??
+//                     '0.0')),
+//                 center: Column(
+//                   mainAxisAlignment: MainAxisAlignment.center,
+//                   children: [
+//                     Text(
+//                       '${convertToHoursAndMinutes(double.tryParse(homeProvider.scanByDayData?.data['working_hour']?.toString() ?? '0.0'))['hours']} ${AppLang.translate(key: 'hour', lang: lang ?? 'kh')}',
+//                       style: TextStyle(
+//                         fontSize:
+//                             Theme.of(context).textTheme.bodyLarge!.fontSize,
+//                         fontWeight: FontWeight.w500,
+//                         color: Colors.blue[800],
+//                       ),
+//                     ),
+//                     Text(
+//                       '${convertToHoursAndMinutes(double.tryParse(homeProvider.scanByDayData?.data['working_hour']?.toString() ?? '0.0'))['minutes']} ${AppLang.translate(key: 'minute', lang: lang ?? 'kh')}',
+//                       style: TextStyle(
+//                         fontSize:
+//                             Theme.of(context).textTheme.bodyLarge!.fontSize,
+//                       ),
+//                     ),
+//                   ],
+//                 ),
+//                 progressColor: Colors.blue[700],
+//                 backgroundColor: Colors.grey[200]!,
+//                 circularStrokeCap: CircularStrokeCap.round,
+//                 animation: true,
+//                 animationDuration: 1000,
+//               ),
+//               const SizedBox(width: 20.0),
+//               Expanded(
+//                 child: Column(
+//                   children: [
+//                     CheckInOutCard(
+//                       isCheckIn: true,
+//                       time: formatTimeToHour(
+//                           homeProvider.scanByDayData?.data['check_in']),
+//                       terminal: getSafeString(
+//                           value: homeProvider
+//                                   .scanByDayData?.data['first_terminal_log']
+//                               ?['terminal_device']?['name']),
+//                       group: getSafeString(
+//                           value: homeProvider
+//                                   .scanByDayData?.data['first_terminal_log']
+//                               ?['terminal_device']?['group']),
+//                     ),
+//                     const SizedBox(height: 12.0),
+//                     CheckInOutCard(
+//                       isCheckIn: false,
+//                       time: formatTimeToHour(
+//                           homeProvider.scanByDayData?.data['check_out']),
+//                       terminal: getSafeString(
+//                           value: homeProvider
+//                                   .scanByDayData?.data['last_terminal_log']
+//                               ?['terminal_device']?['name']),
+//                       group: getSafeString(
+//                           value: homeProvider
+//                                   .scanByDayData?.data['last_terminal_log']
+//                               ?['terminal_device']?['group']),
+//                     ),
+//                   ],
+//                 ),
+//               ),
+//             ],
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }
+// Widget for daily view
+// Widget for daily view
 class DailyView extends StatelessWidget {
   final HomeProvider homeProvider;
   final String Function(String) formatDateToDDMMYY;
@@ -451,11 +456,15 @@ class DailyView extends StatelessWidget {
     final lang = Provider.of<SettingProvider>(context).lang;
     return Container(
       padding: const EdgeInsets.all(13.0),
-      decoration: ShapeDecoration(
+      decoration: BoxDecoration(
         color: Colors.white,
-        shape: RoundedRectangleBorder(
-          side: BorderSide(width: 1, color: const Color(0xFFCBD5E1)),
-          borderRadius: BorderRadius.circular(12),
+        border: Border.all(width: 1, color: const Color(0xFFCBD5E1)),
+        borderRadius: BorderRadius.circular(12),
+        image: DecorationImage(
+          image: AssetImage('lib/assets/images/Kbach-2.png'), 
+          fit: BoxFit.contain,
+          opacity: 0.5,
+          alignment: Alignment.centerRight
         ),
       ),
       child: Column(
@@ -658,6 +667,12 @@ class MonthlyView extends StatelessWidget {
           side: BorderSide(width: 1, color: const Color(0xFFCBD5E1)),
           borderRadius: BorderRadius.circular(12),
         ),
+        image: DecorationImage(
+          image: AssetImage('lib/assets/images/Kbach-2.png'), 
+          fit: BoxFit.contain,
+          opacity: 0.5,
+          alignment: Alignment.centerRight
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -755,24 +770,7 @@ class MonthlyView extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 4.0),
-              // LinearPercentIndicator(
-              //   padding: const EdgeInsets.symmetric(horizontal: 0.0),
-              //   lineHeight: 25.0,
-              //   center: Text(
-              //     "${getHoursFromSumHour(homeProvider.scanByMonthData?.data['sum_hour'])} ${AppLang.translate(key: 'hour', lang: lang ?? 'kh')} / ${homeProvider.scanByMonthData?.data['max_hour'] ?? '...'} ${AppLang.translate(key: 'hour', lang: lang ?? 'kh')}",
-              //     style: TextStyle(
-              //       fontSize: Theme.of(context).textTheme.bodySmall!.fontSize,
-              //       fontWeight: FontWeight.w600,
-              //     ),
-              //   ),
-              //   percent: clampToZeroOne(getSafeDouble(
-              //       value: homeProvider.scanByMonthData?.data['percentage'])),
-              //   backgroundColor: Colors.grey[300],
-              //   progressColor: Colors.blue[400],
-              //   barRadius: const Radius.circular(4.0),
-              //   animation: true,
-              //   animationDuration: 500,
-              // ),
+            
               CustomProgressBar(
                 percent: getSafeDouble(
                     value: homeProvider.scanByMonthData?.data['percentage']),
@@ -1023,6 +1021,7 @@ class StatIcon extends StatelessWidget {
       padding:
           const EdgeInsets.only(top: 5.0, bottom: 5.0, right: 15, left: 15),
       decoration: BoxDecoration(
+        color: Colors.white,
         border: Border.all(color: Colors.grey[300]!, width: 1.0),
         borderRadius: BorderRadius.circular(6.0),
       ),
@@ -1083,12 +1082,12 @@ class MenuGrid extends StatelessWidget {
       {
         'icon': Icons.account_box_outlined,
         'label': AppLang.translate(key: 'home_id_card', lang: lang ?? 'kh'),
-        'route': null
+        'route': AppRoutes.card
       },
       {
         'icon': Icons.file_copy_outlined,
         'label': AppLang.translate(key: 'home_document', lang: lang ?? 'kh'),
-        'route': null
+        'route': AppRoutes.document
       },
     ];
 

@@ -23,7 +23,7 @@ class DailyScreenState extends State<DailyScreen> {
   // New variables for the updated date picker
   int selectedYear = DateTime.now().year;
   int selectedMonth = DateTime.now().month - 1; // 0-based for khmerMonths
-  String displayMonth = '';
+  late String displayMonth;
   final List<String> khmerMonths = [
     'មករា',
     'កុម្ភៈ',
@@ -46,14 +46,15 @@ class DailyScreenState extends State<DailyScreen> {
   @override
   void initState() {
     super.initState();
-    // Use current month as default
+    // Initialize with current month and year
     final now = DateTime.now();
-    sselectedMonth = now;
-
-    // Set start date to first day of current month
-    _startDate = DateTime(now.year, now.month, 1);
-    // Set end date to last day of current month
-    _endDate = DateTime(now.year, now.month + 1, 0);
+    selectedYear = now.year;
+    selectedMonth = now.month - 1; // 0-based index for khmerMonths
+    displayMonth = khmerMonths[selectedMonth];
+    sselectedMonth = DateTime(selectedYear, now.month, 1);
+    _startDate = sselectedMonth;
+    _endDate = DateTime(
+        selectedYear, now.month, getLastDayOfMonth(selectedYear, now.month));
   }
 
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
@@ -275,52 +276,66 @@ class DailyScreenState extends State<DailyScreen> {
               padding: const EdgeInsets.symmetric(vertical: 16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    date,
-                    style: TextStyle(
-                      fontSize: 14.0,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.black,
-                    ),
-                  ),
-                  const SizedBox(height: 8.0),
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Container(
-                        width: 20,
-                        height: 20,
-                        decoration: BoxDecoration(
-                          color: HColors.darkgrey.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(7),
-                        ),
-                        child: Icon(Icons.login,
-                            color: HColors.bluegrey, size: 14.0),
-                      ),
-                      const SizedBox(width: 4.0),
                       Text(
-                        loginTime,
-                        style:
-                            TextStyle(fontSize: 14.0, color: Colors.grey[700]),
-                      ),
-                      const SizedBox(width: 16.0),
-                      Container(
-                        width: 20,
-                        height: 20,
-                        decoration: BoxDecoration(
-                          color: HColors.darkgrey.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(7),
+                        date,
+                        style: TextStyle(
+                          fontSize: 14.0,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black,
                         ),
-                        child: Icon(Icons.logout,
-                            color: HColors.bluegrey, size: 14.0),
                       ),
-                      const SizedBox(width: 4.0),
-                      Text(
-                        logoutTime,
-                        style:
-                            TextStyle(fontSize: 14.0, color: Colors.grey[700]),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 20,
+                              height: 20,
+                              decoration: BoxDecoration(
+                                color: HColors.darkgrey.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(7),
+                              ),
+                              child: Icon(Icons.login,
+                                  color: HColors.bluegrey, size: 14.0),
+                            ),
+                            const SizedBox(width: 4.0),
+                            Text(
+                              loginTime,
+                              style: TextStyle(
+                                  fontSize: 14.0, color: Colors.grey[700]),
+                            ),
+                            const SizedBox(width: 16.0),
+                            Container(
+                              width: 20,
+                              height: 20,
+                              decoration: BoxDecoration(
+                                color: HColors.darkgrey.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(7),
+                              ),
+                              child: Icon(Icons.logout,
+                                  color: HColors.bluegrey, size: 14.0),
+                            ),
+                            const SizedBox(width: 4.0),
+                            Text(
+                              logoutTime,
+                              style: TextStyle(
+                                  fontSize: 14.0, color: Colors.grey[700]),
+                            ),
+                          ],
+                        ),
                       ),
-                      const SizedBox(width: 1.0),
+                    ],
+                  ),
+                  // const SizedBox(height:15.0),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      // const SizedBox(width: 1.0),
                       Expanded(
                         child: LinearPercentIndicator(
                           lineHeight: 5.0,

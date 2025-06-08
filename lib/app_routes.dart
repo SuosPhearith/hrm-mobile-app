@@ -28,4 +28,6 @@ class AppRoutes {
   static const String updateUserMedal = '/update-user-medal';
   static const String updateUserWork = '/update-user-work';
   static const String salary = '/salary';
+  static const String card = '/card-screen';
+  static const String document = '/document-screen';
 }

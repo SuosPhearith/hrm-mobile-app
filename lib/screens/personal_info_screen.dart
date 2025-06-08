@@ -270,7 +270,7 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                               context.push('/create-education/${user['id']}');
                             },
                           ),
-                        
+
                           ...(user?['user_educations'] != null
                                   ? user['user_educations'] as List
                                   : [])
@@ -329,7 +329,7 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                                   .push('/create-langauge-level/${user['id']}');
                             },
                           ),
-                     
+
                           ...(user?['user_languages'] != null
                                   ? user['user_languages'] as List
                                   : [])
@@ -441,9 +441,9 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
           Spacer(),
           // Only show edit icon if onEditTap is provided
           if (onEditTap != null)
-            GestureDetector(
-              onTap: onEditTap,
-              child: Icon(Icons.edit, size: 20.0, color: HColors.darkgrey),
+            IconButton(
+              onPressed: () => onEditTap,
+              icon: Icon(Icons.edit, size: 20.0, color: HColors.darkgrey),
             ),
         ],
       ),
@@ -473,17 +473,17 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  name,
-                  style: TextStyle(
-                    fontSize: 16.0,
-                  ),
+                  description,
+                  style: TextStyle(fontSize: 12.0, color: HColors.darkgrey),
                   softWrap: true, // Allow text to wrap to multiple lines
                 ),
                 SizedBox(
                     height: 2.0), // Small spacing between name and description
                 Text(
-                  description,
-                  style: TextStyle(fontSize: 14.0, color: HColors.darkgrey),
+                  name,
+                  style: TextStyle(
+                    fontSize: 16.0,
+                  ),
                   softWrap: true, // Allow text to wrap to multiple lines
                 ),
               ],
