@@ -5,7 +5,8 @@ import 'package:mobile_app/providers/local/about_provider.dart';
 import 'package:mobile_app/shared/color/colors.dart';
 import 'package:mobile_app/utils/help_util.dart';
 import 'package:mobile_app/widgets/custom_header.dart';
-import 'package:mobile_app/widgets/skeleton.dart';
+
+import 'package:mobile_app/widgets/skeleton/about_skeleton.dart';
 import 'package:provider/provider.dart';
 
 class AboutScreen extends StatelessWidget {
@@ -36,7 +37,7 @@ class AboutScreen extends StatelessWidget {
               bottom: CustomHeader(),
             ),
             body: aboutProvider.isLoading
-                ? Skeleton()
+                ? AboutSkeleton()
                 : SingleChildScrollView(
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),

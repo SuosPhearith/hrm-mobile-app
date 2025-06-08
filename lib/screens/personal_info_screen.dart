@@ -50,7 +50,8 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
   }
 
   //delete  education
-  void _deleteEducation(int id, int userID,PersonalInfoProvider provider) async {
+  void _deleteEducation(
+      int id, int userID, PersonalInfoProvider provider) async {
     try {
       await _service.deleteEducation(id: id, userId: userID);
       provider.getHome();
@@ -72,7 +73,8 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
   }
 
   //delete  language level
-  void _deleteLanuageLevel(int id, int userID,PersonalInfoProvider provider) async {
+  void _deleteLanuageLevel(
+      int id, int userID, PersonalInfoProvider provider) async {
     try {
       await _service.deleteLanguageLevel(id: id, userId: userID);
       provider.getHome();
@@ -100,7 +102,6 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
         final user = provider.data?.data['user'];
         return Scaffold(
           backgroundColor: Colors.white,
-        
           appBar: AppBar(
             title: Text(AppLang.translate(
                 key: 'user_info_personal_info',
@@ -142,8 +143,8 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                                 key: 'user_info_personal_info',
                                 lang: settingProvider.lang ?? 'kh'),
                             onEditTap: () => {
-                              context.push(
-                                  '/update-personal-info/${user['id']}'),
+                              context
+                                  .push('/update-personal-info/${user['id']}'),
                             },
                           ),
                           buildProfileContainer(
@@ -186,8 +187,8 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                             icon: Icons.fingerprint,
                           ),
                           buildProfileContainer(
-                            name: getSafeString(
-                                value: formatDate(user?['dob'])),
+                            name:
+                                getSafeString(value: formatDate(user?['dob'])),
                             description: AppLang.translate(
                                 key: 'user_info_date_of_birth',
                                 lang: settingProvider.lang ?? 'kh'),
@@ -220,27 +221,40 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                                 lang: settingProvider.lang ?? 'kh'),
                             icon: Icons.group,
                             onEditTap: () {
-                              context.push(
-                                  '/create-user-relative/${user['id']}');
+                              context
+                                  .push('/create-user-relative/${user['id']}');
                             },
                           ),
-    
+
                           ...(user?['relatives'] != null
                                   ? user['relatives'] as List
                                   : [])
                               .map((record) {
-                            return buildProfileContainerAction(
+                            return buildProfileContainerAction1(
                               name:
                                   '${getSafeString(value: record?['name_kh'])} (${getSafeString(value: record?['name_en'])})',
-                              description:
-                                  '${formatDate(record['dob'])} • ${getSafeString(value: record?['job'])} • ${getSafeString(value: record?['work_place'])}',
+                              descriptionItems: [
+                                {
+                                  'icon': Icons.cake_outlined,
+                                  'description': formatDate(record['dob']),
+                                },
+                                {
+                                  'icon': Icons.work_outline,
+                                  'description':
+                                      getSafeString(value: record?['job']),
+                                },
+                                {
+                                  'icon': Icons.place_outlined,
+                                  'description': getSafeString(
+                                      value: record?['work_place']),
+                                },
+                              ],
                               icon: Icons.person,
                               onDelete: () =>
                                   _deleteRelative(record['id'], provider),
                               onUpdated: () {
-                                // Navigator.pop(context);
-                                context
-                                    .push('/update-relative/${user['id']}/${record['id']}');
+                                context.push(
+                                    '/update-relative/${user['id']}/${record['id']}');
                               },
                             );
                           }),
@@ -256,25 +270,49 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                               context.push('/create-education/${user['id']}');
                             },
                           ),
+                        
                           ...(user?['user_educations'] != null
                                   ? user['user_educations'] as List
                                   : [])
                               .map((record) {
-                            return buildProfileContainerAction(
+                            return buildProfileContainerAction1(
                               name:
                                   "${AppLang.translate(data: record['education_type'], lang: settingProvider.lang ?? 'kh')} - ${AppLang.translate(data: record['education_level'], lang: settingProvider.lang ?? 'kh')}",
-                              description:
-                                  '• ${AppLang.translate(data: record['school'], lang: settingProvider.lang ?? 'kh')} \n• ${AppLang.translate(data: record['education_place'], lang: settingProvider.lang ?? 'kh')} \n• ${AppLang.translate(data: record['major'], lang: settingProvider.lang ?? 'kh')}\n• ${AppLang.translate(data: record['education_place'], lang: settingProvider.lang ?? 'kh')}\n• ${formatDate(record['study_at'])} | ${formatDate(record['graduate_at'])}',
+                              descriptionItems: [
+                                {
+                                  'icon': Icons.apartment_rounded,
+                                  'description': AppLang.translate(
+                                      data: record['school'],
+                                      lang: settingProvider.lang ?? 'kh'),
+                                },
+                                {
+                                  'icon': Icons.place_outlined,
+                                  'description': AppLang.translate(
+                                      data: record['education_place'],
+                                      lang: settingProvider.lang ?? 'kh'),
+                                },
+                                {
+                                  'icon': Icons.school_outlined,
+                                  'description': AppLang.translate(
+                                      data: record['major'],
+                                      lang: settingProvider.lang ?? 'kh'),
+                                },
+                                {
+                                  'icon': Icons.date_range_outlined,
+                                  'description':
+                                      "${formatDate(record['study_at'])} | ${formatDate(record['graduate_at'])}",
+                                },
+                              ],
                               icon: Icons.person,
-                              onDelete: () =>
-                                  _deleteEducation(record['id'], user['id'],provider),
+                              onDelete: () => _deleteEducation(
+                                  record['id'], user['id'], provider),
                               onUpdated: () {
-                                context
-                                    .push('/update-education/${user['id']}/${record['id']}');
+                                context.push(
+                                    '/update-education/${user['id']}/${record['id']}');
                               },
                             );
                           }),
-    
+
                           //Language
                           buildContainer(
                             text: AppLang.translate(
@@ -287,26 +325,51 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                                 lang: settingProvider.lang ?? 'kh'),
                             icon: Icons.translate,
                             onEditTap: () {
-                              context.push(
-                                  '/create-langauge-level/${user['id']}');
+                              context
+                                  .push('/create-langauge-level/${user['id']}');
                             },
                           ),
+                     
                           ...(user?['user_languages'] != null
                                   ? user['user_languages'] as List
                                   : [])
                               .map((record) {
-                            return buildProfileContainerAction(
-                              name:
-                                  "${AppLang.translate(data: record['language'], lang: settingProvider.lang ?? 'kh')} ",
-                              description:
-                                  '• ${AppLang.translate(data: record['speaking_level'], lang: settingProvider.lang ?? 'kh')} (Speaking)  \n• ${AppLang.translate(data: record['writing_level'], lang: settingProvider.lang ?? 'kh')} (Writing) \n• ${AppLang.translate(data: record['reading_level'], lang: settingProvider.lang ?? 'kh')} (Reading) \n• ${AppLang.translate(data: record['listening_level'], lang: settingProvider.lang ?? 'kh')} (Listening)',
-                              icon: Icons.flag,
+                            return buildProfileContainerAction1(
+                              name: AppLang.translate(
+                                  data: record['language'],
+                                  lang: settingProvider.lang ?? 'kh'),
+                              descriptionItems: [
+                                {
+                                  'icon': Icons.mic_outlined,
+                                  'description': AppLang.translate(
+                                      data: record['speaking_level'],
+                                      lang: settingProvider.lang ?? 'kh'),
+                                },
+                                {
+                                  'icon': Icons.edit_outlined,
+                                  'description': AppLang.translate(
+                                      data: record['writing_level'],
+                                      lang: settingProvider.lang ?? 'kh'),
+                                },
+                                {
+                                  'icon': Icons.book_outlined,
+                                  'description': AppLang.translate(
+                                      data: record['reading_level'],
+                                      lang: settingProvider.lang ?? 'kh'),
+                                },
+                                {
+                                  'icon': Icons.hearing_outlined,
+                                  'description': AppLang.translate(
+                                      data: record['listening_level'],
+                                      lang: settingProvider.lang ?? 'kh'),
+                                },
+                              ],
+                              icon: Icons.flag_outlined,
                               onDelete: () => _deleteLanuageLevel(
-                                  record['id'], user['id'],provider),
+                                  record['id'], user['id'], provider),
                               onUpdated: () {
-                                // context.push('');
-                                context
-                                    .push('/update-langauge-level/${user['id']}/${record['id']}');
+                                context.push(
+                                    '/update-langauge-level/${user['id']}/${record['id']}');
                               },
                             );
                           }),
@@ -317,8 +380,7 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                           //   icon: Icons.person,
                           // ),
                           SizedBox(
-                              height:
-                                  MediaQuery.of(context).size.height * 0.1),
+                              height: MediaQuery.of(context).size.height * 0.1),
                         ],
                       ),
                     )),
@@ -412,7 +474,9 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
               children: [
                 Text(
                   name,
-                  style: TextStyle(fontSize: 16.0, ),
+                  style: TextStyle(
+                    fontSize: 16.0,
+                  ),
                   softWrap: true, // Allow text to wrap to multiple lines
                 ),
                 SizedBox(
@@ -430,51 +494,6 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
     );
   }
 
-  // Widget buildProfileContainerAction({
-  //   required String name,
-  //   required String description,
-  //   IconData icon = Icons.person, // Default icon is person
-  //   int? iD,
-  // }) {
-  //   return Container(
-  //     padding: EdgeInsets.only(bottom: 16.0),
-  //     child: Row(
-  //       crossAxisAlignment: CrossAxisAlignment.start,
-  //       children: [
-  //         CircleAvatar(
-  //           radius: 25.0,
-  //           backgroundColor: Colors.grey[300],
-  //           child: Icon(icon, size: 25.0, color: Colors.grey),
-  //         ),
-  //         SizedBox(width: 8.0),
-  //         Expanded(
-  //           child: Column(
-  //             crossAxisAlignment: CrossAxisAlignment.start,
-  //             children: [
-  //               Text(
-  //                 name,
-  //                 style: TextStyle(fontSize: 16.0, color: Colors.black87),
-  //                 softWrap: true,
-  //               ),
-  //               SizedBox(height: 2.0),
-  //               Text(
-  //                 description,
-  //                 style: TextStyle(fontSize: 14.0, color: Colors.grey),
-  //                 softWrap: true,
-  //               ),
-  //             ],
-  //           ),
-  //         ),
-  //         IconButton(
-  //           icon: Icon(Icons.edit, size: 20.0, color: Colors.grey),
-  //           onPressed: () {
-  //             _showAddRequestBottomSheet(context, iD!);
-  //           },
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
   Widget buildProfileContainerAction({
     required String name,
     required String description,
@@ -498,7 +517,9 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(name,
-                    style: TextStyle(fontSize: 16.0,),
+                    style: TextStyle(
+                      fontSize: 16.0,
+                    ),
                     softWrap: true),
                 SizedBox(height: 2.0),
                 Text(description,
@@ -518,63 +539,68 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
     );
   }
 
-  // void _showAddRequestBottomSheet(
-  //   BuildContext context,
-  //   int id,
-  // ) {
-  //   final lang = Provider.of<SettingProvider>(context, listen: false).lang;
-  //   showModalBottomSheet(
-  //     context: context,
-  //     isScrollControlled: true,
-  //     shape: const RoundedRectangleBorder(
-  //       borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
-  //     ),
-  //     backgroundColor: Colors.white,
-  //     builder: (BuildContext context) {
-  //       return Padding(
-  //         padding: const EdgeInsets.all(16.0),
-  //         child: Column(
-  //           mainAxisSize: MainAxisSize.min,
-  //           children: [
-  //             // Text(
-  //             //   'បន្ថែមសំណើថ្មី',
-  //             //   style: TextStyle(
-  //             //     fontSize: 20.0,
-  //             //     fontWeight: FontWeight.w500,
-  //             //     color: Colors.blue[900],
-  //             //   ),
-  //             // ),
-  //             // const SizedBox(height: 16.0),
-  //             _buildBottomSheetOption(
-  //               icon: Icons.edit,
-  //               label: AppLang.translate(key: 'update', lang: lang ?? 'kh'),
-  //               onTap: () {
-  //                 Navigator.pop(context);
-  //               },
-  //             ),
-  //             _buildBottomSheetOption(
-  //               icon: Icons.delete,
-  //               label: AppLang.translate(key: 'delete', lang: lang ?? 'kh'),
-  //               colors: Colors.red,
-  //               onTap: () {
-  //                 showConfirmDialog(
-  //                   context,
-  //                   AppLang.translate(
-  //                       lang: lang ?? 'kh', key: 'Confirm Delete'),
-  //                   '${AppLang.translate(lang: lang ?? 'kh', key: 'Are you sure to delete')}?',
-  //                   DialogType.primary,
-  //                   () {
-  //                     _validateAndSubmit(id);
-  //                   },
-  //                 );
-  //               },
-  //             ),
-  //           ],
-  //         ),
-  //       );
-  //     },
-  //   );
-  // }
+  Widget buildProfileContainerAction1({
+    required String name,
+    required List<Map<String, dynamic>> descriptionItems,
+    required VoidCallback? onDelete,
+    required VoidCallback? onUpdated,
+    IconData icon = Icons.person,
+  }) {
+    return Container(
+      padding: EdgeInsets.only(bottom: 16.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          CircleAvatar(
+            radius: 25.0,
+            backgroundColor: HColors.darkgrey.withOpacity(0.1),
+            child: Icon(icon, size: 25.0, color: HColors.darkgrey),
+          ),
+          SizedBox(width: 8.0),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  name,
+                  style: TextStyle(fontSize: 16.0),
+                  softWrap: true,
+                ),
+                SizedBox(height: 2.0),
+                ...descriptionItems.map((item) => Row(
+                      children: [
+                        Icon(
+                          item['icon'] as IconData,
+                          size: 14.0,
+                          color: HColors.darkgrey,
+                        ),
+                        SizedBox(width: 4.0),
+                        Expanded(
+                          child: Text(
+                            item['description'] as String,
+                            style: TextStyle(
+                              fontSize: 14.0,
+                              color: HColors.darkgrey,
+                            ),
+                            softWrap: true,
+                          ),
+                        ),
+                      ],
+                    )),
+              ],
+            ),
+          ),
+          IconButton(
+            icon: Icon(Icons.edit, size: 20.0, color: HColors.darkgrey),
+            onPressed: () {
+              _showBottomSheet(context, onDelete!, onUpdated!);
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
   void _showBottomSheet(
       BuildContext context, VoidCallback onDelete, VoidCallback onUpdated) {
     final lang = Provider.of<SettingProvider>(context, listen: false).lang;

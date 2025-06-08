@@ -147,14 +147,14 @@ import 'package:mobile_app/shared/color/colors.dart';
                             ),
                             child: Row(
                               children: [
-                                Icon(
-                                  Icons.person_2_outlined,
-                                  color: HColors.darkgrey,
-                                  size: 24,
-                                ),
-                                SizedBox(
-                                  width: 8,
-                                ),
+                                // Icon(
+                                //   Icons.person_2_outlined,
+                                //   color: HColors.darkgrey,
+                                //   size: 24,
+                                // ),
+                                // SizedBox(
+                                //   width: 8,
+                                // ),
                                 Expanded(
                                   child: Text(
                                     entry.value,

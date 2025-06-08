@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mobile_app/app_lang.dart';
 import 'package:mobile_app/app_routes.dart';
 import 'package:mobile_app/providers/global/auth_provider.dart';
+import 'package:mobile_app/providers/global/setting_provider.dart';
 import 'package:mobile_app/shared/color/colors.dart';
 import 'package:mobile_app/widgets/custom_header.dart';
 import 'package:mobile_app/widgets/helper.dart';
@@ -16,35 +18,12 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  final storage = FlutterSecureStorage();
-  String? name, email;
-
-  @override
-  void initState() {
-    _loadData();
-    super.initState();
-  }
-
-  Future<void> _loadData() async {
-    try {
-      final String? loadedName = await storage.read(key: 'username');
-      final String? loadedEmail = await storage.read(key: 'email');
-      if (!mounted) return;
-      setState(() {
-        name = loadedName ?? '';
-        email = loadedEmail ?? '';
-      });
-    } catch (e) {
-      if (!mounted) return;
-      setState(() {
-        name = '';
-        email = '';
-      });
-    }
-  }
+  // final storage = FlutterSecureStorage();
+  // String? name, email;
 
   @override
   Widget build(BuildContext context) {
+    final lang = Provider.of<SettingProvider>(context).lang;
     return Consumer<AuthProvider>(builder: (context, authProvider, child) {
       return Scaffold(
         backgroundColor: Colors.white,
@@ -103,12 +82,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         //     size: 48,
                         //   )),
                         // ),
-                        CircleAvatar(
-                          radius: 24,
-                          backgroundColor: HColors.darkgrey.withOpacity(0.2),
-                          child: Icon(
-                            Icons.person,
-                            color: HColors.darkgrey,
+                        ClipOval(
+                          child: Image.network(
+                            '${authProvider.profile?.data['user']['avatar']['file_domain']}${authProvider.profile?.data['user']['avatar']['uri']}',
+                            width: 40.0,
+                            height: 40.0,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) =>
+                                Container(
+                              width: 40.0,
+                              height: 40.0,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.grey[600],
+                              ),
+                              child: const Center(
+                                child: Icon(Icons.person,
+                                    size: 30.0, color: Colors.white),
+                              ),
+                            ),
                           ),
                         ),
                         SizedBox(
@@ -119,21 +111,36 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             // const SizedBox(height: 8),
-                            Text(
-                              name ?? 'Guest',
-                              style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                  // color: Colors.white,
-                                  color: Colors.black),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              email ?? 'Unknown Email',
-                              style: const TextStyle(
-                                fontSize: 12,
-                                // color: Colors.white,
-                              ),
+
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  AppLang.translate(
+                                      data: authProvider.profile?.data['user'],
+                                      lang: lang ?? 'kh'),
+                                  style: TextStyle(
+                                    fontSize: Theme.of(context)
+                                        .textTheme
+                                        .bodyLarge!
+                                        .fontSize,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                Text(
+                                  AppLang.translate(
+                                      data: authProvider.profile?.data['user']
+                                          ['roles'][0]['role'],
+                                      lang: lang ?? 'kh'),
+                                  style: TextStyle(
+                                    fontSize: Theme.of(context)
+                                        .textTheme
+                                        .bodySmall!
+                                        .fontSize,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
                             ),
                           ],
                         ),
@@ -256,9 +263,9 @@ class ProfileActionItem extends StatelessWidget {
           color: Colors.white,
           border: isLast
               ? null
-              :  Border(
+              : Border(
                   bottom: BorderSide(
-                    color:HColors.darkgrey,
+                    color: HColors.darkgrey,
                     width: 0.1,
                   ),
                 ),

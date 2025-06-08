@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:mobile_app/app_lang.dart';
 import 'package:mobile_app/providers/global/setting_provider.dart';
+import 'package:mobile_app/providers/local/personal_info_provider.dart';
 import 'package:mobile_app/providers/local/personalinfo/create_relative_provider.dart';
 import 'package:mobile_app/services/personal_info/create_personalinfo_service.dart';
 import 'package:mobile_app/shared/component/build_selection.dart';
@@ -22,11 +23,11 @@ class CreateRelativeScreen extends StatefulWidget {
 }
 
 class _CreateRelativeScreenState extends State<CreateRelativeScreen> {
-  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
-      GlobalKey<RefreshIndicatorState>();
-  Future<void> _refreshData(CreateRelativeProvider provider) async {
-    return await provider.getHome();
-  }
+  // final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
+  //     GlobalKey<RefreshIndicatorState>();
+  // Future<void> _refreshData(CreateRelativeProvider provider) async {
+  //   return await provider.getHome();
+  // }
 
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _dobController = TextEditingController();
@@ -100,7 +101,7 @@ class _CreateRelativeScreenState extends State<CreateRelativeScreen> {
             const SnackBar(content: Text('ការស្នើសុំត្រូវបានបញ្ជូនដោយជោគជ័យ')),
           );
           _clearAllFields();
-
+           Provider.of<PersonalInfoProvider>(context,listen: false).getHome();
           context.pop();
         }
       } catch (e) {
@@ -177,198 +178,192 @@ class _CreateRelativeScreenState extends State<CreateRelativeScreen> {
               ],
               bottom: CustomHeader(),
             ),
-            body: RefreshIndicator(
-              key: _refreshIndicatorKey,
-              color: Theme.of(context).colorScheme.primary,
-              backgroundColor: Theme.of(context).colorScheme.surface,
-              onRefresh: () => _refreshData(createRelativeProvider),
-              child: createRelativeProvider.isLoading
-                  ? const Center(child: Text('Loading...'))
-                  : SingleChildScrollView(
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      padding: const EdgeInsets.all(16.0),
-                      child: Form(
-                        key: _formKey,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const SizedBox(height: 16.0),
-                            // Relative Type
-                            buildSelectionField(
-                              context: context,
-                              controller: _relativeTypeController,
-                              label: AppLang.translate(
-                                  lang: settingProvider.lang ?? 'kh',
-                                  key: 'relative_type'),
-                              items: relativeTypes,
-                              selectedId: selectedRelativeTypeId,
-                              onSelected: (id, value) {
-                                setState(() {
-                                  selectedRelativeTypeId = id;
-                                  _relativeTypeController.text = value;
-                                });
-                              },
-                            ),
-                            const SizedBox(height: 24.0),
-                            // Gender Selection
-                            Text(
-                              AppLang.translate(
-                                  lang: settingProvider.lang ?? 'kh',
-                                  key: 'user_info_sex'),
-                              style: TextStyle(fontWeight: FontWeight.w500),
-                            ),
-                            const SizedBox(height: 8.0),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: RadioListTile<String>(
-                                    title: Text(AppLang.translate(
-                                        lang: settingProvider.lang ?? 'kh',
-                                        key: 'male')),
-                                    value: '1',
-                                    groupValue: selectedGender,
-                                    onChanged: (value) =>
-                                        setState(() => selectedGender = value),
-                                    activeColor:
-                                        Theme.of(context).colorScheme.primary,
-                                    contentPadding: const EdgeInsets.symmetric(
-                                        horizontal: 8.0),
-                                  ),
-                                ),
-                                Expanded(
-                                  child: RadioListTile<String>(
-                                    title: Text(AppLang.translate(
-                                        lang: settingProvider.lang ?? 'kh',
-                                        key: 'female')),
-                                    value: '2',
-                                    groupValue: selectedGender,
-                                    onChanged: (value) =>
-                                        setState(() => selectedGender = value),
-                                    activeColor:
-                                        Theme.of(context).colorScheme.primary,
-                                    contentPadding: const EdgeInsets.symmetric(
-                                        horizontal: 8.0),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 24.0),
-                            // Name (Khmer)
-                            buildTextField(
-                              context: context,
-                              controller: _firstNameController,
-                              label:
-                                  '${AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'user_info_kh_name')} *',
-                              validator: (value) => value!.isEmpty
-                                  ? AppLang.translate(
+            body: createRelativeProvider.isLoading
+                ? const Center(child: Text('Loading...'))
+                : SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    padding: const EdgeInsets.all(16.0),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 16.0),
+                          // Relative Type
+                          buildSelectionField(
+                            context: context,
+                            controller: _relativeTypeController,
+                            label: AppLang.translate(
+                                lang: settingProvider.lang ?? 'kh',
+                                key: 'relative_type'),
+                            items: relativeTypes,
+                            selectedId: selectedRelativeTypeId,
+                            onSelected: (id, value) {
+                              setState(() {
+                                selectedRelativeTypeId = id;
+                                _relativeTypeController.text = value;
+                              });
+                            },
+                          ),
+                          const SizedBox(height: 24.0),
+                          // Gender Selection
+                          Text(
+                            AppLang.translate(
+                                lang: settingProvider.lang ?? 'kh',
+                                key: 'user_info_sex'),
+                            style: TextStyle(fontWeight: FontWeight.w500),
+                          ),
+                          const SizedBox(height: 8.0),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: RadioListTile<String>(
+                                  title: Text(AppLang.translate(
                                       lang: settingProvider.lang ?? 'kh',
-                                      key: 'please enter name_kh')
-                                  : null,
-                            ),
-                            const SizedBox(height: 24.0),
-                            // Name (Latin)
-                            buildTextField(
-                              context: context,
-                              controller: _lastNameController,
-                              label:
-                                  '${AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'user_info_en_name')} *',
-                              validator: (value) => value!.isEmpty
-                                  ? AppLang.translate(
+                                      key: 'male')),
+                                  value: '1',
+                                  groupValue: selectedGender,
+                                  onChanged: (value) =>
+                                      setState(() => selectedGender = value),
+                                  activeColor:
+                                      Theme.of(context).colorScheme.primary,
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 8.0),
+                                ),
+                              ),
+                              Expanded(
+                                child: RadioListTile<String>(
+                                  title: Text(AppLang.translate(
                                       lang: settingProvider.lang ?? 'kh',
-                                      key: 'please enter name_en')
-                                  : null,
-                            ),
-                            const SizedBox(height: 24.0),
-                            // Date of Birth
-                            // _buildTextField(
-                            //   controller: _dobController,
-                            //   label: AppLang.translate(
-                            //       lang: settingProvider.lang ?? 'kh',
-                            //       key: 'dob'),
-                            //   readOnly: true,
-                            //   onTap: _selectDate,
-                            //   suffixIcon: IconButton(
-                            //     icon: const Icon(Icons.calendar_today_rounded),
-                            //     onPressed: _selectDate,
-                            //   ),
-                            // ),
-                            DateInputField(
-                              label: AppLang.translate(
-                                  lang: settingProvider.lang ?? 'kh',
-                                  key: 'user_info_date_of_birth'),
-                              hint: 'សូមជ្រើសរើសកាលបរិច្ឆេទ',
-                              initialDate: DateTime.now(),
-                              selectedDate: dob,
-                              onDateSelected: (date) {
-                                setState(() {
-                                  dob = date;
-                                });
-                              },
-                            ),
-                            const SizedBox(height: 24.0),
-                            // // Job
-                            // _buildSelectionField(
-                            //   controller: _jobController,
-                            //   label: AppLang.translate(
-                            //       lang: settingProvider.lang ?? 'kh',
-                            //       key: 'job'),
-                            //   items: jobTypes,
-                            //   onSelected: (id, value) {
-                            //     setState(() {
-                            //       selectedJobId = id;
-                            //       _jobController.text = value;
-                            //     });
-                            //   },
-                            // ),
-                            // const SizedBox(height: 24.0),
-                            // // Work Place
-                            // _buildSelectionField(
-                            //   controller: _workPlaceController,
-                            //   label: AppLang.translate(
-                            //       lang: settingProvider.lang ?? 'kh',
-                            //       key: 'work_place'),
-                            //   items: workPlaces,
-                            //   onSelected: (id, value) {
-                            //     setState(() {
-                            //       selectedWorkPlaceId = id;
-                            //       _workPlaceController.text = value;
-                            //     });
-                            //   },
-                            // ),
-
-                            // Name (Khmer)
-                            buildTextField(
-                              context: context,
-                              controller: _jobController,
-                              label: AppLang.translate(
-                                  lang: settingProvider.lang ?? 'kh',
-                                  key: 'job'),
-                              // validator: (value) => value!.isEmpty
-                              //     ? AppLang.translate(
-                              //         lang: settingProvider.lang ?? 'kh',
-                              //         key: 'please enter name_kh')
-                              //     : null,
-                            ),
-                            const SizedBox(height: 24.0),
-                            // Name (Latin)
-                            buildTextField(
-                              context: context,
-                              controller: _workPlaceController,
-                              label: AppLang.translate(
-                                  lang: settingProvider.lang ?? 'kh',
-                                  key: 'work_place'),
-                              // validator: (value) => value!.isEmpty
-                              //     ? AppLang.translate(
-                              //         lang: settingProvider.lang ?? 'kh',
-                              //         key: 'please enter name_en')
-                              //     : null,
-                            ),
-                            const SizedBox(height: 24.0),
-                          ],
-                        ),
+                                      key: 'female')),
+                                  value: '2',
+                                  groupValue: selectedGender,
+                                  onChanged: (value) =>
+                                      setState(() => selectedGender = value),
+                                  activeColor:
+                                      Theme.of(context).colorScheme.primary,
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 8.0),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 24.0),
+                          // Name (Khmer)
+                          buildTextField(
+                            context: context,
+                            controller: _firstNameController,
+                            label:
+                                '${AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'user_info_kh_name')} *',
+                            validator: (value) => value!.isEmpty
+                                ? AppLang.translate(
+                                    lang: settingProvider.lang ?? 'kh',
+                                    key: 'please enter name_kh')
+                                : null,
+                          ),
+                          const SizedBox(height: 24.0),
+                          // Name (Latin)
+                          buildTextField(
+                            context: context,
+                            controller: _lastNameController,
+                            label:
+                                '${AppLang.translate(lang: settingProvider.lang ?? 'kh', key: 'user_info_en_name')} *',
+                            validator: (value) => value!.isEmpty
+                                ? AppLang.translate(
+                                    lang: settingProvider.lang ?? 'kh',
+                                    key: 'please enter name_en')
+                                : null,
+                          ),
+                          const SizedBox(height: 24.0),
+                          // Date of Birth
+                          // _buildTextField(
+                          //   controller: _dobController,
+                          //   label: AppLang.translate(
+                          //       lang: settingProvider.lang ?? 'kh',
+                          //       key: 'dob'),
+                          //   readOnly: true,
+                          //   onTap: _selectDate,
+                          //   suffixIcon: IconButton(
+                          //     icon: const Icon(Icons.calendar_today_rounded),
+                          //     onPressed: _selectDate,
+                          //   ),
+                          // ),
+                          DateInputField(
+                            label: AppLang.translate(
+                                lang: settingProvider.lang ?? 'kh',
+                                key: 'user_info_date_of_birth'),
+                            hint: 'សូមជ្រើសរើសកាលបរិច្ឆេទ',
+                            initialDate: DateTime.now(),
+                            selectedDate: dob,
+                            onDateSelected: (date) {
+                              setState(() {
+                                dob = date;
+                              });
+                            },
+                          ),
+                          const SizedBox(height: 24.0),
+                          // // Job
+                          // _buildSelectionField(
+                          //   controller: _jobController,
+                          //   label: AppLang.translate(
+                          //       lang: settingProvider.lang ?? 'kh',
+                          //       key: 'job'),
+                          //   items: jobTypes,
+                          //   onSelected: (id, value) {
+                          //     setState(() {
+                          //       selectedJobId = id;
+                          //       _jobController.text = value;
+                          //     });
+                          //   },
+                          // ),
+                          // const SizedBox(height: 24.0),
+                          // // Work Place
+                          // _buildSelectionField(
+                          //   controller: _workPlaceController,
+                          //   label: AppLang.translate(
+                          //       lang: settingProvider.lang ?? 'kh',
+                          //       key: 'work_place'),
+                          //   items: workPlaces,
+                          //   onSelected: (id, value) {
+                          //     setState(() {
+                          //       selectedWorkPlaceId = id;
+                          //       _workPlaceController.text = value;
+                          //     });
+                          //   },
+                          // ),
+            
+                          // Name (Khmer)
+                          buildTextField(
+                            context: context,
+                            controller: _jobController,
+                            label: AppLang.translate(
+                                lang: settingProvider.lang ?? 'kh',
+                                key: 'job'),
+                            // validator: (value) => value!.isEmpty
+                            //     ? AppLang.translate(
+                            //         lang: settingProvider.lang ?? 'kh',
+                            //         key: 'please enter name_kh')
+                            //     : null,
+                          ),
+                          const SizedBox(height: 24.0),
+                          // Name (Latin)
+                          buildTextField(
+                            context: context,
+                            controller: _workPlaceController,
+                            label: AppLang.translate(
+                                lang: settingProvider.lang ?? 'kh',
+                                key: 'work_place'),
+                            // validator: (value) => value!.isEmpty
+                            //     ? AppLang.translate(
+                            //         lang: settingProvider.lang ?? 'kh',
+                            //         key: 'please enter name_en')
+                            //     : null,
+                          ),
+                          const SizedBox(height: 24.0),
+                        ],
                       ),
                     ),
-            ),
+                  ),
             // bottomNavigationBar: // Submit Button
             //     Padding(
             //   padding: const EdgeInsets.all(15),

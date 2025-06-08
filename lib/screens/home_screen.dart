@@ -9,6 +9,7 @@ import 'package:mobile_app/shared/color/colors.dart';
 import 'package:mobile_app/utils/help_util.dart';
 import 'package:mobile_app/widgets/custom_progress_bar.dart';
 import 'package:mobile_app/widgets/skeleton.dart';
+import 'package:mobile_app/widgets/skeleton/home_skeleton.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:provider/provider.dart';
 
@@ -54,12 +55,15 @@ class _HomeScreenState extends State<HomeScreen> {
               backgroundColor: Colors.white,
               onRefresh: () => _refreshData(homeProvider),
               child: homeProvider.isLoading
-                  ? const Skeleton()
+                  ? const HomeSkeleton()
                   : SingleChildScrollView(
                       physics: const AlwaysScrollableScrollPhysics(),
                       child: Column(
                         children: [
                           UserProfileHeader(authProvider: authProvider),
+                          SizedBox(
+                            height: 10,
+                          ),
                           DailyMonthlyView(
                             currentIndex: _currentIndex,
                             onPageChanged: (index) =>
@@ -235,7 +239,7 @@ class UserProfileHeader extends StatelessWidget {
     //   ),
     // );
     return AppBar(
-      backgroundColor: Colors.transparent,
+      // backgroundColor: Colors.transparent,
       scrolledUnderElevation: 0,
       title: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -243,25 +247,57 @@ class UserProfileHeader extends StatelessWidget {
           Flexible(
             child: Row(
               children: [
-                ClipOval(
-                  child: Image.network(
-                    '${authProvider.profile?.data['user']['avatar']['file_domain']}${authProvider.profile?.data['user']['avatar']['uri']}',
-                    width: 40.0,
-                    height: 40.0,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => Container(
-                      width: 40.0,
-                      height: 40.0,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.grey[600],
-                      ),
-                      child: const Center(
-                        child:
-                            Icon(Icons.person, size: 30.0, color: Colors.white),
+                Stack(
+                  children: [
+                    ClipOval(
+                      child: Image.network(
+                        '${authProvider.profile?.data['user']['avatar']['file_domain']}${authProvider.profile?.data['user']['avatar']['uri']}',
+                        width: 40.0,
+                        height: 40.0,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => Container(
+                          width: 40.0,
+                          height: 40.0,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.grey[600],
+                          ),
+                          child: const Center(
+                            child: Icon(Icons.person,
+                                size: 30.0, color: Colors.white),
+                          ),
+                        ),
                       ),
                     ),
-                  ),
+                    Positioned(
+                      bottom: 0,
+                      right: 0,
+                      child: GestureDetector(
+                        // onTap: () {
+                        //   // Handle close/remove action
+                        //   setState(() {
+                        //     selectedItems
+                        //         .value = List.from(selected)
+                        //       ..removeWhere(
+                        //           (s) => s['id'] == userId);
+                        //   });
+                        // },
+                        child: Container(
+                          width: 12,
+                          height: 12,
+                          decoration: BoxDecoration(
+                            color: HColors.green,
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: Colors.white,
+                              width: 2,
+                            ),
+                          ),
+                          
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(width: 6.0),
                 Flexible(
@@ -356,7 +392,7 @@ class DailyMonthlyView extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: SizedBox(
-        height: 240,
+        height: 220,
         child: Column(
           children: [
             Expanded(
@@ -373,7 +409,7 @@ class DailyMonthlyView extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 6),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: List.generate(2, (index) {
@@ -391,7 +427,7 @@ class DailyMonthlyView extends StatelessWidget {
                 );
               }),
             ),
-            const SizedBox(height: 12),
+            // const SizedBox(height: 6),
           ],
         ),
       ),
