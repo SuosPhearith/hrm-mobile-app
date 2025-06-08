@@ -3,6 +3,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile_app/app_lang.dart';
 import 'package:mobile_app/providers/global/setting_provider.dart';
+import 'package:mobile_app/providers/local/holiday_provider.dart';
 import 'package:mobile_app/providers/local/personal_info_provider.dart';
 import 'package:mobile_app/providers/local/request_provider.dart';
 import 'package:mobile_app/providers/local/work_provider.dart';
@@ -64,7 +65,8 @@ void main() async {
         ChangeNotifierProvider(create: (_) => SettingProvider()),
         ChangeNotifierProvider(create: (_) => PersonalInfoProvider()),
         ChangeNotifierProvider(create: (_) => WorkProvider()),
-        ChangeNotifierProvider(create: (_) => RequestProvider())
+        ChangeNotifierProvider(create: (_) => RequestProvider()),
+        ChangeNotifierProvider(create: (_) => HolidayProvider())
       ],
       child: const MyApp(),
     ),
@@ -219,7 +221,6 @@ final GoRouter _router = GoRouter(
       path: AppRoutes.document,
       builder: (context, state) => const DocumentScreen(),
     ),
-
     GoRoute(
       path: '${AppRoutes.createRequest}/:id',
       builder: (context, state) {
@@ -534,8 +535,6 @@ class _MainLayoutState extends State<MainLayout> {
       ),
     );
   }
-
-  
 
   Widget _buildNavIcon(IconData icon, int index, {bool active = false}) {
     // Check if this icon's index matches the currently selected index

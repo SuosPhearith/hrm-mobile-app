@@ -1,31 +1,19 @@
 import 'package:dio/dio.dart';
-import 'package:mobile_app/error_type.dart';
-import 'package:mobile_app/models/response_structure_model.dart';
 import 'package:mobile_app/utils/dio.client.dart';
-import 'package:mobile_app/utils/help_util.dart';
 
 class HolidayService {
-  Future<ResponseStructure<Map<String, dynamic>>> holidays() async {
+  Future<Map<String, dynamic>> holidays() async {
     try {
       final response = await DioClient.dio.get("/user/holiday");
-      return ResponseStructure<Map<String, dynamic>>.fromJson(
-        response.data as Map<String, dynamic>,
-        dataFromJson: (json) => json,
-      );
-    } on DioException catch (dioError) {
-      if (dioError.response != null) {
-        printError(
-          errorMessage: ErrorType.requestError,
-          statusCode: dioError.response!.statusCode,
-        );
-        throw Exception(ErrorType.requestError);
+      if (response.data is Map<String, dynamic>) {
+        return response.data as Map<String, dynamic>;
       } else {
-        printError(errorMessage: ErrorType.networkError, statusCode: null);
-        throw Exception(ErrorType.networkError);
+        throw Exception('Response data is not a Map<String, dynamic>');
       }
+    } on DioException catch (dioError) {
+      rethrow;
     } catch (e) {
-      printError(errorMessage: 'Something went wrong.', statusCode: 500);
-      throw Exception(ErrorType.unexpectedError);
+      rethrow;
     }
   }
 }

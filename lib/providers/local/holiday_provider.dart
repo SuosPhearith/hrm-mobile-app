@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_app/models/response_structure_model.dart';
 import 'package:mobile_app/services/holiday_service.dart';
 
 class HolidayProvider extends ChangeNotifier {
   // Feilds
   bool _isLoading = false;
   String? _error;
-  ResponseStructure<Map<String, dynamic>>? _data;
+  Map<String, dynamic> _data = {};
 
   // Services
   final HolidayService _holidayService = HolidayService();
@@ -14,7 +13,7 @@ class HolidayProvider extends ChangeNotifier {
   // Getters
   bool get isLoading => _isLoading;
   String? get error => _error;
-  ResponseStructure<Map<String, dynamic>>? get data => _data;
+  Map<String, dynamic> get data => _data;
 
   // Setters
 
