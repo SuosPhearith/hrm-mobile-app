@@ -5,6 +5,7 @@ import 'package:mobile_app/app_routes.dart';
 import 'package:mobile_app/providers/global/setting_provider.dart';
 import 'package:mobile_app/providers/local/request_provider.dart';
 import 'package:mobile_app/shared/color/colors.dart';
+import 'package:mobile_app/shared/date/date_chooser.dart';
 import 'package:mobile_app/utils/help_util.dart';
 import 'package:mobile_app/widgets/custom_header.dart';
 import 'package:provider/provider.dart';
@@ -23,6 +24,63 @@ class _RequestScreenState extends State<RequestScreen> {
     return await provider.getHome();
   }
 
+  DateTime? sselectedMonth;
+  DateTime? _startDate;
+  DateTime? _endDate;
+
+  // New variables for the updated date picker
+  int selectedYear = DateTime.now().year;
+  int selectedMonth = DateTime.now().month - 1; // 0-based for khmerMonths
+  late String displayMonth;
+  @override
+  void initState() {
+    super.initState();
+    // Initialize with current month and year
+    final now = DateTime.now();
+    selectedYear = now.year;
+    selectedMonth = now.month - 1; // 0-based index for khmerMonths
+    displayMonth = khmerMonths[selectedMonth];
+    sselectedMonth = DateTime(selectedYear, now.month, 1);
+    _startDate = sselectedMonth;
+    _endDate = DateTime(
+        selectedYear, now.month, getLastDayOfMonth(selectedYear, now.month));
+  }
+
+  final List<String> khmerMonths = [
+    'មករា',
+    'កុម្ភៈ',
+    'មីនា',
+    'មេសា',
+    'ឧសភា',
+    'មិថុនា',
+    'កក្កដា',
+    'សីហា',
+    'កញ្ញា',
+    'តុលា',
+    'វិច្ឆិកា',
+    'ធ្នូ',
+  ];
+
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   // Use current month as default
+  //   final now = DateTime.now();
+  //   sselectedMonth = now;
+
+  //   // Set start date to first day of current month
+  //   _startDate = DateTime(now.year, now.month, 1);
+  //   // Set end date to last day of current month
+  //   _endDate = DateTime(now.year, now.month + 1, 0);
+
+  //   selectedYear = now.year;
+  //   selectedMonth = now.month - 1;
+  // }
+
+  int getLastDayOfMonth(int year, int month) {
+    return DateTime(year, month + 1, 0).day;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer2<RequestProvider, SettingProvider>(
@@ -33,14 +91,35 @@ class _RequestScreenState extends State<RequestScreen> {
           backgroundColor: Colors.white,
           appBar: AppBar(
             bottom: CustomHeader(),
-            title: Text(
-              AppLang.translate(
-                key: 'request',
-                lang: settingProvider.lang ?? 'kh',
-              ),
-              style: const TextStyle(
-                fontWeight: FontWeight.w500,
-                color: Colors.black,
+            // title: Text(
+            //   AppLang.translate(
+            //     key: 'request',
+            //     lang: settingProvider.lang ?? 'kh',
+            //   ),
+            //   style: const TextStyle(
+            //     fontWeight: FontWeight.w500,
+            //     color: Colors.black,
+            //   ),
+            // ),
+            title: GestureDetector(
+              onTap: () {
+                _showMonthPicker(context, requestProvider);
+               
+              },
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    displayMonth.isEmpty ? "ស្កេន" : "ស្កេន - $displayMonth",
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w500,
+                      // color: Colors.black,
+                      fontSize: 20,
+                    ),
+                  ),
+                  const SizedBox(width: 4.0),
+                  Icon(Icons.arrow_drop_down, color: HColors.darkgrey),
+                ],
               ),
             ),
             centerTitle: true,
@@ -48,26 +127,31 @@ class _RequestScreenState extends State<RequestScreen> {
             iconTheme: const IconThemeData(color: Colors.black),
             elevation: 0,
             actions: [
-              GestureDetector(
-                onTap: () {
-                  _showAddRequestBottomSheet(context, dataSetup ?? {});
-                },
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Container(
-                    padding: const EdgeInsets.all(6.0),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.white,
-                    ),
-                    child: Icon(
-                      Icons.add,
-                      size: 28.0,
-                      color: HColors.darkgrey,
-                    ),
-                  ),
-                ),
-              ),
+              // GestureDetector(
+              //   onTap: () {
+              //     _showAddRequestBottomSheet(context, dataSetup ?? {});
+              //   },
+              //   child: Padding(
+              //     padding: const EdgeInsets.all(8.0),
+              //     child: Container(
+              //       padding: const EdgeInsets.all(6.0),
+              //       decoration: BoxDecoration(
+              //         shape: BoxShape.circle,
+              //         color: Colors.white,
+              //       ),
+              //       child: Icon(
+              //         Icons.add,
+              //         size: 28.0,
+              //         color: HColors.darkgrey,
+              //       ),
+              //     ),
+              //   ),
+              // ),
+              IconButton(
+                  onPressed: () {
+                    _showAddRequestBottomSheet(context, dataSetup ?? {});
+                  },
+                  icon: Icon(Icons.add))
             ],
           ),
           body: RefreshIndicator(
@@ -94,8 +178,7 @@ class _RequestScreenState extends State<RequestScreen> {
                           padding: const EdgeInsets.all(16.0),
                           child: Column(
                             children: [
-                              ...requestProvider.requestData!.data.results
-                                  .map((
+                              ...requestProvider.requestData!.data.results.map((
                                 record,
                               ) {
                                 return GestureDetector(
@@ -131,6 +214,53 @@ class _RequestScreenState extends State<RequestScreen> {
           ),
         );
       },
+    );
+  }
+
+  void _showMonthPicker(BuildContext context, RequestProvider provider) {
+    showMonthYearPicker(context, selectedYear, selectedMonth, (year, month) {
+      final khMonth = khmerMonths[month];
+      final lastDay = getLastDayOfMonth(year, month + 1);
+
+      final startDate =
+          '${year.toString().padLeft(4, '0')}-${(month + 1).toString().padLeft(2, '0')}-01';
+      final endDate =
+          '${year.toString().padLeft(4, '0')}-${(month + 1).toString().padLeft(2, '0')}-$lastDay';
+
+      setState(() {
+        selectedYear = year;
+        selectedMonth = month;
+        displayMonth = khMonth;
+        // Update the existing date variables to maintain compatibility
+        sselectedMonth = DateTime(year, month + 1, 1);
+        _startDate = DateTime(year, month + 1, 1);
+        _endDate = DateTime(year, month + 1, lastDay);
+      });
+
+      provider.getHome(
+        startDate: startDate,
+        endDate: endDate,
+      );
+    });
+  }
+
+  void showMonthYearPicker(
+    BuildContext context,
+    int initialYear,
+    int selectedMonth,
+    Function(int year, int month) onConfirm,
+  ) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      backgroundColor: Colors.white,
+      builder: (_) => MonthYearPickerContent(
+        initialYear: initialYear,
+        selectedMonth: selectedMonth,
+        onConfirm: onConfirm,
+      ),
     );
   }
 

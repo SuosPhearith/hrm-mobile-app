@@ -82,10 +82,10 @@ class _CreateWorkHistoryScreenState extends State<CreateWorkHistoryScreen> {
       // if (selecteddepartmentId == null || selecteddepartmentId!.isEmpty) {
       //   return 'Please select department';
       // }
-      if (_dateIn.text.isEmpty) {
+      if (_startDate ==null) {
         return 'Start Date is required';
       }
-      if (_dateOut.text.isEmpty) {
+      if (_endDate ==null) {
         return 'End Date is required';
       }
       return null;

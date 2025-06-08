@@ -6,15 +6,15 @@ class MonthYearPickerContent extends StatefulWidget {
   final int selectedMonth;
   final Function(int year, int month) onConfirm;
 
-  const MonthYearPickerContent({super.key, 
+  const MonthYearPickerContent({
+    super.key,
     required this.initialYear,
     required this.selectedMonth,
     required this.onConfirm,
   });
 
   @override
-  State<MonthYearPickerContent> createState() =>
-      _MonthYearPickerContentState();
+  State<MonthYearPickerContent> createState() => _MonthYearPickerContentState();
 }
 
 class _MonthYearPickerContentState extends State<MonthYearPickerContent> {
@@ -83,6 +83,9 @@ class _MonthYearPickerContentState extends State<MonthYearPickerContent> {
               ),
             ],
           ),
+          Divider(
+            color: HColors.darkgrey.withOpacity(0.1),
+          ),
           const SizedBox(height: 12),
           GridView.builder(
             shrinkWrap: true,
@@ -90,8 +93,8 @@ class _MonthYearPickerContentState extends State<MonthYearPickerContent> {
             physics: const NeverScrollableScrollPhysics(),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 3,
-              mainAxisSpacing: 12,
-              crossAxisSpacing: 12,
+              mainAxisSpacing: 6,
+              crossAxisSpacing: 6,
               childAspectRatio: 2.3,
             ),
             itemBuilder: (context, index) {
@@ -102,7 +105,7 @@ class _MonthYearPickerContentState extends State<MonthYearPickerContent> {
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
                     color: isSelected ? HColors.blue : Colors.white,
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(24),
                   ),
                   child: Text(
                     khmerMonths[index],
@@ -115,6 +118,9 @@ class _MonthYearPickerContentState extends State<MonthYearPickerContent> {
                 ),
               );
             },
+          ),
+          Divider(
+            color: HColors.darkgrey.withOpacity(0.1),
           ),
           const SizedBox(height: 24),
           Row(

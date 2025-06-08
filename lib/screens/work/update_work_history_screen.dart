@@ -204,12 +204,12 @@ class _UpdateWorkHistoryScreenState extends State<UpdateWorkHistoryScreen> {
       if (selecteddepartmentId == null || selecteddepartmentId!.isEmpty) {
         return 'Please select department';
       }
-      if (_dateIn.text.isEmpty) {
-        return 'Start Date is required';
-      }
-      if (_dateOut.text.isEmpty) {
-        return 'End Date is required';
-      }
+      // if (_dateIn.text.isEmpty) {
+      //   return 'Start Date is required';
+      // }
+      // if (_dateOut.text.isEmpty) {
+      //   return 'End Date is required';
+      // }
       return null;
     }
 

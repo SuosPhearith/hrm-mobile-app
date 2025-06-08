@@ -25,16 +25,16 @@ class RequestProvider extends ChangeNotifier {
   // Setters
 
   // Initialize
-  RequestProvider() {
-    getHome();
+  RequestProvider({String? startDate, String? endDate}) {
+     getHome(startDate: startDate, endDate: endDate);
   }
 
   // Functions
-  Future<void> getHome() async {
+  Future<void> getHome({String? startDate, String? endDate}) async {
     _isLoading = true;
     notifyListeners();
     try {
-      final response = await _requestService.request();
+      final response = await _requestService.request(startDate: startDate, endDate: endDate);
       final res = await _createRequestService.dataSetup();
       _dataSetup = res;
       _requestData = response;

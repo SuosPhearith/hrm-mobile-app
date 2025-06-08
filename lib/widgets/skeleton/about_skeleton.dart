@@ -8,20 +8,7 @@ class AboutSkeleton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        title: Container(
-          width: MediaQuery.of(context).size.width * 0.4,
-          height: Theme.of(context).textTheme.titleLarge!.fontSize!,
-          color: HColors.darkgrey.withOpacity(0.1),
-        ),
-        centerTitle: true,
-        elevation: 0,
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(48.0),
-          child: _CustomHeaderSkeleton(),
-        ),
-      ),
+
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -52,6 +39,8 @@ class AboutSkeleton extends StatelessWidget {
 
   Widget _buildSectionHeaderSkeleton(BuildContext context) {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
           width: MediaQuery.of(context).size.width * 0.5,

@@ -500,10 +500,20 @@ class _WorkScreenState extends State<WorkScreen> {
           Spacer(),
           // Only show edit icon if onEditTap is provided
           if (onEditTap != null)
-            GestureDetector(
-              onTap: onEditTap,
-              child: Icon(Icons.edit, size: 20.0, color: HColors.darkgrey),
-            ),
+            // InkWell(
+            //   onTap: onEditTap,
+            //   child: Padding(
+            //     padding: const EdgeInsets.all(8.0),
+            //     child: Container(
+            //         decoration:
+            //             BoxDecoration(borderRadius: BorderRadius.circular(50)),
+            //         child:
+            //             Icon(Icons.edit, size: 20.0, color: HColors.darkgrey)),
+            //   ),
+            // ),
+            IconButton(
+                onPressed: () => onEditTap,
+                icon: Icon(Icons.edit, size: 20.0, color: HColors.darkgrey))
         ],
       ),
     );
@@ -532,15 +542,15 @@ class _WorkScreenState extends State<WorkScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  name,
-                  style: TextStyle(fontSize: 16.0, color: Colors.black87),
+                  description,
+                  style: TextStyle(fontSize: 12.0, color: HColors.darkgrey),
                   softWrap: true, // Allow text to wrap to multiple lines
                 ),
                 SizedBox(
                     height: 2.0), // Small spacing between name and description
                 Text(
-                  description,
-                  style: TextStyle(fontSize: 14.0, color: HColors.darkgrey),
+                  name,
+                  style: TextStyle(fontSize: 16.0, color: Colors.black87),
                   softWrap: true, // Allow text to wrap to multiple lines
                 ),
               ],

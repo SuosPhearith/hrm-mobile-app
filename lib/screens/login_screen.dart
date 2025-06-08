@@ -145,11 +145,13 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                         const SizedBox(height: 24),
-                        Text(
-                          AppLang.translate(
-                              lang: setting.lang ?? 'kh', data: error),
-                          style: TextStyle(color: Colors.red),
-                        ),
+                        error != null
+                            ? Text(
+                                AppLang.translate(
+                                    lang: setting.lang ?? 'kh', data: error),
+                                style: TextStyle(color: Colors.red),
+                              )
+                            : SizedBox(),
                         // Add bottom padding to ensure content isn't too close to the button
                         SizedBox(height: 20),
                       ],

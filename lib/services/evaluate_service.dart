@@ -15,8 +15,8 @@ class EvaluationService {
   final queryParams = {
     'limit': limit ?? 50,
     'offset': offset ?? 0,
-    'start_date': startDate ?? '2025-03-01',
-    'end_date': endDate ?? '2025-05-30',
+    'start_date': startDate ?? '2025-01-01',
+    'end_date': endDate ?? '2025-12-31',
   };
 
   try {

@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_app/widgets/custom_header.dart';
 
-class SalaryScreen extends StatelessWidget {
-  const SalaryScreen({super.key});
+class CardScreen extends StatelessWidget {
+  const CardScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          "Salary",
+          "Card",
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.w500,

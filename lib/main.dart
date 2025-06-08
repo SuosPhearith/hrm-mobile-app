@@ -7,7 +7,9 @@ import 'package:mobile_app/providers/local/personal_info_provider.dart';
 import 'package:mobile_app/providers/local/request_provider.dart';
 import 'package:mobile_app/providers/local/work_provider.dart';
 import 'package:mobile_app/screens/about_screen.dart';
+import 'package:mobile_app/screens/card_screen.dart';
 import 'package:mobile_app/screens/daily_screen.dart';
+import 'package:mobile_app/screens/document_screen.dart';
 import 'package:mobile_app/screens/evaluate_screen.dart';
 import 'package:mobile_app/screens/holliday_screen.dart';
 import 'package:mobile_app/screens/personal_info/create_education_screen.dart';
@@ -150,7 +152,7 @@ final GoRouter _router = GoRouter(
           routes: [
             GoRoute(
               path: AppRoutes.holliday,
-              builder: (context, state) => const HollidayScreen(),
+              builder: (context, state) => const HolidayScreen(),
             ),
           ],
         ),
@@ -209,6 +211,15 @@ final GoRouter _router = GoRouter(
       path: AppRoutes.salary,
       builder: (context, state) => const SalaryScreen(),
     ),
+    GoRoute(
+      path: AppRoutes.card,
+      builder: (context, state) => const CardScreen(),
+    ),
+    GoRoute(
+      path: AppRoutes.document,
+      builder: (context, state) => const DocumentScreen(),
+    ),
+
     GoRoute(
       path: '${AppRoutes.createRequest}/:id',
       builder: (context, state) {
@@ -524,77 +535,7 @@ class _MainLayoutState extends State<MainLayout> {
     );
   }
 
-  void _showAddRequestBottomSheet(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
-      ),
-      backgroundColor: Colors.white,
-      builder: (BuildContext context) {
-        return Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const SizedBox(height: 16.0),
-              _buildBottomSheetOption(
-                icon: Icons.account_circle,
-                label: 'សំណើរច្បាប់',
-                onTap: () {},
-              ),
-              const SizedBox(height: 12.0),
-              _buildBottomSheetOption(
-                icon: Icons.airplanemode_active_rounded,
-                label: 'សំណើរបេសកកម្ម',
-                onTap: () {},
-              ),
-              const SizedBox(height: 16.0),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildBottomSheetOption({
-    required IconData icon,
-    required String label,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(12.0),
-        decoration: BoxDecoration(
-          color: Colors.grey[100],
-          borderRadius: BorderRadius.circular(12.0),
-        ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8.0),
-              decoration: BoxDecoration(
-                color: Colors.grey[200],
-                shape: BoxShape.circle,
-              ),
-              child: Icon(icon, size: 24.0, color: Colors.blue[800]),
-            ),
-            const SizedBox(width: 12.0),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 16.0,
-                fontWeight: FontWeight.w600,
-                color: Colors.grey.shade800,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  
 
   Widget _buildNavIcon(IconData icon, int index, {bool active = false}) {
     // Check if this icon's index matches the currently selected index

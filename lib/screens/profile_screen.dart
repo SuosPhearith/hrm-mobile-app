@@ -6,6 +6,7 @@ import 'package:mobile_app/app_routes.dart';
 import 'package:mobile_app/providers/global/auth_provider.dart';
 import 'package:mobile_app/providers/global/setting_provider.dart';
 import 'package:mobile_app/shared/color/colors.dart';
+import 'package:mobile_app/utils/help_util.dart';
 import 'package:mobile_app/widgets/custom_header.dart';
 import 'package:mobile_app/widgets/helper.dart';
 import 'package:provider/provider.dart';
@@ -28,10 +29,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
       return Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
-          title: Text(
-            'គណនី',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
-          ),
+          title: Text(AppLang.translate(
+            lang: lang??'kh',
+            key: 'settings',
+          ),),
           centerTitle: true,
           actions: [
             Padding(
@@ -59,92 +60,190 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       color: HColors.darkgrey.withOpacity(0.2),
                     ),
                   ),
-                  child: Container(
-                    padding: const EdgeInsets.all(16),
-                    width: MediaQuery.of(context).size.width,
-                    decoration: BoxDecoration(
-                        // Replace with your primary color if needed.
-                        borderRadius: BorderRadius.circular(12),
-                        color: Colors.white),
-                    child: Row(
-                      children: [
-                        // Profile Image Container
-                        // Container(
-                        //   width: 36,
-                        //   height: 36,
-                        //   decoration: BoxDecoration(
-                        //     shape: BoxShape.circle,
-                        //     color: Colors.grey[200],
-                        //   ),
-                        //   child: ClipOval(
-                        //       child: Icon(
-                        //     Icons.person,
-                        //     size: 48,
-                        //   )),
-                        // ),
-                        ClipOval(
-                          child: Image.network(
-                            '${authProvider.profile?.data['user']['avatar']['file_domain']}${authProvider.profile?.data['user']['avatar']['uri']}',
-                            width: 40.0,
-                            height: 40.0,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) =>
-                                Container(
-                              width: 40.0,
-                              height: 40.0,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: Colors.grey[600],
-                              ),
-                              child: const Center(
-                                child: Icon(Icons.person,
-                                    size: 30.0, color: Colors.white),
-                              ),
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          width: 8,
-                        ),
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // const SizedBox(height: 8),
+                  // child: Container(
+                  //   padding: const EdgeInsets.all(16),
+                  //   width: MediaQuery.of(context).size.width,
+                  //   decoration: BoxDecoration(
+                  //       // Replace with your primary color if needed.
+                  //       borderRadius: BorderRadius.circular(12),
+                  //       color: Colors.white),
+                  //   child: Row(
+                  //     children: [
+                  //       // Profile Image Container
+                  //       // Container(
+                  //       //   width: 36,
+                  //       //   height: 36,
+                  //       //   decoration: BoxDecoration(
+                  //       //     shape: BoxShape.circle,
+                  //       //     color: Colors.grey[200],
+                  //       //   ),
+                  //       //   child: ClipOval(
+                  //       //       child: Icon(
+                  //       //     Icons.person,
+                  //       //     size: 48,
+                  //       //   )),
+                  //       // ),
+                  // CircleAvatar(
+                  //   radius: 28,
+                  //   backgroundColor: Colors.grey[300],
+                  //   backgroundImage: authProvider.profile?.data['user']
+                  //               ['avatar'] !=
+                  //           null
+                  //       ? NetworkImage(
+                  //           '${authProvider.profile?.data['user']['avatar']['file_domain']}${authProvider.profile?.data['user']['avatar']['uri']}',
+                  //         )
+                  //       : null,
+                  //   child: authProvider.profile?.data['user']['avatar'] ==
+                  //           null
+                  //       ? const Icon(Icons.person,
+                  //           size: 30.0, color: Colors.white)
+                  //       : null,
+                  // ),
 
-                            Column(
+                  //       SizedBox(
+                  //         width: 8,
+                  //       ),
+                  //       Column(
+                  //         mainAxisAlignment: MainAxisAlignment.start,
+                  //         crossAxisAlignment: CrossAxisAlignment.start,
+                  //         children: [
+                  //           // const SizedBox(height: 8),
+
+                  //           Column(
+                  //             crossAxisAlignment: CrossAxisAlignment.start,
+                  //             children: [
+                  //               Text(
+                  //                 AppLang.translate(
+                  //                     data: authProvider.profile?.data['user'],
+                  //                     lang: lang ?? 'kh'),
+                  //                 style: TextStyle(
+                  //                   fontSize: Theme.of(context)
+                  //                       .textTheme
+                  //                       .bodyLarge!
+                  //                       .fontSize,
+                  //                   fontWeight: FontWeight.w500,
+                  //                 ),
+                  //               ),
+                  //               Text(
+                  //                 AppLang.translate(
+                  //                     data: authProvider.profile?.data['user']
+                  //                         ['roles'][0]['role'],
+                  //                     lang: lang ?? 'kh'),
+                  //                 style: TextStyle(
+                  //                   fontSize: Theme.of(context)
+                  //                       .textTheme
+                  //                       .bodySmall!
+                  //                       .fontSize,
+                  //                 ),
+                  //                 overflow: TextOverflow.ellipsis,
+                  //               ),
+                  //               Text(
+                  //                 "${getSafeString(safeValue: 'N/A', value: authProvider.profile?.data['user']['phone_number'])} | ${getSafeString(safeValue: 'N/A', value: authProvider.profile?.data['user']['email'])}",
+                  //                 style: TextStyle(
+                  //                   fontSize: Theme.of(context)
+                  //                       .textTheme
+                  //                       .bodySmall!
+                  //                       .fontSize,
+                  //                 ),
+                  //                 overflow: TextOverflow.ellipsis,
+                  //               ),
+                  //             ],
+                  //           ),
+                  //         ],
+                  //       ),
+                  //     ],
+                  //   ),
+                  // ),
+                  child: Container(
+                    // margin: EdgeInsets.only(
+                    //     bottom: isLastItem
+                    //         ? 0
+                    //         : 12), // Add spacing except for last item
+                    clipBehavior: Clip.antiAlias,
+                    decoration: ShapeDecoration(
+                      color: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        side: const BorderSide(
+                          width: 1,
+                          color: Color(0xFFCBD5E1),
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8),
+                      child: Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 28,
+                            backgroundColor: Colors.grey[300],
+                            backgroundImage: authProvider.profile?.data['user']
+                                        ['avatar'] !=
+                                    null
+                                ? NetworkImage(
+                                    '${authProvider.profile?.data['user']['avatar']['file_domain']}${authProvider.profile?.data['user']['avatar']['uri']}',
+                                  )
+                                : null,
+                            child: authProvider.profile?.data['user']
+                                        ['avatar'] ==
+                                    null
+                                ? const Icon(Icons.person,
+                                    size: 30.0, color: Colors.white)
+                                : null,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  AppLang.translate(
-                                      data: authProvider.profile?.data['user'],
-                                      lang: lang ?? 'kh'),
-                                  style: TextStyle(
-                                    fontSize: Theme.of(context)
-                                        .textTheme
-                                        .bodyLarge!
-                                        .fontSize,
-                                    fontWeight: FontWeight.w500,
-                                  ),
+                                  '${getSafeString(safeValue: '...', value: authProvider.profile?.data['user']?['name_kh'])} (${getSafeString(safeValue: '...', value: authProvider.profile?.data['user']?['name_en'])})',
+                                  style: TextStyle(fontWeight: FontWeight.w500),
+                                ),
+                                SizedBox(
+                                  height: 2,
                                 ),
                                 Text(
-                                  AppLang.translate(
-                                      data: authProvider.profile?.data['user']
-                                          ['roles'][0]['role'],
-                                      lang: lang ?? 'kh'),
+                                  '${AppLang.translate(lang: lang ?? 'kh', data: authProvider.profile?.data['user']?['user_work']?['general_department'])} ',
                                   style: TextStyle(
-                                    fontSize: Theme.of(context)
-                                        .textTheme
-                                        .bodySmall!
-                                        .fontSize,
+                                    fontSize: 12,
                                   ),
-                                  overflow: TextOverflow.ellipsis,
                                 ),
+                                SizedBox(
+                                  height: 2,
+                                ),
+                                Wrap(
+                                  crossAxisAlignment: WrapCrossAlignment.center,
+                                  spacing: 8,
+                                  runSpacing: 4,
+                                  children: [
+                                    Icon(Icons.star_border, size: 16),
+                                    Text(
+                                      '${AppLang.translate(lang: lang ?? 'kh', data: authProvider.profile?.data['user']?['user_work']?['staff_type'])} |',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                    Text(
+                                      '# ${getSafeString(value: authProvider.profile?.data['user']?['user_work']?['id_number'])} |',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                    Icon(Icons.phone_android_sharp, size: 16),
+                                    Text(
+                                      '${getSafeString(value: authProvider.profile?.data['user']?['phone_number'])} ',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ],
+                                )
                               ],
                             ),
-                          ],
-                        ),
-                      ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -186,7 +285,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         icon: Icons.translate,
                         text: 'ភាសា',
                         onTap: () {
-                          context.push(AppRoutes.selectLanguage);
+                          _showSelectLanguageBottomSheet(context);
                         },
                       ),
                       ProfileActionItem(
@@ -242,59 +341,118 @@ class _ProfileScreenState extends State<ProfileScreen> {
 class ProfileActionItem extends StatelessWidget {
   final IconData icon;
   final String text;
-  final VoidCallback? onTap;
-  final bool isLast; // New parameter
+  final VoidCallback onTap;
+  final bool isLast;
 
   const ProfileActionItem({
-    super.key,
+    Key? key,
     required this.icon,
     required this.text,
-    this.onTap,
-    this.isLast = false, // Default to false
-  });
+    required this.onTap,
+    this.isLast = false,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          border: isLast
-              ? null
-              : Border(
-                  bottom: BorderSide(
-                    color: HColors.darkgrey,
-                    width: 0.1,
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+            child: Row(
+              children: [
+                Icon(icon, size: 24, color: HColors.darkgrey),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Text(
+                    text,
+                    style: const TextStyle(fontSize: 16),
                   ),
                 ),
-        ),
-        child: Row(
-          children: [
-            Icon(
-              icon,
-              size: 24,
-              color: HColors.darkgrey,
+                const Icon(Icons.arrow_forward_ios, size: 16),
+              ],
             ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                text,
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-            ),
-            const Icon(
-              Icons.arrow_forward_ios,
-              size: 14,
-              color: HColors.darkgrey,
-            ),
-          ],
-        ),
+          ),
+          if (!isLast)
+            Divider(height: 1, color: HColors.darkgrey.withOpacity(0.1)),
+        ],
       ),
     );
   }
+}
+
+void _showSelectLanguageBottomSheet(BuildContext context) {
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    useRootNavigator: true,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(5.0)),
+    ),
+    backgroundColor: Colors.white,
+    builder: (BuildContext context) {
+      return Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // const SizedBox(height: 16.0),
+            _buildBottomSheetOption(
+              // icon: Icons.account_circle,
+              label: '🇺🇸 English',
+              onTap: () {
+                Provider.of<SettingProvider>(context, listen: false).handleSetLanguage('en');
+                Navigator.pop(context);
+              },
+            ),
+            const SizedBox(height: 16.0),
+            _buildBottomSheetOption(
+              // icon: Icons.airplanemode_active_rounded,
+              label: '🇰🇭 ភាសាខ្មែរ',
+              onTap: () {
+                Provider.of<SettingProvider>(context, listen: false).handleSetLanguage('kh');
+                Navigator.pop(context);
+              },
+            ),
+            const SizedBox(height: 16.0),
+          ],
+        ),
+      );
+    },
+  );
+}
+
+Widget _buildBottomSheetOption({
+  // required IconData icon,
+  required String label,
+  required VoidCallback onTap,
+}) {
+  return InkWell(
+    onTap: onTap,
+    child: Padding(
+      padding: const EdgeInsets.all(8),
+      child: Row(
+        children: [
+          // Container(
+          //   padding: const EdgeInsets.all(8.0),
+          //   decoration: BoxDecoration(
+          //     color: Colors.grey[200],
+          //     shape: BoxShape.circle,
+          //   ),
+          //   child: Icon(icon, size: 24.0, color: Colors.blue[800]),
+          // ),
+          // const SizedBox(width: 12.0),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 16.0,
+              fontWeight: FontWeight.w400,
+              // color: Colors.grey.shade800,
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
 }
