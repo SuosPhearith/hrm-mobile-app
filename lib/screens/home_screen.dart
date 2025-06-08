@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile_app/app_lang.dart';
@@ -11,6 +13,8 @@ import 'package:mobile_app/widgets/custom_progress_bar.dart';
 import 'package:mobile_app/widgets/skeleton/home_skeleton.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:provider/provider.dart';
+import 'package:qr_flutter/qr_flutter.dart';
+import 'package:url_launcher/url_launcher.dart'; // Added for QR code
 
 // Main HomeScreen widget
 class HomeScreen extends StatefulWidget {
@@ -98,7 +102,7 @@ class UserProfileHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final lang = Provider.of<SettingProvider>(context).lang;
-    
+
     return AppBar(
       // backgroundColor: Colors.transparent,
       scrolledUnderElevation: 0,
@@ -154,7 +158,6 @@ class UserProfileHeader extends StatelessWidget {
                               width: 2,
                             ),
                           ),
-                          
                         ),
                       ),
                     ),
@@ -233,7 +236,6 @@ class _IconButton extends StatelessWidget {
   }
 }
 
-// Widget for daily and monthly view
 class DailyMonthlyView extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onPageChanged;
@@ -266,29 +268,31 @@ class DailyMonthlyView extends StatelessWidget {
                     formatDateToDDMMYY: formatDateToDDMMYY,
                   ),
                   MonthlyView(homeProvider: homeProvider),
-                  // CardView(homeProvider: homeProvider),
+                  FlippableCardView(
+                      homeProvider:
+                          homeProvider), // Updated to use FlippableCardView
                 ],
               ),
             ),
             const SizedBox(height: 6),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(2, (index) {
+              children: List.generate(3, (index) {
+                // Updated to 3 for the three pages
                 return AnimatedContainer(
                   duration: const Duration(milliseconds: 300),
-                  width: index == 0 ? 12.0 : 8.0,
+                  width: index == currentIndex ? 12.0 : 8.0,
                   height: 8.0,
                   margin: const EdgeInsets.symmetric(horizontal: 4.0),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: index == currentIndex
-                        ? Colors.blue[700]
+                        ? HColors.blue
                         : Colors.grey[300],
                   ),
                 );
               }),
             ),
-            // const SizedBox(height: 6),
           ],
         ),
       ),
@@ -296,150 +300,6 @@ class DailyMonthlyView extends StatelessWidget {
   }
 }
 
-// Widget for daily view
-// class DailyView extends StatelessWidget {
-//   final HomeProvider homeProvider;
-//   final String Function(String) formatDateToDDMMYY;
-
-//   const DailyView({
-//     super.key,
-//     required this.homeProvider,
-//     required this.formatDateToDDMMYY,
-//   });
-
-//   @override
-//   Widget build(BuildContext context) {
-//     final lang = Provider.of<SettingProvider>(context).lang;
-//     return Container(
-//       padding: const EdgeInsets.all(13.0),
-//       decoration: ShapeDecoration(
-//         color: Colors.white,
-//         shape: RoundedRectangleBorder(
-//           side: BorderSide(width: 1, color: const Color(0xFFCBD5E1)),
-//           borderRadius: BorderRadius.circular(12),
-//         ),
-//       ),
-//       child: Column(
-//         crossAxisAlignment: CrossAxisAlignment.start,
-//         children: [
-//           Row(
-//             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//             children: [
-//               Text(
-//                 AppLang.translate(key: 'home_today', lang: lang ?? 'kh'),
-//                 style: TextStyle(
-//                   fontSize: Theme.of(context).textTheme.bodyLarge!.fontSize,
-//                   fontWeight: FontWeight.w500,
-//                   color: Colors.blue[900],
-//                 ),
-//               ),
-//               Container(
-//                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-//                 decoration: ShapeDecoration(
-//                   color: const Color(0x0C1E293B),
-//                   shape: RoundedRectangleBorder(
-//                     borderRadius: BorderRadius.circular(8),
-//                   ),
-//                 ),
-//                 child: Row(
-//                   children: [
-//                     Text(
-//                       '03-03-2025',
-//                       style: TextStyle(
-//                         color: const Color(0xFF64748B),
-//                         fontSize: 12,
-//                         fontFamily: 'Kantumruy Pro',
-//                         fontWeight: FontWeight.w400,
-//                       ),
-//                     ),
-//                     SizedBox(width: 4),
-//                     Icon(Icons.calendar_today,
-//                         size: 16, color: const Color(0xFF64748B)),
-//                   ],
-//                 ),
-//               ),
-//             ],
-//           ),
-//           const SizedBox(height: 16.0),
-//           Row(
-//             crossAxisAlignment: CrossAxisAlignment.center,
-//             children: [
-//               CircularPercentIndicator(
-//                 radius: 50.0,
-//                 lineWidth: 8.0,
-//                 percent: clampToZeroOne(double.tryParse(homeProvider
-//                         .scanByDayData?.data['percentage']
-//                         ?.toString() ??
-//                     '0.0')),
-//                 center: Column(
-//                   mainAxisAlignment: MainAxisAlignment.center,
-//                   children: [
-//                     Text(
-//                       '${convertToHoursAndMinutes(double.tryParse(homeProvider.scanByDayData?.data['working_hour']?.toString() ?? '0.0'))['hours']} ${AppLang.translate(key: 'hour', lang: lang ?? 'kh')}',
-//                       style: TextStyle(
-//                         fontSize:
-//                             Theme.of(context).textTheme.bodyLarge!.fontSize,
-//                         fontWeight: FontWeight.w500,
-//                         color: Colors.blue[800],
-//                       ),
-//                     ),
-//                     Text(
-//                       '${convertToHoursAndMinutes(double.tryParse(homeProvider.scanByDayData?.data['working_hour']?.toString() ?? '0.0'))['minutes']} ${AppLang.translate(key: 'minute', lang: lang ?? 'kh')}',
-//                       style: TextStyle(
-//                         fontSize:
-//                             Theme.of(context).textTheme.bodyLarge!.fontSize,
-//                       ),
-//                     ),
-//                   ],
-//                 ),
-//                 progressColor: Colors.blue[700],
-//                 backgroundColor: Colors.grey[200]!,
-//                 circularStrokeCap: CircularStrokeCap.round,
-//                 animation: true,
-//                 animationDuration: 1000,
-//               ),
-//               const SizedBox(width: 20.0),
-//               Expanded(
-//                 child: Column(
-//                   children: [
-//                     CheckInOutCard(
-//                       isCheckIn: true,
-//                       time: formatTimeToHour(
-//                           homeProvider.scanByDayData?.data['check_in']),
-//                       terminal: getSafeString(
-//                           value: homeProvider
-//                                   .scanByDayData?.data['first_terminal_log']
-//                               ?['terminal_device']?['name']),
-//                       group: getSafeString(
-//                           value: homeProvider
-//                                   .scanByDayData?.data['first_terminal_log']
-//                               ?['terminal_device']?['group']),
-//                     ),
-//                     const SizedBox(height: 12.0),
-//                     CheckInOutCard(
-//                       isCheckIn: false,
-//                       time: formatTimeToHour(
-//                           homeProvider.scanByDayData?.data['check_out']),
-//                       terminal: getSafeString(
-//                           value: homeProvider
-//                                   .scanByDayData?.data['last_terminal_log']
-//                               ?['terminal_device']?['name']),
-//                       group: getSafeString(
-//                           value: homeProvider
-//                                   .scanByDayData?.data['last_terminal_log']
-//                               ?['terminal_device']?['group']),
-//                     ),
-//                   ],
-//                 ),
-//               ),
-//             ],
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }
-// Widget for daily view
 // Widget for daily view
 class DailyView extends StatelessWidget {
   final HomeProvider homeProvider;
@@ -461,11 +321,10 @@ class DailyView extends StatelessWidget {
         border: Border.all(width: 1, color: const Color(0xFFCBD5E1)),
         borderRadius: BorderRadius.circular(12),
         image: DecorationImage(
-          image: AssetImage('lib/assets/images/Kbach-2.png'), 
-          fit: BoxFit.contain,
-          opacity: 0.5,
-          alignment: Alignment.centerRight
-        ),
+            image: AssetImage('lib/assets/images/Kbach-2.png'),
+            fit: BoxFit.contain,
+            opacity: 0.5,
+            alignment: Alignment.centerRight),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -668,11 +527,10 @@ class MonthlyView extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
         ),
         image: DecorationImage(
-          image: AssetImage('lib/assets/images/Kbach-2.png'), 
-          fit: BoxFit.contain,
-          opacity: 0.5,
-          alignment: Alignment.centerRight
-        ),
+            image: AssetImage('lib/assets/images/Kbach-2.png'),
+            fit: BoxFit.contain,
+            opacity: 0.5,
+            alignment: Alignment.centerRight),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -770,7 +628,6 @@ class MonthlyView extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 4.0),
-            
               CustomProgressBar(
                 percent: getSafeDouble(
                     value: homeProvider.scanByMonthData?.data['percentage']),
@@ -785,6 +642,96 @@ class MonthlyView extends StatelessWidget {
   }
 }
 
+class RotatedImagePainter extends CustomPainter {
+  final String imagePath;
+  final double rotationAngle;
+
+  RotatedImagePainter({required this.imagePath, required this.rotationAngle});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()..color = Colors.white.withOpacity(0.5);
+
+    canvas.save();
+    canvas.translate(size.width / 2, size.height / 2);
+    canvas.rotate(rotationAngle);
+    canvas.translate(-size.width / 2, -size.height / 2);
+    canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height), paint);
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
+}
+
+class FlippableCardView extends StatefulWidget {
+  final HomeProvider homeProvider;
+
+  const FlippableCardView({super.key, required this.homeProvider});
+
+  @override
+  _FlippableCardViewState createState() => _FlippableCardViewState();
+}
+
+class _FlippableCardViewState extends State<FlippableCardView>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  bool _isFront = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 500),
+      vsync: this,
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _toggleCard() {
+    if (_isFront) {
+      _controller.forward();
+    } else {
+      _controller.reverse();
+    }
+    setState(() {
+      _isFront = !_isFront;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: _toggleCard,
+      child: AnimatedBuilder(
+        animation: _controller,
+        builder: (context, child) {
+          final angle = _controller.value * math.pi;
+          final isFrontVisible = angle < math.pi / 2 || angle > 3 * math.pi / 2;
+          return Transform(
+            transform: Matrix4.identity()
+              ..setEntry(3, 2, 0.001) // Perspective
+              ..rotateY(angle),
+            alignment: Alignment.center,
+            child: isFrontVisible
+                ? CardView(homeProvider: widget.homeProvider)
+                : Transform(
+                    transform: Matrix4.identity()..rotateY(math.pi),
+                    alignment: Alignment.center,
+                    child: BackCardView(),
+                  ),
+          );
+        },
+      ),
+    );
+  }
+}
+
 class CardView extends StatelessWidget {
   final HomeProvider homeProvider;
 
@@ -792,128 +739,147 @@ class CardView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // final lang = Provider.of<SettingProvider>(context).lang;
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      clipBehavior: Clip.antiAlias,
-      decoration: ShapeDecoration(
-        color: Colors.white,
-        shape: RoundedRectangleBorder(
-          side: const BorderSide(
-            width: 1,
-            color: Color(0xFFCBD5E1),
-          ),
-          borderRadius: BorderRadius.circular(10),
-        ),
+    final lang = Provider.of<SettingProvider>(context).lang;
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    return CustomPaint(
+      painter: RotatedImagePainter(
+        imagePath: 'lib/assets/images/Kbach-2.png',
+        rotationAngle: 3.14159, // 180 degrees in radians
       ),
-      child: IntrinsicHeight(
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Profile Image Section
-            Column(
-              children: [
-                Container(
-                  width: 80,
-                  height: 80,
-                  decoration: ShapeDecoration(
-                    image: const DecorationImage(
-                      image: NetworkImage("https://placehold.co/80x80"),
-                      fit: BoxFit.cover,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(100),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Container(
-                  width: 56,
-                  height: 56,
-                  decoration: const BoxDecoration(
-                    image: DecorationImage(
-                      image: NetworkImage("https://placehold.co/56x56"),
-                      fit: BoxFit.fill,
-                    ),
-                  ),
-                ),
-              ],
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(16),
+        clipBehavior: Clip.antiAlias,
+        decoration: ShapeDecoration(
+          color: Colors.white,
+          shape: RoundedRectangleBorder(
+            side: const BorderSide(
+              width: 1,
+              color: Color(0xFFCBD5E1),
             ),
-            const SizedBox(width: 16),
-            // Content Section
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Name and Title Section
-                  Container(
-                    padding: const EdgeInsets.only(bottom: 4),
-                    decoration: const ShapeDecoration(
-                      shape: RoundedRectangleBorder(
-                        side: BorderSide(
-                          width: 1,
-                          color: Color(0xFFDDAD01),
-                        ),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          image: DecorationImage(
+            image: AssetImage('lib/assets/images/Kbach-2.png'),
+            fit: BoxFit.fitHeight,
+            opacity: 0.5,
+            alignment: Alignment.centerLeft,
+          ),
+        ),
+        child: IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.only(bottom: 4),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            getSafeString(
+                                safeValue: '...',
+                                value: authProvider.profile?.data['user']
+                                    ?['name_kh']),
+                            style: TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 18,
+                              color: HColors.blue,
+                            ),
+                          ),
+                          SizedBox(height: 2),
+                          Wrap(
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            spacing: 8,
+                            runSpacing: 4,
+                            children: [
+                              Icon(
+                                Icons.apartment_outlined,
+                                size: 16,
+                                color: HColors.darkgrey,
+                              ),
+                              Text(
+                                "${AppLang.translate(lang: lang ?? 'kh', data: authProvider.profile?.data['user']?['user_work']?['general_department'])} |",
+                                style: TextStyle(
+                                    fontSize: 14, fontWeight: FontWeight.w500),
+                              ),
+                              Icon(Icons.star_border, size: 16),
+                              Text(
+                                '${AppLang.translate(lang: lang ?? 'kh', data: authProvider.profile?.data['user']?['user_work']?['staff_type'])} |',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              Text(
+                                '# ${getSafeString(value: authProvider.profile?.data['user']?['user_work']?['id_number'])} |',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 2),
+                          Container(
+                            width: 30,
+                            height: 1,
+                            color: Color(0xFFDDAD01),
+                          ),
+                        ],
                       ),
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'ខួច គឿន',
-                          style: TextStyle(
-                            color: Color(0xFF002458),
-                            fontSize: 16,
-                            fontFamily: 'Kantumruy Pro',
-                            fontWeight: FontWeight.w500,
-                            height: 1.50,
-                          ),
-                        ),
-                        const Text(
-                          'អនុប្រធានាយកដ្ឋាន | អគ្គលេខាធិការដ្ឋាន នៃ ក.អ.ក.',
-                          style: TextStyle(
-                            color: Color(0xFF0F172A),
-                            fontSize: 12,
-                            fontFamily: 'Kantumruy Pro',
-                            fontWeight: FontWeight.w500,
-                            height: 1.33,
-                          ),
-                        ),
-                      ],
+                    _buildContactRow(
+                      Icons.phone_android_sharp,
+                      '${getSafeString(value: authProvider.profile?.data['user']?['phone_number'])} ',
                     ),
+                    const SizedBox(height: 4),
+                    _buildContactRow(
+                      Icons.email,
+                      '${getSafeString(value: authProvider.profile?.data['user']?['email'])} ',
+                    ),
+                    const SizedBox(height: 4),
+                    _buildContactRow(
+                      Icons.location_on,
+                      '${AppLang.translate(lang: lang ?? 'kh', data: authProvider.profile?.data['user']?['village'])} ,${AppLang.translate(lang: lang ?? 'kh', data: authProvider.profile?.data['user']?['commune'])} ,${AppLang.translate(lang: lang ?? 'kh', data: authProvider.profile?.data['user']?['district'])} ,${AppLang.translate(lang: lang ?? 'kh', data: authProvider.profile?.data['user']?['province'])}  ',
+                      isAddress: true,
+                    ),
+                  ],
+                ),
+              ),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  CircleAvatar(
+                    radius: 36,
+                    backgroundColor: Colors.grey[300],
+                    backgroundImage:
+                        authProvider.profile?.data['user']['avatar'] != null
+                            ? NetworkImage(
+                                '${authProvider.profile?.data['user']['avatar']['file_domain']}${authProvider.profile?.data['user']['avatar']['uri']}',
+                              )
+                            : null,
+                    child: authProvider.profile?.data['user']['avatar'] == null
+                        ? const Icon(Icons.person,
+                            size: 30.0, color: Colors.white)
+                        : null,
                   ),
-                  const SizedBox(height: 8),
-                  // Contact Information
-                  _buildContactRow(Icons.phone, '+855 96 541 6704'),
-                  const SizedBox(height: 4),
-                  _buildContactRow(Icons.phone_android, '+855 96 541 6704'),
-                  const SizedBox(height: 4),
-                  _buildContactRow(Icons.email, 'khouch.koeun@gmail.com'),
-                  const SizedBox(height: 4),
-                  _buildContactRow(
-                    Icons.location_on,
-                    'វិមានរាជរដ្ឋាភិបាល, តីរវិថីស៊ីសុវត្ថិ, វត្តភ្នំ, ភ្នំពេញ',
-                    isAddress: true,
+                  QrImageView(
+                    data: getSafeString(
+                        value:
+                            authProvider.profile?.data['user']?['email'] ?? ''),
+                    version: QrVersions.auto,
+                    size: 56.0,
+                    backgroundColor: Colors.white,
+                    padding: const EdgeInsets.all(4),
                   ),
                 ],
               ),
-            ),
-            // Action Button
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: ShapeDecoration(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(100),
-                ),
-              ),
-              child: const Icon(
-                Icons.more_vert,
-                size: 24,
-                color: Color(0xFF64748B),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -940,16 +906,242 @@ class CardView extends StatelessWidget {
             text,
             style: const TextStyle(
               color: Color(0xFF0F172A),
-              fontSize: 12,
+              fontSize: 14,
               fontFamily: 'Kantumruy Pro',
               fontWeight: FontWeight.w400,
-              height: 1.33,
+              height: 1.5,
             ),
             maxLines: isAddress ? 2 : 1,
             overflow: TextOverflow.ellipsis,
           ),
         ),
       ],
+    );
+  }
+}
+
+class BackCardView extends StatelessWidget {
+  const BackCardView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      clipBehavior: Clip.antiAlias,
+      decoration: ShapeDecoration(
+        color: Colors.white,
+        shape: RoundedRectangleBorder(
+          side: const BorderSide(
+            width: 1,
+            color: Color(0xFFCBD5E1),
+          ),
+          borderRadius: BorderRadius.circular(10),
+        ),
+      ),
+      child: Stack(
+        children: [
+          // Row(
+          //   mainAxisAlignment: MainAxisAlignment.end,
+          //   children: [
+          //     IconButton(
+          //       onPressed: () {},
+          //       icon: Icon(
+          //         Icons.more_vert_outlined,
+          //       ),
+          //     ),
+          //   ],
+          // ),
+          // Top-left background image
+          Positioned(
+            left: -30,
+            top: -30,
+            child: Opacity(
+              opacity: 0.5, // Lower opacity for subtle background
+              child: Container(
+                width: 100,
+                height: 100,
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage('lib/assets/images/f.png'),
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          // Bottom-right background image
+          Positioned(
+            right: -30,
+            bottom: -30,
+            child: Opacity(
+              opacity: 0.5,
+              child: Container(
+                width: 100,
+                height: 100,
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage('lib/assets/images/f.png'),
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          // Center content
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Container(
+                  height: 60,
+                  width: 100,
+                  decoration: const BoxDecoration(
+                    image: DecorationImage(
+                      fit: BoxFit.contain,
+                      image: AssetImage('lib/assets/images/logo.png'),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  "ក្រុមប្រឹក្សារអភិវឌ្ឍកម្ពុជា",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w500,
+                    // color: Color(0xFFDDAD01),
+                    // fontFamily: 'Kantumruy Pro',
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  "Council for the Development of Cambodia",
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center, // Center the row
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: 16,
+                      height: 16,
+                      margin: const EdgeInsets.only(top: 2),
+                      child: Icon(
+                        Icons.location_on,
+                        size: 14,
+                        color: const Color(0xFF64748B),
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Flexible(
+                      // Use Flexible to prevent overflow
+                      child: Text(
+                        'វិមានរាជរដ្ឋាភិបាល, វិថីសុីសុវត្ថិ, វត្តភ្នំ, ភ្នំពេញ',
+                        style: const TextStyle(
+                          // color: Color(0xFF0F172A),
+                          fontSize: 12,
+
+                          fontWeight: FontWeight.w400,
+                          height: 1.5,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign:
+                            TextAlign.center, // Center text within the Flexible
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(
+                  height: 8,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    GestureDetector(
+                      onTap: () async {
+                        final url = 'https://www.youtube.com';
+                        if (await canLaunchUrl(Uri.parse(url))) {
+                          await launchUrl(Uri.parse(url));
+                        } else {
+                          // Handle error (e.g., show a snackbar)
+                          // print('Could not launch $url');
+                        }
+                      },
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Icon(
+                            Icons.email,
+                            size: 14,
+                            color: HColors.darkgrey,
+                          ),
+                          SizedBox(
+                            width: 5,
+                          ),
+                          Text(
+                            'info@cdc.gov.kh',
+                            style: TextStyle(
+                              // decoration:
+                              //     TextDecoration.underline, // Adds underline
+                              color: HColors.darkgrey,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Text(
+                      '+855 99 799 579',
+                      style: TextStyle(fontSize: 12, color: HColors.darkgrey),
+                    ),
+                    GestureDetector(
+                      onTap: () async {
+                        final url = 'www.cdc.gov.kh';
+                        if (await canLaunchUrl(Uri.parse(url))) {
+                          await launchUrl(Uri.parse(url));
+                        } else {
+                          // Handle error (e.g., show a snackbar)
+                          print('Could not launch $url');
+                        }
+                      },
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Icon(
+                            Icons.language,
+                            size: 14,
+                            color: HColors.darkgrey,
+                          ),
+                          SizedBox(
+                            width: 5,
+                          ),
+                          Text(
+                            'www.cdc.gov.kh',
+                            style: TextStyle(
+                              // decoration:
+                              //     TextDecoration.underline, // Adds underline
+                              color: HColors.darkgrey,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                )
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

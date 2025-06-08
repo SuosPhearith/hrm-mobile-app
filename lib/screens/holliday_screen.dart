@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:mobile_app/providers/local/holiday_provider.dart';
 import 'package:mobile_app/shared/color/colors.dart';
 import 'package:mobile_app/widgets/custom_header.dart';
+import 'package:mobile_app/widgets/skeleton/holiday_skeleton.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -58,7 +59,7 @@ class _HolidayScreenState extends State<HolidayScreen> {
           bottom: CustomHeader(),
         ),
         body: provider.isLoading
-            ? Text('Loading..')
+            ?HolidayScreenSkeleton()
             : Column(
                 children: [
                   TableCalendar(

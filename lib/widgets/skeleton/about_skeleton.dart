@@ -172,17 +172,3 @@ class AboutSkeleton extends StatelessWidget {
   }
 }
 
-class _CustomHeaderSkeleton extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-      color: HColors.darkgrey.withOpacity(0.1),
-      child: Container(
-        width: double.infinity,
-        height: 32.0,
-        color: HColors.darkgrey.withOpacity(0.1),
-      ),
-    );
-  }
-}

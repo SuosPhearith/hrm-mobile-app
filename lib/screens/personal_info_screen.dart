@@ -442,7 +442,12 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
           // Only show edit icon if onEditTap is provided
           if (onEditTap != null)
             IconButton(
-              onPressed: () => onEditTap,
+              onPressed: (){
+                setState(() {
+                  onEditTap();
+                  // print("hello");
+                });
+              },
               icon: Icon(Icons.edit, size: 20.0, color: HColors.darkgrey),
             ),
         ],
