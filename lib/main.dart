@@ -522,13 +522,13 @@ class _MainLayoutState extends State<MainLayout> {
               ),
             ),
             BottomNavigationBarItem(
-              icon: _buildNavIcon(Icons.grid_view_rounded, 4),
+              icon: _buildNavIcon(Icons.manage_accounts_outlined, 4),
               activeIcon: _buildNavIcon(
-                Icons.grid_view_rounded,
+                Icons.manage_accounts,
                 4,
                 active: true,
               ),
-              label: AppLang.translate(key: 'layout_other', lang: lang ?? 'kh'),
+              label: AppLang.translate(key: 'settings', lang: lang ?? 'kh'),
             ),
           ],
         ),

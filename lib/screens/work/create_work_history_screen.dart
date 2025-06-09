@@ -25,11 +25,11 @@ class CreateWorkHistoryScreen extends StatefulWidget {
 }
 
 class _CreateWorkHistoryScreenState extends State<CreateWorkHistoryScreen> {
-  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
-      GlobalKey<RefreshIndicatorState>();
-  Future<void> _refreshData(CreateWorkProvider provider) async {
-    return await provider.getHome();
-  }
+  // final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
+  //     GlobalKey<RefreshIndicatorState>();
+  // Future<void> _refreshData(CreateWorkProvider provider) async {
+  //   return await provider.getHome();
+  // }
 
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _dateIn = TextEditingController();
@@ -181,14 +181,10 @@ class _CreateWorkHistoryScreenState extends State<CreateWorkHistoryScreen> {
               scrolledUnderElevation: 0,
               bottom: CustomHeader(),
             ),
-            body: RefreshIndicator(
-              key: _refreshIndicatorKey,
-              color: Colors.blue[800],
-              backgroundColor: Colors.white,
-              onRefresh: () => _refreshData(provider),
-              child: provider.isLoading
-                  ? const Center(child: Text('Loading...'))
-                  : SingleChildScrollView(
+            body: provider.isLoading
+                ? const Center(child: Text('Loading...'))
+                : SafeArea(
+                  child: SingleChildScrollView(
                       physics: const AlwaysScrollableScrollPhysics(),
                       padding: const EdgeInsets.all(15),
                       child: Form(
@@ -384,7 +380,7 @@ class _CreateWorkHistoryScreenState extends State<CreateWorkHistoryScreen> {
                                 });
                               },
                             ),
-
+                              
                             const SizedBox(height: 16),
                             // Department
                             _buildSelectionField(
@@ -454,33 +450,35 @@ class _CreateWorkHistoryScreenState extends State<CreateWorkHistoryScreen> {
                               },
                             ),
                             const SizedBox(height: 16),
-
+                              
                             // const SizedBox(
                             //     height: 30), // Extra space before button
                           ],
                         ),
                       ),
                     ),
-            ),
-            bottomNavigationBar: Padding(
-              padding: const EdgeInsets.all(15),
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    backgroundColor: Colors.blue[900],
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
+                ),
+            bottomNavigationBar: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(15),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      backgroundColor: Colors.blue[900],
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
                     ),
-                  ),
-                  onPressed: () {
-                    _handleSubmit();
-                  },
-                  child: Text(
-                    AppLang.translate(
-                        lang: settingProvider.lang ?? 'kh', key: 'create'),
-                    style: TextStyle(fontSize: 16, color: Colors.white),
+                    onPressed: () {
+                      _handleSubmit();
+                    },
+                    child: Text(
+                      AppLang.translate(
+                          lang: settingProvider.lang ?? 'kh', key: 'create'),
+                      style: TextStyle(fontSize: 16, color: Colors.white),
+                    ),
                   ),
                 ),
               ),

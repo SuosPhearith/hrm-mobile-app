@@ -106,96 +106,101 @@ class UserProfileHeader extends StatelessWidget {
     return AppBar(
       // backgroundColor: Colors.transparent,
       scrolledUnderElevation: 0,
-      title: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Flexible(
-            child: Row(
-              children: [
-                Stack(
-                  children: [
-                    ClipOval(
-                      child: Image.network(
-                        '${authProvider.profile?.data['user']['avatar']['file_domain']}${authProvider.profile?.data['user']['avatar']['uri']}',
-                        width: 40.0,
-                        height: 40.0,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) => Container(
+      title: InkWell(
+        onTap: (){
+          context.push(AppRoutes.profile);
+        },
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Flexible(
+              child: Row(
+                children: [
+                  Stack(
+                    children: [
+                      ClipOval(
+                        child: Image.network(
+                          '${authProvider.profile?.data['user']['avatar']['file_domain']}${authProvider.profile?.data['user']['avatar']['uri']}',
                           width: 40.0,
                           height: 40.0,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.grey[600],
-                          ),
-                          child: const Center(
-                            child: Icon(Icons.person,
-                                size: 30.0, color: Colors.white),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: GestureDetector(
-                        // onTap: () {
-                        //   // Handle close/remove action
-                        //   setState(() {
-                        //     selectedItems
-                        //         .value = List.from(selected)
-                        //       ..removeWhere(
-                        //           (s) => s['id'] == userId);
-                        //   });
-                        // },
-                        child: Container(
-                          width: 12,
-                          height: 12,
-                          decoration: BoxDecoration(
-                            color: HColors.green,
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: Colors.white,
-                              width: 2,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) => Container(
+                            width: 40.0,
+                            height: 40.0,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.grey[600],
+                            ),
+                            child: const Center(
+                              child: Icon(Icons.person,
+                                  size: 30.0, color: Colors.white),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(width: 6.0),
-                Flexible(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        AppLang.translate(
-                            data: authProvider.profile?.data['user'],
-                            lang: lang ?? 'kh'),
-                        style: TextStyle(
-                          fontSize:
-                              Theme.of(context).textTheme.bodyLarge!.fontSize,
-                          fontWeight: FontWeight.w500,
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: GestureDetector(
+                          // onTap: () {
+                          //   // Handle close/remove action
+                          //   setState(() {
+                          //     selectedItems
+                          //         .value = List.from(selected)
+                          //       ..removeWhere(
+                          //           (s) => s['id'] == userId);
+                          //   });
+                          // },
+                          child: Container(
+                            width: 12,
+                            height: 12,
+                            decoration: BoxDecoration(
+                              color: HColors.green,
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: Colors.white,
+                                width: 2,
+                              ),
+                            ),
+                          ),
                         ),
-                      ),
-                      Text(
-                        AppLang.translate(
-                            data: authProvider.profile?.data['user']['roles'][0]
-                                ['role'],
-                            lang: lang ?? 'kh'),
-                        style: TextStyle(
-                          fontSize:
-                              Theme.of(context).textTheme.bodySmall!.fontSize,
-                        ),
-                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ),
-                ),
-              ],
-            ),
-          )
-        ],
+                  const SizedBox(width: 6.0),
+                  Flexible(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          AppLang.translate(
+                              data: authProvider.profile?.data['user'],
+                              lang: lang ?? 'kh'),
+                          style: TextStyle(
+                            fontSize:
+                                Theme.of(context).textTheme.bodyLarge!.fontSize,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        Text(
+                          AppLang.translate(
+                              data: authProvider.profile?.data['user']['roles'][0]
+                                  ['role'],
+                              lang: lang ?? 'kh'),
+                          style: TextStyle(
+                            fontSize:
+                                Theme.of(context).textTheme.bodySmall!.fontSize,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            )
+          ],
+        ),
       ),
       actions: [
         Padding(
@@ -286,9 +291,8 @@ class DailyMonthlyView extends StatelessWidget {
                   margin: const EdgeInsets.symmetric(horizontal: 4.0),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: index == currentIndex
-                        ? HColors.blue
-                        : Colors.grey[300],
+                    color:
+                        index == currentIndex ? HColors.blue : Colors.grey[300],
                   ),
                 );
               }),
@@ -323,7 +327,7 @@ class DailyView extends StatelessWidget {
         image: DecorationImage(
             image: AssetImage('lib/assets/images/Kbach-2.png'),
             fit: BoxFit.contain,
-            opacity: 0.5,
+            opacity: 0.3,
             alignment: Alignment.centerRight),
       ),
       child: Column(
@@ -527,9 +531,11 @@ class MonthlyView extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
         ),
         image: DecorationImage(
-            image: AssetImage('lib/assets/images/Kbach-2.png'),
-            fit: BoxFit.contain,
-            opacity: 0.5,
+            image: AssetImage(
+              'lib/assets/images/Kbach-2.png',
+            ),
+            fit: BoxFit.scaleDown,
+            opacity: 0.3,
             alignment: Alignment.centerRight),
       ),
       child: Column(
@@ -761,8 +767,8 @@ class CardView extends StatelessWidget {
           ),
           image: DecorationImage(
             image: AssetImage('lib/assets/images/Kbach-2.png'),
-            fit: BoxFit.fitHeight,
-            opacity: 0.5,
+            fit: BoxFit.contain,
+            opacity: 0.3,
             alignment: Alignment.centerLeft,
           ),
         ),
@@ -778,6 +784,7 @@ class CardView extends StatelessWidget {
                       padding: const EdgeInsets.only(bottom: 4),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
                             getSafeString(
@@ -791,37 +798,31 @@ class CardView extends StatelessWidget {
                             ),
                           ),
                           SizedBox(height: 2),
-                          Wrap(
-                            crossAxisAlignment: WrapCrossAlignment.center,
-                            spacing: 8,
-                            runSpacing: 4,
-                            children: [
-                              Icon(
-                                Icons.apartment_outlined,
-                                size: 16,
-                                color: HColors.darkgrey,
-                              ),
-                              Text(
-                                "${AppLang.translate(lang: lang ?? 'kh', data: authProvider.profile?.data['user']?['user_work']?['general_department'])} |",
-                                style: TextStyle(
-                                    fontSize: 14, fontWeight: FontWeight.w500),
-                              ),
-                              Icon(Icons.star_border, size: 16),
-                              Text(
-                                '${AppLang.translate(lang: lang ?? 'kh', data: authProvider.profile?.data['user']?['user_work']?['staff_type'])} |',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
+                          SizedBox(
+                            width: 220,
+                            child: Wrap(
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              spacing: 4,
+                              runSpacing: 4,
+                              children: [
+                                Text(
+                                  "${AppLang.translate(data: authProvider.profile?.data['user']['roles'][0]['department'], lang: lang ?? 'kh')} | ${AppLang.translate(lang: lang ?? 'kh', data: authProvider.profile?.data['user']?['user_work']?['staff_type'])}",
+                                  style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500),
                                 ),
-                              ),
-                              Text(
-                                '# ${getSafeString(value: authProvider.profile?.data['user']?['user_work']?['id_number'])} |',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
+                                // Text(
+                                //   AppLang.translate(
+                                //       lang: lang ?? 'kh',
+                                //       data: authProvider.profile?.data['user']
+                                //           ?['user_work']?['staff_type']),
+                                //   style: TextStyle(
+                                //     fontSize: 14,
+                                //     fontWeight: FontWeight.w500,
+                                //   ),
+                                // ),
+                              ],
+                            ),
                           ),
                           SizedBox(height: 2),
                           Container(
@@ -852,9 +853,10 @@ class CardView extends StatelessWidget {
               ),
               Column(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   CircleAvatar(
-                    radius: 36,
+                    radius: 42,
                     backgroundColor: Colors.grey[300],
                     backgroundImage:
                         authProvider.profile?.data['user']['avatar'] != null
@@ -867,12 +869,15 @@ class CardView extends StatelessWidget {
                             size: 30.0, color: Colors.white)
                         : null,
                   ),
+                  SizedBox(
+                    height: 12,
+                  ),
                   QrImageView(
                     data: getSafeString(
                         value:
                             authProvider.profile?.data['user']?['email'] ?? ''),
                     version: QrVersions.auto,
-                    size: 56.0,
+                    size: 70.0,
                     backgroundColor: Colors.white,
                     padding: const EdgeInsets.all(4),
                   ),
@@ -889,11 +894,12 @@ class CardView extends StatelessWidget {
       {bool isAddress = false}) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.start,
       children: [
         Container(
           width: 16,
           height: 16,
-          margin: const EdgeInsets.only(top: 2),
+          margin: const EdgeInsets.only(top: 3),
           child: Icon(
             icon,
             size: 14,
@@ -901,18 +907,25 @@ class CardView extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 4),
-        Expanded(
-          child: Text(
-            text,
-            style: const TextStyle(
-              color: Color(0xFF0F172A),
-              fontSize: 14,
-              fontFamily: 'Kantumruy Pro',
-              fontWeight: FontWeight.w400,
-              height: 1.5,
-            ),
-            maxLines: isAddress ? 2 : 1,
-            overflow: TextOverflow.ellipsis,
+        SizedBox(
+          width: 210,
+          child: Wrap(
+            crossAxisAlignment: WrapCrossAlignment.center,
+            // spacing: 2,
+            //                   runSpacing: 2,
+            children: [
+              Text(
+                text,
+                style: const TextStyle(
+                  // color: Color(0xFF0F172A),
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                  height: 1.5,
+                ),
+                maxLines: isAddress ? 2 : 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
           ),
         ),
       ],

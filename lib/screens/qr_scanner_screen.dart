@@ -178,75 +178,77 @@ class _QRScanSuccessScreenState extends State<QRScanSuccessScreen> {
       ),
       body: isLoading
           ? const QRScanSuccessSkeleton()
-          : Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.check_circle,
-                    size: 100,
-                    color: HColors.blue,
-                  ),
-                  const SizedBox(height: 24),
-                  Text(
-                    'QR Code Scanned Successfully!',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black,
+          : SafeArea(
+            child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.check_circle,
+                      size: 100,
+                      color: HColors.blue,
                     ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 16),
-                  Container(
-                    padding: const EdgeInsets.all(16.0),
-                    decoration: BoxDecoration(
-                      color: Colors.grey[200],
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: HColors.blue.withOpacity(0.2)),
-                    ),
-                    child: Text(
-                      widget.scannedResult,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w400,
-                        color: Colors.black87,
+                    const SizedBox(height: 24),
+                    Text(
+                      'QR Code Scanned Successfully!',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black,
                       ),
                       textAlign: TextAlign.center,
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 3,
                     ),
-                  ),
-                  const SizedBox(height: 24),
-                  ElevatedButton(
-                    onPressed: () {
-                      // Pop back to the previous screen with the result
-                      Navigator.pop(context, widget.scannedResult);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: HColors.blue,
-                      foregroundColor: HColors.yellow,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 32,
-                        vertical: 12,
-                      ),
-                      shape: RoundedRectangleBorder(
+                    const SizedBox(height: 16),
+                    Container(
+                      padding: const EdgeInsets.all(16.0),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[200],
                         borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: HColors.blue.withOpacity(0.2)),
+                      ),
+                      child: Text(
+                        widget.scannedResult,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w400,
+                          color: Colors.black87,
+                        ),
+                        textAlign: TextAlign.center,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 3,
                       ),
                     ),
-                    child: const Text(
-                      'Done',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
+                    const SizedBox(height: 24),
+                    ElevatedButton(
+                      onPressed: () {
+                        // Pop back to the previous screen with the result
+                        Navigator.pop(context, widget.scannedResult);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: HColors.blue,
+                        foregroundColor: HColors.yellow,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 32,
+                          vertical: 12,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: const Text(
+                        'Done',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
+          ),
     );
   }
 }

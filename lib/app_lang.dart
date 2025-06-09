@@ -180,7 +180,7 @@ class AppLang {
     'home_no_department': 'មិនមានផ្នែក',
     'hour': 'ម៉ោង',
     'minute': 'នាទី',
-     'settings':'ការកំណត់',
+    'settings':'ការកំណត់',
     // About ================================================
     'about_system': 'អំពីប្រព័ន្ធ',
     'about_rule': 'អនុក្រឹត',

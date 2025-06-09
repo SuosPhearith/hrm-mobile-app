@@ -37,13 +37,15 @@ class _PersonalInfoDetailScreenState extends State<PersonalInfoDetailScreen> {
               onRefresh: () => _refreshData(evaluateProvider),
               child: evaluateProvider.isLoading
                   ? Center(child: Text('Loading...'))
-                  : SingleChildScrollView(
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Text('Personal info'),
+                  : SafeArea(
+                    child: SingleChildScrollView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Text('Personal info'),
+                        ),
                       ),
-                    ),
+                  ),
             ),
           );
         }));

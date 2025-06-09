@@ -386,369 +386,373 @@ class _UpdateUserWorkScreenState extends State<UpdateUserWorkScreen> {
             ),
             body: provider.isLoading
                 ? const Center(child: Text('Loading...'))
-                : SingleChildScrollView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    padding: const EdgeInsets.all(15),
-                    child: Form(
-                      key: _formKey,
-                      child: Column(
-                        children: [
-                          const SizedBox(height: 10),
-                          Row(
-                            children: [
-                              Expanded(
-                                // child: TextFormField(
-                                //   controller: txtStreetNumber,
-                                //   decoration: InputDecoration(
-                                //     labelText: AppLang.translate(
-                                //         key: "user_info_street", lang: 'kh'),
-                                //     border: const OutlineInputBorder(
-                                //       borderRadius: BorderRadius.all(
-                                //           Radius.circular(12.0)),
-                                //     ),
-                                //   ),
-                                // ),
-                                child: _buildTextField(
-                                  controller: _id,
-                                  label: AppLang.translate(
-                                    lang: settingProvider.lang ?? 'kh',
-                                    key: 'id_number',
+                : SafeArea(
+                  child: SingleChildScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      padding: const EdgeInsets.all(15),
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          children: [
+                            const SizedBox(height: 10),
+                            Row(
+                              children: [
+                                Expanded(
+                                  // child: TextFormField(
+                                  //   controller: txtStreetNumber,
+                                  //   decoration: InputDecoration(
+                                  //     labelText: AppLang.translate(
+                                  //         key: "user_info_street", lang: 'kh'),
+                                  //     border: const OutlineInputBorder(
+                                  //       borderRadius: BorderRadius.all(
+                                  //           Radius.circular(12.0)),
+                                  //     ),
+                                  //   ),
+                                  // ),
+                                  child: _buildTextField(
+                                    controller: _id,
+                                    label: AppLang.translate(
+                                      lang: settingProvider.lang ?? 'kh',
+                                      key: 'id_number',
+                                    ),
+                                    // keyboardType: TextInputType.number,
                                   ),
-                                  // keyboardType: TextInputType.number,
                                 ),
-                              ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                // child: TextFormField(
-                                //   controller: txtHomeNumber,
-                                //   decoration: InputDecoration(
-                                //     labelText: AppLang.translate(
-                                //         key: "user_info_number", lang: 'kh'),
-                                //     border: const OutlineInputBorder(
-                                //       borderRadius: BorderRadius.all(
-                                //           Radius.circular(12.0)),
-                                //     ),
-                                //   ),
-                                // ),
-                                child: _buildTextField(
-                                  controller: _idCard,
-                                  label: AppLang.translate(
-                                    lang: settingProvider.lang ?? 'kh',
-                                    key: 'staff_card_number',
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  // child: TextFormField(
+                                  //   controller: txtHomeNumber,
+                                  //   decoration: InputDecoration(
+                                  //     labelText: AppLang.translate(
+                                  //         key: "user_info_number", lang: 'kh'),
+                                  //     border: const OutlineInputBorder(
+                                  //       borderRadius: BorderRadius.all(
+                                  //           Radius.circular(12.0)),
+                                  //     ),
+                                  //   ),
+                                  // ),
+                                  child: _buildTextField(
+                                    controller: _idCard,
+                                    label: AppLang.translate(
+                                      lang: settingProvider.lang ?? 'kh',
+                                      key: 'staff_card_number',
+                                    ),
+                                    // keyboardType: TextInputType.number,
                                   ),
-                                  // keyboardType: TextInputType.number,
                                 ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(
-                            height: 16,
-                          ),
-                          // Date Picker Row
-                          // Row(
-                          //   children: [
-                          //     Expanded(
-                          //       child: TextFormField(
-                          //         controller: _appointmentAt,
-                          //         readOnly: true,
-                          //         decoration: InputDecoration(
-                          //           labelText: AppLang.translate(
-                          //             lang: settingProvider.lang ?? 'kh',
-                          //             key: 'appointed_at',
-                          //           ),
-                          //           labelStyle:
-                          //               TextStyle(color: Colors.blueGrey),
-                          //           border: OutlineInputBorder(
-                          //             borderRadius:
-                          //                 BorderRadius.circular(12.0),
-                          //             borderSide: BorderSide(
-                          //                 color: Colors
-                          //                     .blueGrey), // Normal border color
-                          //           ),
-                          //           enabledBorder: OutlineInputBorder(
-                          //             borderRadius:
-                          //                 BorderRadius.circular(12.0),
-                          //             borderSide: BorderSide(
-                          //                 color: Colors
-                          //                     .blueGrey), // Enabled but not focused
-                          //           ),
-                          //           focusedBorder: OutlineInputBorder(
-                          //             borderRadius:
-                          //                 BorderRadius.circular(12.0),
-                          //             borderSide: BorderSide(
-                          //               color: Theme.of(context)
-                          //                   .colorScheme
-                          //                   .primary, // Focused border color
-                          //               width: 2.0,
-                          //             ),
-                          //           ),
-                          //           errorBorder: OutlineInputBorder(
-                          //             borderRadius:
-                          //                 BorderRadius.circular(12.0),
-                          //             borderSide: BorderSide(
-                          //                 color: Colors.red), // Error state
-                          //           ),
-                          //           focusedErrorBorder: OutlineInputBorder(
-                          //             borderRadius:
-                          //                 BorderRadius.circular(12.0),
-                          //             borderSide: BorderSide(
-                          //               color:
-                          //                   Colors.red, // Focused error state
-                          //               width: 2.0,
-                          //             ),
-                          //           ),
-                          //           suffixIcon: IconButton(
-                          //             icon: const Icon(Icons.calendar_today),
-                          //             onPressed: () =>
-                          //                 _selectDate(_appointmentAt),
-                          //           ),
-                          //         ),
-                          //       ),
-                          //     ),
-                          //     const SizedBox(width: 8),
-                          //     Expanded(
-                          //       child: TextFormField(
-                          //         controller: _startWorkingAt,
-                          //         readOnly: true,
-                          //         decoration: InputDecoration(
-                          //           labelText: AppLang.translate(
-                          //               lang: settingProvider.lang ?? 'kh',
-                          //               key: 'start_working_at'),
-                          //           labelStyle:
-                          //               TextStyle(color: Colors.blueGrey),
-                          //           border: OutlineInputBorder(
-                          //             borderRadius:
-                          //                 BorderRadius.circular(12.0),
-                          //             borderSide: BorderSide(
-                          //                 color: Colors
-                          //                     .blueGrey), // Normal border color
-                          //           ),
-                          //           enabledBorder: OutlineInputBorder(
-                          //             borderRadius:
-                          //                 BorderRadius.circular(12.0),
-                          //             borderSide: BorderSide(
-                          //                 color: Colors
-                          //                     .blueGrey), // Enabled but not focused
-                          //           ),
-                          //           focusedBorder: OutlineInputBorder(
-                          //             borderRadius:
-                          //                 BorderRadius.circular(12.0),
-                          //             borderSide: BorderSide(
-                          //               color: Theme.of(context)
-                          //                   .colorScheme
-                          //                   .primary, // Focused border color
-                          //               width: 2.0,
-                          //             ),
-                          //           ),
-                          //           errorBorder: OutlineInputBorder(
-                          //             borderRadius:
-                          //                 BorderRadius.circular(12.0),
-                          //             borderSide: BorderSide(
-                          //                 color: Colors.red), // Error state
-                          //           ),
-                          //           focusedErrorBorder: OutlineInputBorder(
-                          //             borderRadius:
-                          //                 BorderRadius.circular(12.0),
-                          //             borderSide: BorderSide(
-                          //               color:
-                          //                   Colors.red, // Focused error state
-                          //               width: 2.0,
-                          //             ),
-                          //           ),
-                          //           suffixIcon: IconButton(
-                          //             icon: const Icon(Icons.calendar_today),
-                          //             onPressed: () =>
-                          //                 _selectDate(_startWorkingAt),
-                          //           ),
-                          //         ),
-                          //         onTap: () => _selectDate(_startWorkingAt),
-                          //       ),
-                          //     ),
-                          //   ],
-                          // ),
-                          const SizedBox(height: 16),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: DateInputField(
-                                  label: 'ថ្ងៃចាប់ផ្តើម',
-                                  hint: 'សូមជ្រើសរើសកាលបរិច្ឆេទ',
-                                  initialDate: DateTime.now(),
-                                  selectedDate: _startDate,
-                                  onDateSelected: (date) {
-                                    setState(() {
-                                      _startDate = date;
-                                    });
-                                  },
+                              ],
+                            ),
+                            SizedBox(
+                              height: 16,
+                            ),
+                            // Date Picker Row
+                            // Row(
+                            //   children: [
+                            //     Expanded(
+                            //       child: TextFormField(
+                            //         controller: _appointmentAt,
+                            //         readOnly: true,
+                            //         decoration: InputDecoration(
+                            //           labelText: AppLang.translate(
+                            //             lang: settingProvider.lang ?? 'kh',
+                            //             key: 'appointed_at',
+                            //           ),
+                            //           labelStyle:
+                            //               TextStyle(color: Colors.blueGrey),
+                            //           border: OutlineInputBorder(
+                            //             borderRadius:
+                            //                 BorderRadius.circular(12.0),
+                            //             borderSide: BorderSide(
+                            //                 color: Colors
+                            //                     .blueGrey), // Normal border color
+                            //           ),
+                            //           enabledBorder: OutlineInputBorder(
+                            //             borderRadius:
+                            //                 BorderRadius.circular(12.0),
+                            //             borderSide: BorderSide(
+                            //                 color: Colors
+                            //                     .blueGrey), // Enabled but not focused
+                            //           ),
+                            //           focusedBorder: OutlineInputBorder(
+                            //             borderRadius:
+                            //                 BorderRadius.circular(12.0),
+                            //             borderSide: BorderSide(
+                            //               color: Theme.of(context)
+                            //                   .colorScheme
+                            //                   .primary, // Focused border color
+                            //               width: 2.0,
+                            //             ),
+                            //           ),
+                            //           errorBorder: OutlineInputBorder(
+                            //             borderRadius:
+                            //                 BorderRadius.circular(12.0),
+                            //             borderSide: BorderSide(
+                            //                 color: Colors.red), // Error state
+                            //           ),
+                            //           focusedErrorBorder: OutlineInputBorder(
+                            //             borderRadius:
+                            //                 BorderRadius.circular(12.0),
+                            //             borderSide: BorderSide(
+                            //               color:
+                            //                   Colors.red, // Focused error state
+                            //               width: 2.0,
+                            //             ),
+                            //           ),
+                            //           suffixIcon: IconButton(
+                            //             icon: const Icon(Icons.calendar_today),
+                            //             onPressed: () =>
+                            //                 _selectDate(_appointmentAt),
+                            //           ),
+                            //         ),
+                            //       ),
+                            //     ),
+                            //     const SizedBox(width: 8),
+                            //     Expanded(
+                            //       child: TextFormField(
+                            //         controller: _startWorkingAt,
+                            //         readOnly: true,
+                            //         decoration: InputDecoration(
+                            //           labelText: AppLang.translate(
+                            //               lang: settingProvider.lang ?? 'kh',
+                            //               key: 'start_working_at'),
+                            //           labelStyle:
+                            //               TextStyle(color: Colors.blueGrey),
+                            //           border: OutlineInputBorder(
+                            //             borderRadius:
+                            //                 BorderRadius.circular(12.0),
+                            //             borderSide: BorderSide(
+                            //                 color: Colors
+                            //                     .blueGrey), // Normal border color
+                            //           ),
+                            //           enabledBorder: OutlineInputBorder(
+                            //             borderRadius:
+                            //                 BorderRadius.circular(12.0),
+                            //             borderSide: BorderSide(
+                            //                 color: Colors
+                            //                     .blueGrey), // Enabled but not focused
+                            //           ),
+                            //           focusedBorder: OutlineInputBorder(
+                            //             borderRadius:
+                            //                 BorderRadius.circular(12.0),
+                            //             borderSide: BorderSide(
+                            //               color: Theme.of(context)
+                            //                   .colorScheme
+                            //                   .primary, // Focused border color
+                            //               width: 2.0,
+                            //             ),
+                            //           ),
+                            //           errorBorder: OutlineInputBorder(
+                            //             borderRadius:
+                            //                 BorderRadius.circular(12.0),
+                            //             borderSide: BorderSide(
+                            //                 color: Colors.red), // Error state
+                            //           ),
+                            //           focusedErrorBorder: OutlineInputBorder(
+                            //             borderRadius:
+                            //                 BorderRadius.circular(12.0),
+                            //             borderSide: BorderSide(
+                            //               color:
+                            //                   Colors.red, // Focused error state
+                            //               width: 2.0,
+                            //             ),
+                            //           ),
+                            //           suffixIcon: IconButton(
+                            //             icon: const Icon(Icons.calendar_today),
+                            //             onPressed: () =>
+                            //                 _selectDate(_startWorkingAt),
+                            //           ),
+                            //         ),
+                            //         onTap: () => _selectDate(_startWorkingAt),
+                            //       ),
+                            //     ),
+                            //   ],
+                            // ),
+                            const SizedBox(height: 16),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: DateInputField(
+                                    label: 'ថ្ងៃចាប់ផ្តើម',
+                                    hint: 'សូមជ្រើសរើសកាលបរិច្ឆេទ',
+                                    initialDate: DateTime.now(),
+                                    selectedDate: _startDate,
+                                    onDateSelected: (date) {
+                                      setState(() {
+                                        _startDate = date;
+                                      });
+                                    },
+                                  ),
                                 ),
-                              ),
-                              SizedBox(
-                                width: 16,
-                              ),
-                              Expanded(
-                                child: DateInputField(
-                                  label: 'ថ្ងៃបញ្ចប់',
-                                  hint: 'សូមជ្រើសរើសកាលបរិច្ឆេទ',
-                                  initialDate: DateTime.now(),
-                                  selectedDate: _endDate,
-                                  onDateSelected: (date) {
-                                    setState(() {
-                                      _endDate = date;
-                                    });
-                                  },
+                                SizedBox(
+                                  width: 16,
                                 ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(
-                            height: 16,
-                          ),
-                          // //Institution
-                          // _buildSelectionField(
-                          //   controller: _place,
-                          //   label: AppLang.translate(
-                          //       lang: settingProvider.lang ?? 'kh',
-                          //       key: 'institutions'),
-                          //   items: department,
-                          //   selectedId:
-                          //       selectedPlaceId, // Pass current selection
-                          //   onSelected: (id, value) {
-                          //     setState(() {
-                          //       selectedPlaceId = id;
-                          //       _place.text = value;
-                          //     });
-                          //   },
-                          // ),
-                          const SizedBox(height: 16),
-                          // Oganization
-                          _buildSelectionField(
-                            controller: _organization,
-                            label: AppLang.translate(
-                                lang: settingProvider.lang ?? 'kh',
-                                key: 'organization'),
-                            items: department,
-                            selectedId:
-                                selectedOganizationId, // Pass current selection
-                            onSelected: (id, value) {
-                              setState(() {
-                                selectedOganizationId = id;
-                                _organization.text = value;
-                              });
-                            },
-                          ),
-            
-                          const SizedBox(height: 16),
-                          // Department
-                          _buildSelectionField(
-                            controller: _department,
-                            label: AppLang.translate(
-                                lang: settingProvider.lang ?? 'kh',
-                                key: 'department'),
-                            items: department,
-                            selectedId:
-                                selecteddepartmentId, // Pass current selection
-                            onSelected: (id, value) {
-                              setState(() {
-                                selecteddepartmentId = id;
-                                _department.text = value;
-                              });
-                            },
-                          ),
-                          const SizedBox(height: 16),
-                          // Office
-                          _buildSelectionField(
-                            controller: _office,
-                            label: AppLang.translate(
-                                lang: settingProvider.lang ?? 'kh',
-                                key: 'office'),
-                            items: department,
-                            selectedId:
-                                selectedOfficeId, // Pass current selection
-                            onSelected: (id, value) {
-                              setState(() {
-                                selectedOfficeId = id;
-                                _office.text = value;
-                              });
-                            },
-                          ),
-                          const SizedBox(height: 16),
-                          // possition
-                          _buildSelectionField(
-                            controller: _possition,
-                            label: AppLang.translate(
-                                lang: settingProvider.lang ?? 'kh',
-                                key: 'position'),
-                            items: position,
-                            selectedId:
-                                selectedpossitionId, // Pass current selection
-                            onSelected: (id, value) {
-                              setState(() {
-                                selectedpossitionId = id;
-                                _possition.text = value;
-                              });
-                            },
-                          ),
-                          const SizedBox(height: 16),
-                          // // staffType
-                          // _buildSelectionField(
-                          //   controller: _staffType,
-                          //   label: AppLang.translate(
-                          //       lang: settingProvider.lang ?? 'kh',
-                          //       key: 'staff_type'),
-                          //   items: staffTypes,
-                          //   selectedId:
-                          //       selectedStaffTypeId, // Pass current selection
-                          //   onSelected: (id, value) {
-                          //     setState(() {
-                          //       selectedStaffTypeId = id;
-                          //       _staffType.text = value;
-                          //     });
-                          //   },
-                          // ),
-                          const SizedBox(height: 16),
-                          // rank position
-                          _buildSelectionField(
-                            controller: _rankPossition,
-                            label: AppLang.translate(
-                                lang: settingProvider.lang ?? 'kh',
-                                key: 'rank_position'),
-                            items: position,
-                            selectedId:
-                                selectedRankPositionId, // Pass current selection
-                            onSelected: (id, value) {
-                              setState(() {
-                                selectedRankPositionId = id;
-                                _rankPossition.text = value;
-                              });
-                            },
-                          ),
-                          const SizedBox(height: 16),
-            
-                          // const SizedBox(
-                          //     height: 30), // Extra space before button
-                        ],
+                                Expanded(
+                                  child: DateInputField(
+                                    label: 'ថ្ងៃបញ្ចប់',
+                                    hint: 'សូមជ្រើសរើសកាលបរិច្ឆេទ',
+                                    initialDate: DateTime.now(),
+                                    selectedDate: _endDate,
+                                    onDateSelected: (date) {
+                                      setState(() {
+                                        _endDate = date;
+                                      });
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(
+                              height: 16,
+                            ),
+                            // //Institution
+                            // _buildSelectionField(
+                            //   controller: _place,
+                            //   label: AppLang.translate(
+                            //       lang: settingProvider.lang ?? 'kh',
+                            //       key: 'institutions'),
+                            //   items: department,
+                            //   selectedId:
+                            //       selectedPlaceId, // Pass current selection
+                            //   onSelected: (id, value) {
+                            //     setState(() {
+                            //       selectedPlaceId = id;
+                            //       _place.text = value;
+                            //     });
+                            //   },
+                            // ),
+                            const SizedBox(height: 16),
+                            // Oganization
+                            _buildSelectionField(
+                              controller: _organization,
+                              label: AppLang.translate(
+                                  lang: settingProvider.lang ?? 'kh',
+                                  key: 'organization'),
+                              items: department,
+                              selectedId:
+                                  selectedOganizationId, // Pass current selection
+                              onSelected: (id, value) {
+                                setState(() {
+                                  selectedOganizationId = id;
+                                  _organization.text = value;
+                                });
+                              },
+                            ),
+                              
+                            const SizedBox(height: 16),
+                            // Department
+                            _buildSelectionField(
+                              controller: _department,
+                              label: AppLang.translate(
+                                  lang: settingProvider.lang ?? 'kh',
+                                  key: 'department'),
+                              items: department,
+                              selectedId:
+                                  selecteddepartmentId, // Pass current selection
+                              onSelected: (id, value) {
+                                setState(() {
+                                  selecteddepartmentId = id;
+                                  _department.text = value;
+                                });
+                              },
+                            ),
+                            const SizedBox(height: 16),
+                            // Office
+                            _buildSelectionField(
+                              controller: _office,
+                              label: AppLang.translate(
+                                  lang: settingProvider.lang ?? 'kh',
+                                  key: 'office'),
+                              items: department,
+                              selectedId:
+                                  selectedOfficeId, // Pass current selection
+                              onSelected: (id, value) {
+                                setState(() {
+                                  selectedOfficeId = id;
+                                  _office.text = value;
+                                });
+                              },
+                            ),
+                            const SizedBox(height: 16),
+                            // possition
+                            _buildSelectionField(
+                              controller: _possition,
+                              label: AppLang.translate(
+                                  lang: settingProvider.lang ?? 'kh',
+                                  key: 'position'),
+                              items: position,
+                              selectedId:
+                                  selectedpossitionId, // Pass current selection
+                              onSelected: (id, value) {
+                                setState(() {
+                                  selectedpossitionId = id;
+                                  _possition.text = value;
+                                });
+                              },
+                            ),
+                            const SizedBox(height: 16),
+                            // // staffType
+                            // _buildSelectionField(
+                            //   controller: _staffType,
+                            //   label: AppLang.translate(
+                            //       lang: settingProvider.lang ?? 'kh',
+                            //       key: 'staff_type'),
+                            //   items: staffTypes,
+                            //   selectedId:
+                            //       selectedStaffTypeId, // Pass current selection
+                            //   onSelected: (id, value) {
+                            //     setState(() {
+                            //       selectedStaffTypeId = id;
+                            //       _staffType.text = value;
+                            //     });
+                            //   },
+                            // ),
+                            const SizedBox(height: 16),
+                            // rank position
+                            _buildSelectionField(
+                              controller: _rankPossition,
+                              label: AppLang.translate(
+                                  lang: settingProvider.lang ?? 'kh',
+                                  key: 'rank_position'),
+                              items: position,
+                              selectedId:
+                                  selectedRankPositionId, // Pass current selection
+                              onSelected: (id, value) {
+                                setState(() {
+                                  selectedRankPositionId = id;
+                                  _rankPossition.text = value;
+                                });
+                              },
+                            ),
+                            const SizedBox(height: 16),
+                              
+                            // const SizedBox(
+                            //     height: 30), // Extra space before button
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-            bottomNavigationBar: Padding(
-              padding: const EdgeInsets.all(15),
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    backgroundColor: Colors.blue[900],
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
+                ),
+            bottomNavigationBar: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(15),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      backgroundColor: Colors.blue[900],
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
                     ),
-                  ),
-                  onPressed: () {
-                    _handleSubmit();
-                  },
-                  child: Text(
-                    AppLang.translate(
-                        lang: settingProvider.lang ?? 'kh', key: 'update'),
-                    style: TextStyle(fontSize: 16, color: Colors.white),
+                    onPressed: () {
+                      _handleSubmit();
+                    },
+                    child: Text(
+                      AppLang.translate(
+                          lang: settingProvider.lang ?? 'kh', key: 'update'),
+                      style: TextStyle(fontSize: 16, color: Colors.white),
+                    ),
                   ),
                 ),
               ),

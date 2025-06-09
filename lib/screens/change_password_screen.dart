@@ -9,12 +9,14 @@ class ChangePasswordScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Change Password'),
       ),
-      body: Center(
-        child: ElevatedButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          child: const Text('Go back!'),
+      body: SafeArea(
+        child: Center(
+          child: ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: const Text('Go back!'),
+          ),
         ),
       ),
     );

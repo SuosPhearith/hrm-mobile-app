@@ -60,217 +60,219 @@ class _HolidayScreenState extends State<HolidayScreen> {
         ),
         body: provider.isLoading
             ?HolidayScreenSkeleton()
-            : Column(
-                children: [
-                  TableCalendar(
-                    firstDay: DateTime.utc(2025, 1, 1),
-                    lastDay: DateTime.utc(2025, 12, 31),
-                    focusedDay: _focusedDay,
-                    calendarFormat: calendarFormat,
-                    selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
-                    onDaySelected: (selectedDay, focusedDay) {
-                      setState(() {
-                        _selectedDay = selectedDay;
-                        _focusedDay = focusedDay;
-                      });
-                    },
-                    onPageChanged: (focusedDay) {
-                      setState(() {
-                        _focusedDay = focusedDay;
-                      });
-                    },
-                    locale: 'km_KH',
-                    availableCalendarFormats: const {
-                      CalendarFormat.month: 'Month',
-                    },
-
-                    // Enhanced Header Styling
-                    headerStyle: HeaderStyle(
-                      formatButtonVisible: false,
-                      titleCentered: true,
-                      leftChevronIcon: Icon(
-                        Icons.chevron_left,
-                        color: Colors.grey.shade700,
-                        size: 28,
-                      ),
-                      rightChevronIcon: Icon(
-                        Icons.chevron_right,
-                        color: Colors.grey.shade700,
-                        size: 28,
-                      ),
-                      headerPadding: const EdgeInsets.symmetric(vertical: 16.0),
-                      titleTextStyle: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.grey.shade800,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-
-                    // Professional Calendar Styling
-                    calendarStyle: CalendarStyle(
-                      // Remove default borders and padding
-                      cellMargin: const EdgeInsets.all(2.0),
-                      cellPadding: const EdgeInsets.all(0),
-
-                      // Today's date styling
-                      todayDecoration: BoxDecoration(
-                        color: Colors.blue.shade50,
-                        border: Border.all(
-                          color: Colors.blue.shade400,
-                          width: 2.0,
+            : SafeArea(
+              child: Column(
+                  children: [
+                    TableCalendar(
+                      firstDay: DateTime.utc(2025, 1, 1),
+                      lastDay: DateTime.utc(2025, 12, 31),
+                      focusedDay: _focusedDay,
+                      calendarFormat: calendarFormat,
+                      selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+                      onDaySelected: (selectedDay, focusedDay) {
+                        setState(() {
+                          _selectedDay = selectedDay;
+                          _focusedDay = focusedDay;
+                        });
+                      },
+                      onPageChanged: (focusedDay) {
+                        setState(() {
+                          _focusedDay = focusedDay;
+                        });
+                      },
+                      locale: 'km_KH',
+                      availableCalendarFormats: const {
+                        CalendarFormat.month: 'Month',
+                      },
+              
+                      // Enhanced Header Styling
+                      headerStyle: HeaderStyle(
+                        formatButtonVisible: false,
+                        titleCentered: true,
+                        leftChevronIcon: Icon(
+                          Icons.chevron_left,
+                          color: Colors.grey.shade700,
+                          size: 28,
                         ),
-                        borderRadius: BorderRadius.circular(8.0),
+                        rightChevronIcon: Icon(
+                          Icons.chevron_right,
+                          color: Colors.grey.shade700,
+                          size: 28,
+                        ),
+                        headerPadding: const EdgeInsets.symmetric(vertical: 16.0),
+                        titleTextStyle: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.grey.shade800,
+                          letterSpacing: 0.5,
+                        ),
                       ),
-                      todayTextStyle: TextStyle(
-                        color: Colors.blue.shade700,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 16,
-                      ),
-
-                      // Selected day styling
-                      selectedDecoration: BoxDecoration(
-                        color: Colors.blue.shade600,
-                        borderRadius: BorderRadius.circular(8.0),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.blue.shade200,
-                            blurRadius: 4,
-                            offset: const Offset(0, 2),
+              
+                      // Professional Calendar Styling
+                      calendarStyle: CalendarStyle(
+                        // Remove default borders and padding
+                        cellMargin: const EdgeInsets.all(2.0),
+                        cellPadding: const EdgeInsets.all(0),
+              
+                        // Today's date styling
+                        todayDecoration: BoxDecoration(
+                          color: Colors.blue.shade50,
+                          border: Border.all(
+                            color: Colors.blue.shade400,
+                            width: 2.0,
                           ),
-                        ],
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                        todayTextStyle: TextStyle(
+                          color: Colors.blue.shade700,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 16,
+                        ),
+              
+                        // Selected day styling
+                        selectedDecoration: BoxDecoration(
+                          color: Colors.blue.shade600,
+                          borderRadius: BorderRadius.circular(8.0),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.blue.shade200,
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        selectedTextStyle: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 16,
+                        ),
+              
+                        // Weekend styling
+                        weekendTextStyle: TextStyle(
+                          color: Colors.grey.shade600,
+                          fontSize: 16,
+                        ),
+              
+                        // Default day styling
+                        defaultTextStyle: TextStyle(
+                          color: Colors.grey.shade800,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+              
+                        // Outside month days
+                        outsideDaysVisible: false,
+              
+                        // Holiday styling (will be overridden by custom builder)
+                        holidayTextStyle: const TextStyle(
+                          color: Colors.red,
+                          fontWeight: FontWeight.w500,
+                        ),
+              
+                        // Header styling for days of week
+                        tablePadding: const EdgeInsets.symmetric(horizontal: 8.0),
                       ),
-                      selectedTextStyle: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 16,
+              
+                      // Days of week styling
+                      daysOfWeekStyle: DaysOfWeekStyle(
+                        weekdayStyle: TextStyle(
+                          color: Colors.grey.shade600,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                        ),
+                        weekendStyle: TextStyle(
+                          color: Colors.grey.shade600,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                        ),
                       ),
-
-                      // Weekend styling
-                      weekendTextStyle: TextStyle(
-                        color: Colors.grey.shade600,
-                        fontSize: 16,
-                      ),
-
-                      // Default day styling
-                      defaultTextStyle: TextStyle(
-                        color: Colors.grey.shade800,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                      ),
-
-                      // Outside month days
-                      outsideDaysVisible: false,
-
-                      // Holiday styling (will be overridden by custom builder)
-                      holidayTextStyle: const TextStyle(
-                        color: Colors.red,
-                        fontWeight: FontWeight.w500,
-                      ),
-
-                      // Header styling for days of week
-                      tablePadding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    ),
-
-                    // Days of week styling
-                    daysOfWeekStyle: DaysOfWeekStyle(
-                      weekdayStyle: TextStyle(
-                        color: Colors.grey.shade600,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 14,
-                      ),
-                      weekendStyle: TextStyle(
-                        color: Colors.grey.shade600,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 14,
-                      ),
-                    ),
-
-                    // Holiday predicate
-                    holidayPredicate: (day) {
-                      return parseHolidaysFromApi(provider.data['data'])
-                          .containsKey(DateTime(day.year, day.month, day.day));
-                    },
-
-                    // Custom builders for enhanced styling
-                    calendarBuilders: CalendarBuilders(
-                      // Holiday builder with professional styling
-                      holidayBuilder: (context, day, focusedDay) {
-                        final isSelected = isSameDay(_selectedDay, day);
-                        final isToday = isSameDay(DateTime.now(), day);
-
-                        return Container(
-                          margin: const EdgeInsets.all(2.0),
-                          decoration: BoxDecoration(
-                            color: isSelected
-                                ? Colors.red.shade600
-                                : isToday
-                                    ? Colors.red.shade50
-                                    : Colors.red.shade50,
-                            borderRadius: BorderRadius.circular(8.0),
-                            border: isToday && !isSelected
-                                ? Border.all(
-                                    color: Colors.red.shade300, width: 2.0)
-                                : null,
-                            boxShadow: isSelected
-                                ? [
-                                    BoxShadow(
-                                      color: Colors.red.shade200,
-                                      blurRadius: 4,
-                                      offset: const Offset(0, 2),
-                                    ),
-                                  ]
-                                : null,
-                          ),
-                          child: Center(
-                            child: Text(
-                              '${day.day}',
-                              style: TextStyle(
-                                color: isSelected
-                                    ? Colors.white
-                                    : Colors.red.shade700,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 16,
+              
+                      // Holiday predicate
+                      holidayPredicate: (day) {
+                        return parseHolidaysFromApi(provider.data['data'])
+                            .containsKey(DateTime(day.year, day.month, day.day));
+                      },
+              
+                      // Custom builders for enhanced styling
+                      calendarBuilders: CalendarBuilders(
+                        // Holiday builder with professional styling
+                        holidayBuilder: (context, day, focusedDay) {
+                          final isSelected = isSameDay(_selectedDay, day);
+                          final isToday = isSameDay(DateTime.now(), day);
+              
+                          return Container(
+                            margin: const EdgeInsets.all(2.0),
+                            decoration: BoxDecoration(
+                              color: isSelected
+                                  ? Colors.red.shade600
+                                  : isToday
+                                      ? Colors.red.shade50
+                                      : Colors.red.shade50,
+                              borderRadius: BorderRadius.circular(8.0),
+                              border: isToday && !isSelected
+                                  ? Border.all(
+                                      color: Colors.red.shade300, width: 2.0)
+                                  : null,
+                              boxShadow: isSelected
+                                  ? [
+                                      BoxShadow(
+                                        color: Colors.red.shade200,
+                                        blurRadius: 4,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ]
+                                  : null,
+                            ),
+                            child: Center(
+                              child: Text(
+                                '${day.day}',
+                                style: TextStyle(
+                                  color: isSelected
+                                      ? Colors.white
+                                      : Colors.red.shade700,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 16,
+                                ),
                               ),
                             ),
-                          ),
-                        );
-                      },
-
-                      // Default day builder for consistent styling
-                      defaultBuilder: (context, day, focusedDay) {
-                        return Container(
-                          margin: const EdgeInsets.all(2.0),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8.0),
-                            color: Colors.transparent,
-                          ),
-                          child: Center(
-                            child: Text(
-                              '${day.day}',
-                              style: TextStyle(
-                                color: Colors.grey.shade800,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
+                          );
+                        },
+              
+                        // Default day builder for consistent styling
+                        defaultBuilder: (context, day, focusedDay) {
+                          return Container(
+                            margin: const EdgeInsets.all(2.0),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8.0),
+                              color: Colors.transparent,
+                            ),
+                            child: Center(
+                              child: Text(
+                                '${day.day}',
+                                style: TextStyle(
+                                  color: Colors.grey.shade800,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                             ),
-                          ),
-                        );
-                      },
-
-                      // Weekend builder for subtle differentiation
+                          );
+                        },
+              
+                        // Weekend builder for subtle differentiation
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 20),
-                  Divider(),
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: _buildEventList(provider),
+                    const SizedBox(height: 20),
+                    Divider(),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: _buildEventList(provider),
+                      ),
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                ),
+            ),
       );
     });
   }

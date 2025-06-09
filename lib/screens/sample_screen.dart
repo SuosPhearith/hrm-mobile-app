@@ -36,13 +36,15 @@ class _SampleScreenState extends State<SampleScreen> {
               onRefresh: () => _refreshData(evaluateProvider),
               child: evaluateProvider.isLoading
                   ? Center(child: Text('Loading...'))
-                  : SingleChildScrollView(
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Text('Sample'),
+                  : SafeArea(
+                    child: SingleChildScrollView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Text('Sample'),
+                        ),
                       ),
-                    ),
+                  ),
             ),
           );
         }));

@@ -291,256 +291,258 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
                         Text('Loading...'),
                       ],
                     ))
-                  : ListView(
-                      shrinkWrap: true,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // SingleChildScrollView(
-                              //   scrollDirection: Axis.horizontal,
-                              //   child: Wrap(
-                              //     spacing: 10,
-                              //     runSpacing: 10,
-                              //     children:
-                              //         (data!['request_types'] as List).map((
-                              //       record,
-                              //     ) {
-                              //       return Container(
-                              //         margin: EdgeInsets.zero,
-                              //         padding: const EdgeInsets.symmetric(
-                              //           vertical: 4,
-                              //           horizontal: 8,
-                              //         ),
-                              //         decoration: BoxDecoration(
-                              //           color: const Color.fromRGBO(
-                              //             33,
-                              //             150,
-                              //             243,
-                              //             0.1,
-                              //           ),
-                              //           borderRadius: const BorderRadius.all(
-                              //             Radius.circular(16),
-                              //           ),
-                              //         ),
-                              //         child: Text(
-                              //           '${getSafeString(value: AppLang.translate(data: record, lang: settingProvider.lang ?? 'kh'))} ${getSafeInteger(value: record['max_per_year'])}',
-                              //           style: TextStyle(
-                              //             color: Colors.blue[800],
-                              //           ),
-                              //         ),
-                              //       );
-                              //     }).toList(),
-                              //   ),
-                              // ),
-                              SingleChildScrollView(
-                                scrollDirection: Axis.horizontal,
-                                child: Wrap(
-                                  spacing: 10,
-                                  runSpacing: 10,
-                                  children:
-                                      (data!['request_types'] as List).map((
-                                    record,
-                                  ) {
-                                    return InkWell(
-                                      onTap: () {
-                                        setState(() {
-                                          _selectedTypeId = record['id'];
-                                        });
-                                        // print(_selectedTypeId);
-                                      },
-                                      child: Container(
-                                        margin: EdgeInsets.zero,
-                                        padding: const EdgeInsets.symmetric(
-                                          vertical: 8,
-                                          horizontal: 12,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: const Color.fromRGBO(
-                                            33,
-                                            150,
-                                            243,
-                                            0.1,
+                  : SafeArea(
+                    child: ListView(
+                        shrinkWrap: true,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // SingleChildScrollView(
+                                //   scrollDirection: Axis.horizontal,
+                                //   child: Wrap(
+                                //     spacing: 10,
+                                //     runSpacing: 10,
+                                //     children:
+                                //         (data!['request_types'] as List).map((
+                                //       record,
+                                //     ) {
+                                //       return Container(
+                                //         margin: EdgeInsets.zero,
+                                //         padding: const EdgeInsets.symmetric(
+                                //           vertical: 4,
+                                //           horizontal: 8,
+                                //         ),
+                                //         decoration: BoxDecoration(
+                                //           color: const Color.fromRGBO(
+                                //             33,
+                                //             150,
+                                //             243,
+                                //             0.1,
+                                //           ),
+                                //           borderRadius: const BorderRadius.all(
+                                //             Radius.circular(16),
+                                //           ),
+                                //         ),
+                                //         child: Text(
+                                //           '${getSafeString(value: AppLang.translate(data: record, lang: settingProvider.lang ?? 'kh'))} ${getSafeInteger(value: record['max_per_year'])}',
+                                //           style: TextStyle(
+                                //             color: Colors.blue[800],
+                                //           ),
+                                //         ),
+                                //       );
+                                //     }).toList(),
+                                //   ),
+                                // ),
+                                SingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  child: Wrap(
+                                    spacing: 10,
+                                    runSpacing: 10,
+                                    children:
+                                        (data!['request_types'] as List).map((
+                                      record,
+                                    ) {
+                                      return InkWell(
+                                        onTap: () {
+                                          setState(() {
+                                            _selectedTypeId = record['id'];
+                                          });
+                                          // print(_selectedTypeId);
+                                        },
+                                        child: Container(
+                                          margin: EdgeInsets.zero,
+                                          padding: const EdgeInsets.symmetric(
+                                            vertical: 8,
+                                            horizontal: 12,
                                           ),
-                                          borderRadius:
-                                              const BorderRadius.all(
-                                            Radius.circular(5),
-                                          ),
-                                          border: Border.all(
-                                            color: HColors.darkgrey
-                                                .withOpacity(0.1),
-                                          ),
-                                        ),
-                                        child: Row(
-                                          children: [
-                                            Text(
-                                              '${getSafeString(value: AppLang.translate(data: record, lang: settingProvider.lang ?? 'kh'))} ',
-                                              style: TextStyle(
-                                                color: _selectedTypeId ==
-                                                        record['id']
-                                                    ? Colors.blue
-                                                    : HColors.darkgrey,
-                                              ),
+                                          decoration: BoxDecoration(
+                                            color: const Color.fromRGBO(
+                                              33,
+                                              150,
+                                              243,
+                                              0.1,
                                             ),
-                                            _selectedTypeId == record['id']
-                                                ? Icon(
-                                                    Icons.check,
-                                                    size: 16,
-                                                    color: Colors.blue,
-                                                  )
-                                                : SizedBox(),
-                                          ],
-                                        ),
-                                      ),
-                                    );
-                                  }).toList(),
-                                ),
-                              ),
-              
-                              const SizedBox(height: 16),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: DateInputField(
-                                      label: 'ថ្ងៃចាប់ផ្តើម',
-                                      hint: 'សូមជ្រើសរើសកាលបរិច្ឆេទ',
-                                      initialDate: DateTime.now(),
-                                      selectedDate: _startDate,
-                                      onDateSelected: (date) {
-                                        setState(() {
-                                          _startDate = date;
-                                        });
-                                      },
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    width: 16,
-                                  ),
-                                  Expanded(
-                                    child: DateInputField(
-                                      label: 'ថ្ងៃបញ្ចប់',
-                                      hint: 'សូមជ្រើសរើសកាលបរិច្ឆេទ',
-                                      initialDate: DateTime.now(),
-                                      selectedDate: _endDate,
-                                      onDateSelected: (date) {
-                                        setState(() {
-                                          _endDate = date;
-                                        });
-                                      },
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 16),
-                              DescriptionTextField(
-                                controller: _descriptionController,
-                                onChanged: (value) {
-                                  _description = value;
-                                },
-                              ),
-                              const SizedBox(height: 16),
-                              // Center(
-                              //   child: Column(
-                              //     mainAxisAlignment: MainAxisAlignment.center,
-                              //     children: [
-                              //       // Display selected image or placeholder
-                              //       _image == null
-                              //           ? Text('រូបភាព')
-                              //           : Image.file(
-                              //               _image!,
-                              //               height: 200,
-                              //             ),
-                              //       SizedBox(height: 20),
-                              //       // Button to pick image from gallery
-                              //       ElevatedButton(
-                              //         onPressed: () => _pickImage(
-                              //           ImageSource.gallery,
-                              //         ),
-                              //         child: Text(
-                              //           'Pick Image from Gallery',
-                              //         ),
-                              //       ),
-                              //       // Button to pick image from camera
-                              //       // ElevatedButton(
-                              //       //   onPressed: () =>
-                              //       //       _pickImage(ImageSource.camera),
-                              //       //   child: Text('Take Photo'),
-                              //       // ),
-                              //       // Button to upload image
-                              //       // ElevatedButton(
-                              //       //   onPressed: _image == null ? null : _uploadImage,
-                              //       //   child: Text('Upload Image'),
-                              //       // ),
-                              //     ],
-                              //   ),
-                              // ),
-                              Container(
-                                padding: EdgeInsets.all(15),
-                                decoration: BoxDecoration(
-                                    border: Border.all(
-                                      color:
-                                          HColors.darkgrey.withOpacity(0.1),
-                                      width: 1,
-                                    ),
-                                    borderRadius: BorderRadius.circular(8)),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Icon(Icons.image,
-                                            color: HColors.darkgrey),
-                                        SizedBox(width: 8),
-                                        Text("រូបភាព")
-                                        // EText(text: "រូបភាព", size: EFontSize.content),
-                                      ],
-                                    ),
-                                    Row(
-                                      children: [
-                                        InkWell(
-                                          onTap: () {
-                                            _showBottomSheetFile(context);
-                                          },
-                                          child: Icon(
-                                            Icons.attach_file_outlined,
-                                            color: HColors.darkgrey,
+                                            borderRadius:
+                                                const BorderRadius.all(
+                                              Radius.circular(5),
+                                            ),
+                                            border: Border.all(
+                                              color: HColors.darkgrey
+                                                  .withOpacity(0.1),
+                                            ),
+                                          ),
+                                          child: Row(
+                                            children: [
+                                              Text(
+                                                '${getSafeString(value: AppLang.translate(data: record, lang: settingProvider.lang ?? 'kh'))} ',
+                                                style: TextStyle(
+                                                  color: _selectedTypeId ==
+                                                          record['id']
+                                                      ? Colors.blue
+                                                      : HColors.darkgrey,
+                                                ),
+                                              ),
+                                              _selectedTypeId == record['id']
+                                                  ? Icon(
+                                                      Icons.check,
+                                                      size: 16,
+                                                      color: Colors.blue,
+                                                    )
+                                                  : SizedBox(),
+                                            ],
                                           ),
                                         ),
-                                        SizedBox(width: 15),
-                                        InkWell(
-                                          onTap: () {
-                                            setState(() {
-                                              isClick = !isClick;
-                                            });
-                                          },
-                                          child: isClick
-                                              ? Icon(
-                                                  Icons.menu,
-                                                  color: HColors.darkgrey,
-                                                )
-                                              : Icon(
-                                                  Icons.grid_view,
-                                                  color: HColors.darkgrey,
-                                                ),
-                                        ),
-                                      ],
+                                      );
+                                    }).toList(),
+                                  ),
+                                ),
+                                  
+                                const SizedBox(height: 16),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: DateInputField(
+                                        label: 'ថ្ងៃចាប់ផ្តើម',
+                                        hint: 'សូមជ្រើសរើសកាលបរិច្ឆេទ',
+                                        initialDate: DateTime.now(),
+                                        selectedDate: _startDate,
+                                        onDateSelected: (date) {
+                                          setState(() {
+                                            _startDate = date;
+                                          });
+                                        },
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: 16,
+                                    ),
+                                    Expanded(
+                                      child: DateInputField(
+                                        label: 'ថ្ងៃបញ្ចប់',
+                                        hint: 'សូមជ្រើសរើសកាលបរិច្ឆេទ',
+                                        initialDate: DateTime.now(),
+                                        selectedDate: _endDate,
+                                        onDateSelected: (date) {
+                                          setState(() {
+                                            _endDate = date;
+                                          });
+                                        },
+                                      ),
                                     ),
                                   ],
                                 ),
-                              ),
-                              if (_selectedFiles.isNotEmpty)
-                                Row(children: [
-                                  Expanded(child: _buildFileDisplay(isClick))
-                                ]),
-                              SizedBox(height: 100),
-                            ],
+                                const SizedBox(height: 16),
+                                DescriptionTextField(
+                                  controller: _descriptionController,
+                                  onChanged: (value) {
+                                    _description = value;
+                                  },
+                                ),
+                                const SizedBox(height: 16),
+                                // Center(
+                                //   child: Column(
+                                //     mainAxisAlignment: MainAxisAlignment.center,
+                                //     children: [
+                                //       // Display selected image or placeholder
+                                //       _image == null
+                                //           ? Text('រូបភាព')
+                                //           : Image.file(
+                                //               _image!,
+                                //               height: 200,
+                                //             ),
+                                //       SizedBox(height: 20),
+                                //       // Button to pick image from gallery
+                                //       ElevatedButton(
+                                //         onPressed: () => _pickImage(
+                                //           ImageSource.gallery,
+                                //         ),
+                                //         child: Text(
+                                //           'Pick Image from Gallery',
+                                //         ),
+                                //       ),
+                                //       // Button to pick image from camera
+                                //       // ElevatedButton(
+                                //       //   onPressed: () =>
+                                //       //       _pickImage(ImageSource.camera),
+                                //       //   child: Text('Take Photo'),
+                                //       // ),
+                                //       // Button to upload image
+                                //       // ElevatedButton(
+                                //       //   onPressed: _image == null ? null : _uploadImage,
+                                //       //   child: Text('Upload Image'),
+                                //       // ),
+                                //     ],
+                                //   ),
+                                // ),
+                                Container(
+                                  padding: EdgeInsets.all(15),
+                                  decoration: BoxDecoration(
+                                      border: Border.all(
+                                        color:
+                                            HColors.darkgrey.withOpacity(0.1),
+                                        width: 1,
+                                      ),
+                                      borderRadius: BorderRadius.circular(8)),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Icon(Icons.image,
+                                              color: HColors.darkgrey),
+                                          SizedBox(width: 8),
+                                          Text("រូបភាព")
+                                          // EText(text: "រូបភាព", size: EFontSize.content),
+                                        ],
+                                      ),
+                                      Row(
+                                        children: [
+                                          InkWell(
+                                            onTap: () {
+                                              _showBottomSheetFile(context);
+                                            },
+                                            child: Icon(
+                                              Icons.attach_file_outlined,
+                                              color: HColors.darkgrey,
+                                            ),
+                                          ),
+                                          SizedBox(width: 15),
+                                          InkWell(
+                                            onTap: () {
+                                              setState(() {
+                                                isClick = !isClick;
+                                              });
+                                            },
+                                            child: isClick
+                                                ? Icon(
+                                                    Icons.menu,
+                                                    color: HColors.darkgrey,
+                                                  )
+                                                : Icon(
+                                                    Icons.grid_view,
+                                                    color: HColors.darkgrey,
+                                                  ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                if (_selectedFiles.isNotEmpty)
+                                  Row(children: [
+                                    Expanded(child: _buildFileDisplay(isClick))
+                                  ]),
+                                SizedBox(height: 100),
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
+                        ],
+                      ),
+                  ),
             ),
           );
         },

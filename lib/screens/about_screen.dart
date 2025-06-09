@@ -38,104 +38,106 @@ class AboutScreen extends StatelessWidget {
             ),
             body: aboutProvider.isLoading
                 ? AboutSkeleton()
-                : SingleChildScrollView(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _buildSectionHeader(
-                              context,
-                              AppLang.translate(
-                                  key: 'about_rule', lang: lang ?? 'kh'),
-                              Icons.edit_document),
-                          const SizedBox(height: 12),
-                          _buildInfoTile(
-                            context: context,
-                            icon: Icons.access_time,
-                            title:
-                                '${convertNumberToString(aboutProvider.aboutListData?.data['attendent_rule'][0]['working_hour_per_day'])} ${AppLang.translate(key: 'about_hours', lang: lang ?? 'kh')} / ${AppLang.translate(key: 'about_day', lang: lang ?? 'kh')}',
-                            subtitle: AppLang.translate(
-                                key: 'about_working_hours', lang: lang ?? 'kh'),
-                          ),
-                          _buildInfoTile(
-                            context: context,
-                            icon: Icons.calendar_month,
-                            title:
-                                '${convertNumberToString(aboutProvider.aboutListData?.data['attendent_rule'][0]['working_day_per_week'])} ${AppLang.translate(key: 'about_day', lang: lang ?? 'kh')} / ${AppLang.translate(key: 'about_week', lang: lang ?? 'kh')}',
-                            subtitle: AppLang.translate(
-                                key: 'about_number_of_days',
-                                lang: lang ?? 'kh'),
-                          ),
-                          _buildInfoTile(
-                            context: context,
-                            icon: Icons.av_timer,
-                            title:
-                                '${convertNumberToString(aboutProvider.aboutListData?.data['attendent_rule'][0]['working_hour_per_week'])} ${AppLang.translate(key: 'about_hours', lang: lang ?? 'kh')} / ${AppLang.translate(key: 'about_week', lang: lang ?? 'kh')}',
-                            subtitle: AppLang.translate(
-                                key: 'about_total_hours', lang: lang ?? 'kh'),
-                          ),
-                          const SizedBox(height: 24),
-                          _buildSectionHeader(
-                              context,
-                              AppLang.translate(
-                                  key: 'about_daily_scan', lang: lang ?? 'kh'),
-                              Icons.face),
-                          const SizedBox(height: 12),
-                          _buildInfoTile(
-                            context: context,
-                            icon: Icons.login,
-                            title: formatTimeTo12Hour(aboutProvider
-                                .aboutListData
-                                ?.data['attendent_rule'][0]['check_in']),
-                            subtitle: AppLang.translate(
-                                key: 'about_scan_in', lang: lang ?? 'kh'),
-                          ),
-                          _buildInfoTile(
-                            context: context,
-                            icon: Icons.logout,
-                            title: formatTimeTo12Hour(aboutProvider
-                                .aboutListData
-                                ?.data['attendent_rule'][0]['check_out']),
-                            subtitle: AppLang.translate(
-                                key: 'about_scan_out', lang: lang ?? 'kh'),
-                          ),
-                          _buildInfoTile(
-                            context: context,
-                            icon: Icons.message_outlined,
-                            title: AppLang.translate(
-                                key: 'about_lunch_break', lang: lang ?? 'kh'),
-                            subtitle: AppLang.translate(
-                                key: 'about_note', lang: lang ?? 'kh'),
-                          ),
-                          const SizedBox(height: 24),
-                          _buildSectionHeader(
-                              context,
-                              AppLang.translate(
-                                  key: 'about_face_scanner',
+                : SafeArea(
+                  child: SingleChildScrollView(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildSectionHeader(
+                                context,
+                                AppLang.translate(
+                                    key: 'about_rule', lang: lang ?? 'kh'),
+                                Icons.edit_document),
+                            const SizedBox(height: 12),
+                            _buildInfoTile(
+                              context: context,
+                              icon: Icons.access_time,
+                              title:
+                                  '${convertNumberToString(aboutProvider.aboutListData?.data['attendent_rule'][0]['working_hour_per_day'])} ${AppLang.translate(key: 'about_hours', lang: lang ?? 'kh')} / ${AppLang.translate(key: 'about_day', lang: lang ?? 'kh')}',
+                              subtitle: AppLang.translate(
+                                  key: 'about_working_hours', lang: lang ?? 'kh'),
+                            ),
+                            _buildInfoTile(
+                              context: context,
+                              icon: Icons.calendar_month,
+                              title:
+                                  '${convertNumberToString(aboutProvider.aboutListData?.data['attendent_rule'][0]['working_day_per_week'])} ${AppLang.translate(key: 'about_day', lang: lang ?? 'kh')} / ${AppLang.translate(key: 'about_week', lang: lang ?? 'kh')}',
+                              subtitle: AppLang.translate(
+                                  key: 'about_number_of_days',
                                   lang: lang ?? 'kh'),
-                              Icons.face),
-                          const SizedBox(height: 12),
-                          ...aboutProvider
-                                  .aboutListData?.data['terminal_devices']
-                                  .map((record) {
-                                return _buildScannerTile(
-                                  context: context,
-                                  title: record['name'],
-                                  subtitle:
-                                      '${record['group']} | ${AppLang.translate(data: record['direction'], lang: lang ?? 'kh')}',
-                                  status: AppLang.translate(
-                                      data: record['health_check_status'],
-                                      lang: lang ?? 'kh'),
-                                  count:
-                                      '${record['count']} ${AppLang.translate(key: 'about_day', lang: lang ?? 'kh')}',
-                                );
-                              }).toList() ??
-                              [],
-                        ],
+                            ),
+                            _buildInfoTile(
+                              context: context,
+                              icon: Icons.av_timer,
+                              title:
+                                  '${convertNumberToString(aboutProvider.aboutListData?.data['attendent_rule'][0]['working_hour_per_week'])} ${AppLang.translate(key: 'about_hours', lang: lang ?? 'kh')} / ${AppLang.translate(key: 'about_week', lang: lang ?? 'kh')}',
+                              subtitle: AppLang.translate(
+                                  key: 'about_total_hours', lang: lang ?? 'kh'),
+                            ),
+                            const SizedBox(height: 24),
+                            _buildSectionHeader(
+                                context,
+                                AppLang.translate(
+                                    key: 'about_daily_scan', lang: lang ?? 'kh'),
+                                Icons.face),
+                            const SizedBox(height: 12),
+                            _buildInfoTile(
+                              context: context,
+                              icon: Icons.login,
+                              title: formatTimeTo12Hour(aboutProvider
+                                  .aboutListData
+                                  ?.data['attendent_rule'][0]['check_in']),
+                              subtitle: AppLang.translate(
+                                  key: 'about_scan_in', lang: lang ?? 'kh'),
+                            ),
+                            _buildInfoTile(
+                              context: context,
+                              icon: Icons.logout,
+                              title: formatTimeTo12Hour(aboutProvider
+                                  .aboutListData
+                                  ?.data['attendent_rule'][0]['check_out']),
+                              subtitle: AppLang.translate(
+                                  key: 'about_scan_out', lang: lang ?? 'kh'),
+                            ),
+                            _buildInfoTile(
+                              context: context,
+                              icon: Icons.message_outlined,
+                              title: AppLang.translate(
+                                  key: 'about_lunch_break', lang: lang ?? 'kh'),
+                              subtitle: AppLang.translate(
+                                  key: 'about_note', lang: lang ?? 'kh'),
+                            ),
+                            const SizedBox(height: 24),
+                            _buildSectionHeader(
+                                context,
+                                AppLang.translate(
+                                    key: 'about_face_scanner',
+                                    lang: lang ?? 'kh'),
+                                Icons.face),
+                            const SizedBox(height: 12),
+                            ...aboutProvider
+                                    .aboutListData?.data['terminal_devices']
+                                    .map((record) {
+                                  return _buildScannerTile(
+                                    context: context,
+                                    title: record['name'],
+                                    subtitle:
+                                        '${record['group']} | ${AppLang.translate(data: record['direction'], lang: lang ?? 'kh')}',
+                                    status: AppLang.translate(
+                                        data: record['health_check_status'],
+                                        lang: lang ?? 'kh'),
+                                    count:
+                                        '${record['count']} ${AppLang.translate(key: 'about_day', lang: lang ?? 'kh')}',
+                                  );
+                                }).toList() ??
+                                [],
+                          ],
+                        ),
                       ),
                     ),
-                  ),
+                ),
           );
         },
       ),

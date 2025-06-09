@@ -18,10 +18,12 @@ class SalaryScreen extends StatelessWidget {
         centerTitle: true,
         bottom: CustomHeader(),
       ),
-      body: Center(
-        child: Text(
-          "កំពុងអភិវឌ្ឍន៍",
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
+      body: SafeArea(
+        child: Center(
+          child: Text(
+            "កំពុងអភិវឌ្ឍន៍",
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
+          ),
         ),
       ),
     );
