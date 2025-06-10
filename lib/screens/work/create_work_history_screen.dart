@@ -51,7 +51,7 @@ class _CreateWorkHistoryScreenState extends State<CreateWorkHistoryScreen> {
   String? selectedOfficeId;
   String? selectedpossitionId;
   String? selectedRankPositionId;
- DateTime? _startDate;
+  DateTime? _startDate;
   DateTime? _endDate;
   @override
   void dispose() {
@@ -65,8 +65,6 @@ class _CreateWorkHistoryScreenState extends State<CreateWorkHistoryScreen> {
     _place.dispose();
     super.dispose();
   }
-
- 
 
   void _handleSubmit() async {
     // First validate the form fields
@@ -82,10 +80,10 @@ class _CreateWorkHistoryScreenState extends State<CreateWorkHistoryScreen> {
       // if (selecteddepartmentId == null || selecteddepartmentId!.isEmpty) {
       //   return 'Please select department';
       // }
-      if (_startDate ==null) {
+      if (_startDate == null) {
         return 'Start Date is required';
       }
-      if (_endDate ==null) {
+      if (_endDate == null) {
         return 'End Date is required';
       }
       return null;
@@ -100,7 +98,7 @@ class _CreateWorkHistoryScreenState extends State<CreateWorkHistoryScreen> {
             AppLang.translate(lang: 'kh', key: errorMessage),
             style: const TextStyle(color: Colors.white),
           ),
-          backgroundColor: Colors.red,
+          // backgroundColor: Colors.red,
           duration: const Duration(seconds: 3),
         ),
       );
@@ -126,7 +124,7 @@ class _CreateWorkHistoryScreenState extends State<CreateWorkHistoryScreen> {
           departmentId: selecteddepartmentId!,
           organizatioId: selectedOganizationId!,
           generalDepartmentId: null,
-          officeId:selectedOfficeId,
+          officeId: selectedOfficeId,
           positionId: selectedpossitionId,
           rankPositionId: selectedRankPositionId,
           startWorkingAt: DateFormat('yyyy-MM-dd').format(_startDate!),
@@ -138,7 +136,7 @@ class _CreateWorkHistoryScreenState extends State<CreateWorkHistoryScreen> {
             const SnackBar(content: Text('ការស្នើសុំត្រូវបានបញ្ជូនដោយជោគជ័យ')),
           );
           // _clearAllFields();
-          Provider.of<WorkProvider>(context,listen: false).getHome();
+          Provider.of<WorkProvider>(context, listen: false).getHome();
           context.pop();
         }
       } catch (e) {
@@ -172,7 +170,7 @@ class _CreateWorkHistoryScreenState extends State<CreateWorkHistoryScreen> {
 
           return Scaffold(
             backgroundColor: Colors.white,
-            
+
             appBar: AppBar(
               title: Text(AppLang.translate(
                   lang: settingProvider.lang ?? 'kh',
@@ -180,11 +178,23 @@ class _CreateWorkHistoryScreenState extends State<CreateWorkHistoryScreen> {
               centerTitle: true,
               scrolledUnderElevation: 0,
               bottom: CustomHeader(),
+              actions: [
+                Padding(
+                  padding: EdgeInsets.all(8),
+                  child: InkWell(
+                    onTap: () => _handleSubmit(),
+                    child: Icon(
+                      Icons.check,
+                      color: Colors.blueAccent,
+                    ),
+                  ),
+                )
+              ],
             ),
             body: provider.isLoading
                 ? const Center(child: Text('Loading...'))
                 : SafeArea(
-                  child: SingleChildScrollView(
+                    child: SingleChildScrollView(
                       physics: const AlwaysScrollableScrollPhysics(),
                       padding: const EdgeInsets.all(15),
                       child: Form(
@@ -380,7 +390,7 @@ class _CreateWorkHistoryScreenState extends State<CreateWorkHistoryScreen> {
                                 });
                               },
                             ),
-                              
+
                             const SizedBox(height: 16),
                             // Department
                             _buildSelectionField(
@@ -450,39 +460,39 @@ class _CreateWorkHistoryScreenState extends State<CreateWorkHistoryScreen> {
                               },
                             ),
                             const SizedBox(height: 16),
-                              
+
                             // const SizedBox(
                             //     height: 30), // Extra space before button
                           ],
                         ),
                       ),
                     ),
-                ),
-            bottomNavigationBar: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.all(15),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      backgroundColor: Colors.blue[900],
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                    ),
-                    onPressed: () {
-                      _handleSubmit();
-                    },
-                    child: Text(
-                      AppLang.translate(
-                          lang: settingProvider.lang ?? 'kh', key: 'create'),
-                      style: TextStyle(fontSize: 16, color: Colors.white),
-                    ),
                   ),
-                ),
-              ),
-            ),
+            // bottomNavigationBar: SafeArea(
+            //   child: Padding(
+            //     padding: const EdgeInsets.all(15),
+            //     child: SizedBox(
+            //       width: double.infinity,
+            //       child: ElevatedButton(
+            //         style: ElevatedButton.styleFrom(
+            //           padding: const EdgeInsets.symmetric(vertical: 12),
+            //           backgroundColor: Colors.blue[900],
+            //           shape: RoundedRectangleBorder(
+            //             borderRadius: BorderRadius.circular(30),
+            //           ),
+            //         ),
+            //         onPressed: () {
+            //           _handleSubmit();
+            //         },
+            //         child: Text(
+            //           AppLang.translate(
+            //               lang: settingProvider.lang ?? 'kh', key: 'create'),
+            //           style: TextStyle(fontSize: 16, color: Colors.white),
+            //         ),
+            //       ),
+            //     ),
+            //   ),
+            // ),
           );
         }));
   }
@@ -520,7 +530,7 @@ class _CreateWorkHistoryScreenState extends State<CreateWorkHistoryScreen> {
   }
 
   // Reusable Selection Field widget
-   Widget _buildSelectionField({
+  Widget _buildSelectionField({
     required TextEditingController controller,
     required String label,
     required Map<String, String> items,
@@ -544,8 +554,7 @@ class _CreateWorkHistoryScreenState extends State<CreateWorkHistoryScreen> {
       decoration: InputDecoration(
         labelText: label,
         // hintText: hint,
-          suffixIcon: Icon(Icons.arrow_drop_down,
-            color: HColors.darkgrey),
+        suffixIcon: Icon(Icons.arrow_drop_down, color: HColors.darkgrey),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
         ),
@@ -583,8 +592,8 @@ class _CreateWorkHistoryScreenState extends State<CreateWorkHistoryScreen> {
       //     borderSide: BorderSide(
       //         color: Theme.of(context).colorScheme.primary, width: 1.0),
       //   ),
-        // suffixIcon: Icon(Icons.arrow_drop_down,
-        //     color: Theme.of(context).colorScheme.primary),
+      // suffixIcon: Icon(Icons.arrow_drop_down,
+      //     color: Theme.of(context).colorScheme.primary),
       //   filled: true,
       // ),
     );

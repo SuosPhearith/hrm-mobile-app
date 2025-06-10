@@ -51,7 +51,8 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Consumer3<AuthProvider, HomeProvider, SettingProvider>(
         builder: (context, authProvider, homeProvider, settingProvider, child) {
           return Scaffold(
-            backgroundColor: Color(0xFFF1F5F9),
+            // backgroundColor: Color(0xFFF1F5F9),
+            backgroundColor: Color(0xFFF0F5FA),
             body: RefreshIndicator(
               key: _refreshIndicatorKey,
               color: Colors.blue[800],
@@ -104,11 +105,11 @@ class UserProfileHeader extends StatelessWidget {
     final lang = Provider.of<SettingProvider>(context).lang;
 
     return AppBar(
-      // backgroundColor: Colors.transparent,
+      backgroundColor: Colors.transparent,
       scrolledUnderElevation: 0,
       title: InkWell(
-        onTap: (){
-          context.push(AppRoutes.profile);
+        onTap: () {
+        //  context.go(AppRoutes.profile);
         },
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -124,7 +125,8 @@ class UserProfileHeader extends StatelessWidget {
                           width: 40.0,
                           height: 40.0,
                           fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) => Container(
+                          errorBuilder: (context, error, stackTrace) =>
+                              Container(
                             width: 40.0,
                             height: 40.0,
                             decoration: BoxDecoration(
@@ -184,8 +186,8 @@ class UserProfileHeader extends StatelessWidget {
                         ),
                         Text(
                           AppLang.translate(
-                              data: authProvider.profile?.data['user']['roles'][0]
-                                  ['role'],
+                              data: authProvider.profile?.data['user']['roles']
+                                  [0]['role'],
                               lang: lang ?? 'kh'),
                           style: TextStyle(
                             fontSize:
@@ -260,7 +262,7 @@ class DailyMonthlyView extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: SizedBox(
-        height: 220,
+        height: 215,
         child: Column(
           children: [
             Expanded(
@@ -287,7 +289,7 @@ class DailyMonthlyView extends StatelessWidget {
                 return AnimatedContainer(
                   duration: const Duration(milliseconds: 300),
                   width: index == currentIndex ? 12.0 : 8.0,
-                  height: 8.0,
+                  height: index == currentIndex ? 12.0 : 8,
                   margin: const EdgeInsets.symmetric(horizontal: 4.0),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
@@ -323,7 +325,7 @@ class DailyView extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         border: Border.all(width: 1, color: const Color(0xFFCBD5E1)),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(20),
         image: DecorationImage(
             image: AssetImage('lib/assets/images/Kbach-2.png'),
             fit: BoxFit.contain,
@@ -382,30 +384,36 @@ class DailyView extends StatelessWidget {
                         .scanByDayData?.data['percentage']
                         ?.toString() ??
                     '0.0')),
-                center: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      '${convertToHoursAndMinutes(double.tryParse(homeProvider.scanByDayData?.data['working_hour']?.toString() ?? '0.0'))['hours']} ${AppLang.translate(key: 'hour', lang: lang ?? 'kh')}',
-                      style: TextStyle(
-                        fontSize:
-                            Theme.of(context).textTheme.bodyLarge!.fontSize,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.blue[800],
+                center: Container(
+                  width: 78.0, // Added width = diameter (radius * 2)
+                  height: 78.0, // Added height = diameter (radius * 2)
+                  decoration: BoxDecoration(
+                    color: HColors.bluegrey.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(
+                        50), // Keep this as radius for perfect circle
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        '${convertToHoursAndMinutes(double.tryParse(homeProvider.scanByDayData?.data['working_hour']?.toString() ?? '0.0'))['hours']} ${AppLang.translate(key: 'hour', lang: lang ?? 'kh')}',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.blue[800],
+                        ),
                       ),
-                    ),
-                    Text(
-                      '${convertToHoursAndMinutes(double.tryParse(homeProvider.scanByDayData?.data['working_hour']?.toString() ?? '0.0'))['minutes']} ${AppLang.translate(key: 'minute', lang: lang ?? 'kh')}',
-                      style: TextStyle(
-                        fontSize:
-                            Theme.of(context).textTheme.bodyLarge!.fontSize,
+                      Text(
+                        '${convertToHoursAndMinutes(double.tryParse(homeProvider.scanByDayData?.data['working_hour']?.toString() ?? '0.0'))['minutes']} ${AppLang.translate(key: 'minute', lang: lang ?? 'kh')}',
+                        style:
+                            TextStyle(fontSize: 12, color: Colors.blueAccent),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
                 progressColor: Colors.blue[700],
                 backgroundColor: Colors.grey[200]!,
-                circularStrokeCap: CircularStrokeCap.round,
+                circularStrokeCap: CircularStrokeCap.butt,
                 animation: true,
                 animationDuration: 1000,
               ),
@@ -472,7 +480,7 @@ class CheckInOutCard extends StatelessWidget {
       padding: const EdgeInsets.all(6.0),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12.0),
+        borderRadius: BorderRadius.circular(8.0),
         border: Border.all(color: HColors.darkgrey.withOpacity(0.1)),
       ),
       child: Row(
@@ -480,8 +488,8 @@ class CheckInOutCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(6.0),
             decoration: BoxDecoration(
-              color: Colors.grey[200],
-              borderRadius: BorderRadius.circular(8.0),
+              color: HColors.bluegrey.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(10.0),
             ),
             child: Icon(Icons.logout, size: 20.0, color: Colors.blue[800]),
           ),
@@ -494,14 +502,14 @@ class CheckInOutCard extends StatelessWidget {
                   time ?? '...',
                   style: TextStyle(
                     fontSize: Theme.of(context).textTheme.bodySmall!.fontSize,
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
                 Text(
                   '${terminal ?? '...'} | ${group ?? '...'}',
                   style: TextStyle(
-                    fontSize: Theme.of(context).textTheme.bodySmall!.fontSize,
-                  ),
+                      fontSize: Theme.of(context).textTheme.bodySmall!.fontSize,
+                      color: HColors.darkgrey),
                   overflow: TextOverflow.ellipsis,
                 ),
               ],
@@ -528,7 +536,7 @@ class MonthlyView extends StatelessWidget {
         color: Colors.white,
         shape: RoundedRectangleBorder(
           side: BorderSide(width: 1, color: const Color(0xFFCBD5E1)),
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(20),
         ),
         image: DecorationImage(
             image: AssetImage(
@@ -614,25 +622,25 @@ class MonthlyView extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 6.0),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    AppLang.translate(
-                        key: 'home_total_working_hours', lang: lang ?? 'kh'),
-                    style: TextStyle(
-                      fontSize: Theme.of(context).textTheme.bodySmall!.fontSize,
-                    ),
-                  ),
-                  Text(
-                    '${AppLang.translate(key: 'home_grade_received', lang: lang ?? 'kh')} ${homeProvider.scanByMonthData?.data['grade'] ?? '...'}',
-                    style: TextStyle(
-                      fontSize: Theme.of(context).textTheme.bodySmall!.fontSize,
-                    ),
-                  ),
-                ],
-              ),
+              const SizedBox(height: 15.0),
+              // Row(
+              //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //   children: [
+              //     Text(
+              //       AppLang.translate(
+              //           key: 'home_total_working_hours', lang: lang ?? 'kh'),
+              //       style: TextStyle(
+              //         fontSize: Theme.of(context).textTheme.bodySmall!.fontSize,
+              //       ),
+              //     ),
+              //     Text(
+              //       '${AppLang.translate(key: 'home_grade_received', lang: lang ?? 'kh')} ${homeProvider.scanByMonthData?.data['grade'] ?? '...'}',
+              //       style: TextStyle(
+              //         fontSize: Theme.of(context).textTheme.bodySmall!.fontSize,
+              //       ),
+              //     ),
+              //   ],
+              // ),
               const SizedBox(height: 4.0),
               CustomProgressBar(
                 percent: getSafeDouble(
@@ -763,7 +771,7 @@ class CardView extends StatelessWidget {
               width: 1,
               color: Color(0xFFCBD5E1),
             ),
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(20),
           ),
           image: DecorationImage(
             image: AssetImage('lib/assets/images/Kbach-2.png'),
@@ -856,7 +864,7 @@ class CardView extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   CircleAvatar(
-                    radius: 42,
+                    radius: 36,
                     backgroundColor: Colors.grey[300],
                     backgroundImage:
                         authProvider.profile?.data['user']['avatar'] != null
@@ -877,7 +885,7 @@ class CardView extends StatelessWidget {
                         value:
                             authProvider.profile?.data['user']?['email'] ?? ''),
                     version: QrVersions.auto,
-                    size: 70.0,
+                    size: 56.0,
                     backgroundColor: Colors.white,
                     padding: const EdgeInsets.all(4),
                   ),
@@ -899,7 +907,7 @@ class CardView extends StatelessWidget {
         Container(
           width: 16,
           height: 16,
-          margin: const EdgeInsets.only(top: 3),
+          margin: const EdgeInsets.only(top: 2),
           child: Icon(
             icon,
             size: 14,
@@ -920,10 +928,10 @@ class CardView extends StatelessWidget {
                   // color: Color(0xFF0F172A),
                   fontSize: 14,
                   fontWeight: FontWeight.w400,
-                  height: 1.5,
+                  // height: 1.5,
                 ),
                 maxLines: isAddress ? 2 : 1,
-                overflow: TextOverflow.ellipsis,
+                // overflow: TextOverflow.ellipsis,
               ),
             ],
           ),
@@ -949,7 +957,7 @@ class BackCardView extends StatelessWidget {
             width: 1,
             color: Color(0xFFCBD5E1),
           ),
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(20),
         ),
       ),
       child: Stack(
@@ -1297,7 +1305,7 @@ class MenuGrid extends StatelessWidget {
     ];
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 25),
+      margin: const EdgeInsets.only(bottom: 20),
       clipBehavior: Clip.antiAlias,
       decoration: const BoxDecoration(color: Colors.white),
       child: GridView.count(
@@ -1340,7 +1348,7 @@ class MenuGrid extends StatelessWidget {
                       fontSize: 16,
                       // color: HColors.darkgrey,
                       fontWeight: FontWeight.w400,
-                      height: 1.50,
+                      // height: 1.50,
                     ),
                   ),
                 ],
@@ -1354,6 +1362,7 @@ class MenuGrid extends StatelessWidget {
 }
 
 // Widget for request section
+
 class RequestSection extends StatelessWidget {
   final String selectedIndex;
   final ValueChanged<String> onTabChanged;
@@ -1375,42 +1384,69 @@ class RequestSection extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16.0),
+        // boxShadow: [
+        //   BoxShadow(
+        //     color: Colors.grey.withOpacity(0.1),
+        //     spreadRadius: 1,
+        //     blurRadius: 5,
+        //     offset: const Offset(0, 2),
+        //   ),
+        // ],
       ),
       padding: const EdgeInsets.all(16.0),
       child: Column(
         children: [
           Container(
-            margin: EdgeInsets.only(bottom: 12),
+            width: 100,
+            height: 4,
             decoration: BoxDecoration(
-              color: Colors.grey[200],
-              borderRadius: BorderRadius.circular(20.0),
-              border: Border.all(color: Colors.grey.shade300),
+                gradient: LinearGradient(
+                  colors: [Color(0xFFE6F0FA), Color(0xFFF0F5FA)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(50)),
+          ),
+          SizedBox(
+            height: 8,
+          ),
+          Container(
+            margin: const EdgeInsets.only(bottom: 12),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFFE6F0FA), Color(0xFFF0F5FA)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(24.0),
             ),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Expanded(
                   child: GestureDetector(
                     onTap: () => onTabChanged('Pending'),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 10.0),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
                       decoration: BoxDecoration(
                         color: selectedIndex == 'Pending'
                             ? Colors.white
-                            : Colors.grey[200],
-                        borderRadius: BorderRadius.circular(20.0),
+                            : Colors.transparent,
+                        borderRadius: BorderRadius.circular(24.0),
+                        border: selectedIndex == 'Pending'
+                            ? Border.all(color: HColors.blue, width: 1)
+                            : null,
                       ),
                       child: Center(
                         child: Text(
                           AppLang.translate(
                               key: 'home_request', lang: lang ?? 'kh'),
                           style: TextStyle(
-                            fontSize:
-                                Theme.of(context).textTheme.bodySmall!.fontSize,
+                            fontSize: 14,
                             fontWeight: FontWeight.w500,
                             color: selectedIndex == 'Pending'
-                                ? Colors.blue
-                                : Colors.grey.shade700,
+                                ? HColors.blue
+                                : HColors.darkgrey,
                           ),
                         ),
                       ),
@@ -1420,25 +1456,28 @@ class RequestSection extends StatelessWidget {
                 Expanded(
                   child: GestureDetector(
                     onTap: () => onTabChanged('Reviewing'),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 10.0),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
                       decoration: BoxDecoration(
                         color: selectedIndex == 'Reviewing'
                             ? Colors.white
-                            : Colors.grey[200],
-                        borderRadius: BorderRadius.circular(20.0),
+                            : Colors.transparent,
+                        borderRadius: BorderRadius.circular(24.0),
+                        border: selectedIndex == 'Reviewing'
+                            ? Border.all(color: HColors.blue, width: 1)
+                            : null,
                       ),
                       child: Center(
                         child: Text(
                           AppLang.translate(
                               key: 'home_review', lang: lang ?? 'kh'),
                           style: TextStyle(
-                            fontSize:
-                                Theme.of(context).textTheme.bodySmall!.fontSize,
+                            fontSize: 14,
                             fontWeight: FontWeight.w500,
                             color: selectedIndex == 'Reviewing'
-                                ? Colors.blue
-                                : Colors.grey.shade700,
+                                ? HColors.blue
+                                : HColors.darkgrey,
                           ),
                         ),
                       ),
@@ -1563,12 +1602,12 @@ class RequestCard extends StatelessWidget {
                             calculateDateDifference(
                                 item['start_datetime'], item['end_datetime']),
                             style: TextStyle(
-                              fontSize: Theme.of(context)
-                                  .textTheme
-                                  .bodySmall!
-                                  .fontSize,
-                              color: Color(0xFF3B82F6),
-                            ),
+                                fontSize: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall!
+                                    .fontSize,
+                                color: Colors.blueAccent,
+                                fontWeight: FontWeight.w500),
                           ),
                         ),
                       ],
@@ -1616,8 +1655,9 @@ class RequestCard extends StatelessWidget {
                   AppLang.translate(
                       data: item['request_status'], lang: lang ?? 'kh'),
                   style: TextStyle(
-                    fontSize: Theme.of(context).textTheme.bodySmall!.fontSize,
-                    color: const Color(0xFFF59E0B),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                    color: HColors.orange,
                   ),
                 ),
               ),

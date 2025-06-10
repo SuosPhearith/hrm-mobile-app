@@ -310,7 +310,7 @@ class _UpdateUserWorkScreenState extends State<UpdateUserWorkScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('ការស្នើសុំត្រូវបានបញ្ជូនដោយជោគជ័យ')),
           );
-          Provider.of<WorkProvider>(context,listen: false).getHome();
+          Provider.of<WorkProvider>(context, listen: false).getHome();
           context.pop();
         }
       } catch (e) {
@@ -382,12 +382,24 @@ class _UpdateUserWorkScreenState extends State<UpdateUserWorkScreen> {
               title: Text(AppLang.translate(
                   lang: settingProvider.lang ?? 'kh', key: 'update_user_work')),
               centerTitle: true,
+              actions: [
+                Padding(
+                  padding: EdgeInsets.all(8),
+                  child: InkWell(
+                    onTap: () => _handleSubmit(),
+                    child: Icon(
+                      Icons.check,
+                      color: Colors.blueAccent,
+                    ),
+                  ),
+                )
+              ],
               bottom: CustomHeader(),
             ),
             body: provider.isLoading
                 ? const Center(child: Text('Loading...'))
                 : SafeArea(
-                  child: SingleChildScrollView(
+                    child: SingleChildScrollView(
                       physics: const AlwaysScrollableScrollPhysics(),
                       padding: const EdgeInsets.all(15),
                       child: Form(
@@ -637,7 +649,7 @@ class _UpdateUserWorkScreenState extends State<UpdateUserWorkScreen> {
                                 });
                               },
                             ),
-                              
+
                             const SizedBox(height: 16),
                             // Department
                             _buildSelectionField(
@@ -724,39 +736,39 @@ class _UpdateUserWorkScreenState extends State<UpdateUserWorkScreen> {
                               },
                             ),
                             const SizedBox(height: 16),
-                              
+
                             // const SizedBox(
                             //     height: 30), // Extra space before button
                           ],
                         ),
                       ),
                     ),
-                ),
-            bottomNavigationBar: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.all(15),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      backgroundColor: Colors.blue[900],
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                    ),
-                    onPressed: () {
-                      _handleSubmit();
-                    },
-                    child: Text(
-                      AppLang.translate(
-                          lang: settingProvider.lang ?? 'kh', key: 'update'),
-                      style: TextStyle(fontSize: 16, color: Colors.white),
-                    ),
                   ),
-                ),
-              ),
-            ),
+            // bottomNavigationBar: SafeArea(
+            //   child: Padding(
+            //     padding: const EdgeInsets.all(15),
+            //     child: SizedBox(
+            //       width: double.infinity,
+            //       child: ElevatedButton(
+            //         style: ElevatedButton.styleFrom(
+            //           padding: const EdgeInsets.symmetric(vertical: 12),
+            //           backgroundColor: Colors.blue[900],
+            //           shape: RoundedRectangleBorder(
+            //             borderRadius: BorderRadius.circular(30),
+            //           ),
+            //         ),
+            //         onPressed: () {
+            //           _handleSubmit();
+            //         },
+            //         child: Text(
+            //           AppLang.translate(
+            //               lang: settingProvider.lang ?? 'kh', key: 'update'),
+            //           style: TextStyle(fontSize: 16, color: Colors.white),
+            //         ),
+            //       ),
+            //     ),
+            //   ),
+            // ),
           );
         }));
   }
@@ -836,7 +848,7 @@ class _UpdateUserWorkScreenState extends State<UpdateUserWorkScreen> {
   //     ),
   //   );
   // }
-   Widget _buildSelectionField({
+  Widget _buildSelectionField({
     required TextEditingController controller,
     required String label,
     required Map<String, String> items,
@@ -860,8 +872,7 @@ class _UpdateUserWorkScreenState extends State<UpdateUserWorkScreen> {
       decoration: InputDecoration(
         labelText: label,
         // hintText: hint,
-          suffixIcon: Icon(Icons.arrow_drop_down,
-            color: HColors.darkgrey),
+        suffixIcon: Icon(Icons.arrow_drop_down, color: HColors.darkgrey),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
         ),
@@ -899,8 +910,8 @@ class _UpdateUserWorkScreenState extends State<UpdateUserWorkScreen> {
       //     borderSide: BorderSide(
       //         color: Theme.of(context).colorScheme.primary, width: 1.0),
       //   ),
-        // suffixIcon: Icon(Icons.arrow_drop_down,
-        //     color: Theme.of(context).colorScheme.primary),
+      // suffixIcon: Icon(Icons.arrow_drop_down,
+      //     color: Theme.of(context).colorScheme.primary),
       //   filled: true,
       // ),
     );
@@ -1071,7 +1082,7 @@ class _UpdateUserWorkScreenState extends State<UpdateUserWorkScreen> {
     required String label,
     String? Function(String?)? validator,
     bool readOnly = false,
-      final TextInputType? keyboardType,
+    final TextInputType? keyboardType,
     VoidCallback? onTap,
     int maxLines = 1,
   }) {

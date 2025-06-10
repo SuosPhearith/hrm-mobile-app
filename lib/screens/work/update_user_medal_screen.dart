@@ -186,7 +186,7 @@ class _UpdateUserMedalScreenState extends State<UpdateUserMedalScreen> {
             const SnackBar(content: Text('ការស្នើសុំត្រូវបានបញ្ជូនដោយជោគជ័យ')),
           );
           _clearAllControllers();
-          Provider.of<WorkProvider>(context,listen: false).getHome();
+          Provider.of<WorkProvider>(context, listen: false).getHome();
           context.pop();
         }
       } catch (e) {
@@ -228,11 +228,23 @@ class _UpdateUserMedalScreenState extends State<UpdateUserMedalScreen> {
               centerTitle: true,
               scrolledUnderElevation: 0,
               bottom: CustomHeader(),
+              actions: [
+                Padding(
+                  padding: EdgeInsets.all(8),
+                  child: InkWell(
+                    onTap: () => _handleSubmit(),
+                    child: Icon(
+                      Icons.check,
+                      color: Colors.blueAccent,
+                    ),
+                  ),
+                )
+              ],
             ),
             body: provider.isLoading
                 ? Center(child: Text('Loading...'))
                 : SafeArea(
-                  child: SingleChildScrollView(
+                    child: SingleChildScrollView(
                       physics: const AlwaysScrollableScrollPhysics(),
                       child: Padding(
                         padding: const EdgeInsets.all(15),
@@ -318,9 +330,9 @@ class _UpdateUserMedalScreenState extends State<UpdateUserMedalScreen> {
                                   });
                                 },
                               ),
-                  
+
                               const SizedBox(height: 16),
-                  
+
                               // Speaking and Reading Levels
                               buildSelectionField(
                                 context: context,
@@ -356,32 +368,32 @@ class _UpdateUserMedalScreenState extends State<UpdateUserMedalScreen> {
                         ),
                       ),
                     ),
-                ),
-            bottomNavigationBar: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.all(15),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      backgroundColor: Colors.blue[900],
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                    ),
-                    onPressed: () {
-                      _handleSubmit();
-                    },
-                    child: Text(
-                      AppLang.translate(
-                          lang: settingProvider.lang ?? 'kh', key: 'update'),
-                      style: const TextStyle(fontSize: 16, color: Colors.white),
-                    ),
                   ),
-                ),
-              ),
-            ),
+            // bottomNavigationBar: SafeArea(
+            //   child: Padding(
+            //     padding: const EdgeInsets.all(15),
+            //     child: SizedBox(
+            //       width: double.infinity,
+            //       child: ElevatedButton(
+            //         style: ElevatedButton.styleFrom(
+            //           padding: const EdgeInsets.symmetric(vertical: 12),
+            //           backgroundColor: Colors.blue[900],
+            //           shape: RoundedRectangleBorder(
+            //             borderRadius: BorderRadius.circular(30),
+            //           ),
+            //         ),
+            //         onPressed: () {
+            //           _handleSubmit();
+            //         },
+            //         child: Text(
+            //           AppLang.translate(
+            //               lang: settingProvider.lang ?? 'kh', key: 'update'),
+            //           style: const TextStyle(fontSize: 16, color: Colors.white),
+            //         ),
+            //       ),
+            //     ),
+            //   ),
+            // ),
           );
         }));
   }
