@@ -105,7 +105,8 @@ class UserProfileHeader extends StatelessWidget {
     final lang = Provider.of<SettingProvider>(context).lang;
 
     return AppBar(
-      backgroundColor: Colors.transparent,
+      // backgroundColor: Colors.transparent,
+            backgroundColor: Colors.white,
       scrolledUnderElevation: 0,
       title: InkWell(
         onTap: () {
@@ -262,7 +263,7 @@ class DailyMonthlyView extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: SizedBox(
-        height: 215,
+        height: 220,
         child: Column(
           children: [
             Expanded(
@@ -288,8 +289,8 @@ class DailyMonthlyView extends StatelessWidget {
                 // Updated to 3 for the three pages
                 return AnimatedContainer(
                   duration: const Duration(milliseconds: 300),
-                  width: index == currentIndex ? 12.0 : 8.0,
-                  height: index == currentIndex ? 12.0 : 8,
+                  width: index == currentIndex ? 8.0 : 8.0,
+                  height: index == currentIndex ? 8.0 : 8,
                   margin: const EdgeInsets.symmetric(horizontal: 4.0),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
@@ -325,7 +326,7 @@ class DailyView extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         border: Border.all(width: 1, color: const Color(0xFFCBD5E1)),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(12),
         image: DecorationImage(
             image: AssetImage('lib/assets/images/Kbach-2.png'),
             fit: BoxFit.contain,
@@ -536,7 +537,7 @@ class MonthlyView extends StatelessWidget {
         color: Colors.white,
         shape: RoundedRectangleBorder(
           side: BorderSide(width: 1, color: const Color(0xFFCBD5E1)),
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(12),
         ),
         image: DecorationImage(
             image: AssetImage(
@@ -622,25 +623,25 @@ class MonthlyView extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 15.0),
-              // Row(
-              //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              //   children: [
-              //     Text(
-              //       AppLang.translate(
-              //           key: 'home_total_working_hours', lang: lang ?? 'kh'),
-              //       style: TextStyle(
-              //         fontSize: Theme.of(context).textTheme.bodySmall!.fontSize,
-              //       ),
-              //     ),
-              //     Text(
-              //       '${AppLang.translate(key: 'home_grade_received', lang: lang ?? 'kh')} ${homeProvider.scanByMonthData?.data['grade'] ?? '...'}',
-              //       style: TextStyle(
-              //         fontSize: Theme.of(context).textTheme.bodySmall!.fontSize,
-              //       ),
-              //     ),
-              //   ],
-              // ),
+              const SizedBox(height: 6.0),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    AppLang.translate(
+                        key: 'home_total_working_hours', lang: lang ?? 'kh'),
+                    style: TextStyle(
+                      fontSize: Theme.of(context).textTheme.bodySmall!.fontSize,
+                    ),
+                  ),
+                  Text(
+                    '${AppLang.translate(key: 'home_grade_received', lang: lang ?? 'kh')} ${homeProvider.scanByMonthData?.data['grade'] ?? '...'}',
+                    style: TextStyle(
+                      fontSize: Theme.of(context).textTheme.bodySmall!.fontSize,
+                    ),
+                  ),
+                ],
+              ),
               const SizedBox(height: 4.0),
               CustomProgressBar(
                 percent: getSafeDouble(
@@ -771,7 +772,7 @@ class CardView extends StatelessWidget {
               width: 1,
               color: Color(0xFFCBD5E1),
             ),
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(12),
           ),
           image: DecorationImage(
             image: AssetImage('lib/assets/images/Kbach-2.png'),
@@ -877,9 +878,9 @@ class CardView extends StatelessWidget {
                             size: 30.0, color: Colors.white)
                         : null,
                   ),
-                  SizedBox(
-                    height: 12,
-                  ),
+                  // SizedBox(
+                  //   height: 12,
+                  // ),
                   QrImageView(
                     data: getSafeString(
                         value:
@@ -926,7 +927,7 @@ class CardView extends StatelessWidget {
                 text,
                 style: const TextStyle(
                   // color: Color(0xFF0F172A),
-                  fontSize: 14,
+                  fontSize: 12,
                   fontWeight: FontWeight.w400,
                   // height: 1.5,
                 ),
@@ -957,7 +958,7 @@ class BackCardView extends StatelessWidget {
             width: 1,
             color: Color(0xFFCBD5E1),
           ),
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(12),
         ),
       ),
       child: Stack(

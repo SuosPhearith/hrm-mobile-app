@@ -24,6 +24,7 @@ import 'package:mobile_app/screens/personal_info_screen.dart';
 import 'package:mobile_app/screens/qr_scanner_screen.dart';
 import 'package:mobile_app/screens/request/create_request_screen.dart';
 import 'package:mobile_app/screens/request/detail_request_screen.dart';
+import 'package:mobile_app/screens/request/update_request_screen.dart';
 import 'package:mobile_app/screens/request_screen.dart';
 import 'package:mobile_app/screens/salary_screen.dart';
 import 'package:mobile_app/screens/scan_screen.dart';
@@ -341,6 +342,18 @@ final GoRouter _router = GoRouter(
           id: userId,
           workId: workId,
         );
+      },
+    ),
+    GoRoute(
+      path: AppRoutes.updateRequest,
+      builder: (context, state) {
+        // final String userId = state.pathParameters['userId']!;
+        // final String workId = state.pathParameters['workId']!;
+        // return UpdateUserWorkScreen(
+        //   id: userId,
+        //   workId: workId,
+        // );
+        return UpdateRequestScreen();
       },
     ),
   ],
