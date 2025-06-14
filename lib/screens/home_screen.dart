@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:mobile_app/app_lang.dart';
 import 'package:mobile_app/app_routes.dart';
 import 'package:mobile_app/providers/global/auth_provider.dart';
@@ -10,6 +11,7 @@ import 'package:mobile_app/providers/local/home_provider.dart';
 import 'package:mobile_app/shared/color/colors.dart';
 import 'package:mobile_app/utils/help_util.dart';
 import 'package:mobile_app/widgets/custom_progress_bar.dart';
+import 'package:mobile_app/widgets/helper.dart';
 import 'package:mobile_app/widgets/skeleton/home_skeleton.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:provider/provider.dart';
@@ -106,11 +108,11 @@ class UserProfileHeader extends StatelessWidget {
 
     return AppBar(
       // backgroundColor: Colors.transparent,
-            backgroundColor: Colors.white,
+      backgroundColor: Colors.white,
       scrolledUnderElevation: 0,
       title: InkWell(
         onTap: () {
-        //  context.go(AppRoutes.profile);
+           context.go(AppRoutes.profile);
         },
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -210,9 +212,18 @@ class UserProfileHeader extends StatelessWidget {
           padding: const EdgeInsets.all(8.0),
           child: Row(
             children: [
-              _IconButton(icon: Icons.download, onPressed: null),
+              _IconButton(
+                  icon: Icons.download,
+                  onPressed: () {
+                    showConfirmDialog(context, 'កំពុងអភិវឌ្ឍន៍',
+                        'កំពុងអភិវឌ្ឍន៍', DialogType.primary, () {});
+                  }),
               const SizedBox(width: 8.0),
-              _IconButton(icon: Icons.notifications, onPressed: null),
+              _IconButton(
+                  icon: Icons.notifications,
+                  onPressed: () {
+                    context.push(AppRoutes.notification);
+                  }),
             ],
           ),
         ),
@@ -224,21 +235,26 @@ class UserProfileHeader extends StatelessWidget {
 // Widget for icon button
 class _IconButton extends StatelessWidget {
   final IconData icon;
-  final VoidCallback? onPressed;
+  final VoidCallback onPressed;
 
-  const _IconButton({required this.icon, this.onPressed});
+  const _IconButton({required this.icon, required this.onPressed});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 40.0,
-      height: 40.0,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: HColors.darkgrey.withOpacity(0.1),
-      ),
-      child: Center(
-        child: Icon(icon, color: HColors.darkgrey, size: 22.0),
+    return InkWell(
+      onTap: () {
+        onPressed();
+      },
+      child: Container(
+        width: 40.0,
+        height: 40.0,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: HColors.darkgrey.withOpacity(0.1),
+        ),
+        child: Center(
+          child: Icon(icon, color: HColors.darkgrey, size: 22.0),
+        ),
       ),
     );
   }
@@ -320,6 +336,8 @@ class DailyView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final date = DateTime.now();
+    final formattedDate = DateFormat('dd-MM-yyyy').format(date);
     final lang = Provider.of<SettingProvider>(context).lang;
     return Container(
       padding: const EdgeInsets.all(13.0),
@@ -358,7 +376,7 @@ class DailyView extends StatelessWidget {
                 child: Row(
                   children: [
                     Text(
-                      '03-03-2025',
+                      formattedDate,
                       style: TextStyle(
                         color: const Color(0xFF64748B),
                         fontSize: 12,
@@ -530,6 +548,8 @@ class MonthlyView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final DateTime date = DateTime.now();
+    final formatted = DateFormat.yMMMM('km').format(date); // e.g., មីនា 2025
     final lang = Provider.of<SettingProvider>(context).lang;
     return Container(
       padding: const EdgeInsets.all(13.0),
@@ -572,7 +592,7 @@ class MonthlyView extends StatelessWidget {
                 child: Row(
                   children: [
                     Text(
-                      '03-03-2025',
+                      formatted,
                       style: TextStyle(
                         color: const Color(0xFF64748B),
                         fontSize: 12,
@@ -854,7 +874,7 @@ class CardView extends StatelessWidget {
                     const SizedBox(height: 4),
                     _buildContactRow(
                       Icons.location_on,
-                      '${AppLang.translate(lang: lang ?? 'kh', data: authProvider.profile?.data['user']?['village'])} ,${AppLang.translate(lang: lang ?? 'kh', data: authProvider.profile?.data['user']?['commune'])} ,${AppLang.translate(lang: lang ?? 'kh', data: authProvider.profile?.data['user']?['district'])} ,${AppLang.translate(lang: lang ?? 'kh', data: authProvider.profile?.data['user']?['province'])}  ',
+                      '${AppLang.translate(lang: lang ?? 'kh', data: authProvider.profile?.data['user']?['village'])} ${AppLang.translate(lang: lang ?? 'kh', data: authProvider.profile?.data['user']?['commune'])} ${AppLang.translate(lang: lang ?? 'kh', data: authProvider.profile?.data['user']?['district'])} ${AppLang.translate(lang: lang ?? 'kh', data: authProvider.profile?.data['user']?['province'])}',
                       isAddress: true,
                     ),
                   ],
@@ -1082,83 +1102,120 @@ class BackCardView extends StatelessWidget {
                   ],
                 ),
                 SizedBox(
-                  height: 8,
+                  height: 4,
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                Wrap(
+                  alignment: WrapAlignment.spaceBetween,
+                  spacing: 8.0, // Horizontal spacing between items
+                  runSpacing: 8.0, // Vertical spacing between wrapped lines
                   children: [
                     GestureDetector(
                       onTap: () async {
-                        final url = 'https://www.youtube.com';
+                        final url =
+                            'mailto:info@cdc.gov.kh'; // Use mailto for email
                         if (await canLaunchUrl(Uri.parse(url))) {
                           await launchUrl(Uri.parse(url));
                         } else {
-                          // Handle error (e.g., show a snackbar)
-                          // print('Could not launch $url');
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Could not launch email')),
+                          );
                         }
                       },
                       child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.end,
+                        mainAxisSize: MainAxisSize
+                            .min, // Prevent Row from taking full width
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Icon(
                             Icons.email,
                             size: 14,
                             color: HColors.darkgrey,
                           ),
-                          SizedBox(
-                            width: 5,
-                          ),
-                          Text(
-                            'info@cdc.gov.kh',
-                            style: TextStyle(
-                              // decoration:
-                              //     TextDecoration.underline, // Adds underline
-                              color: HColors.darkgrey,
-                              fontSize: 12,
+                          SizedBox(width: 5),
+                          Flexible(
+                            child: Text(
+                              'info@cdc.gov.kh',
+                              overflow:
+                                  TextOverflow.ellipsis, // Handle overflow
+                              style: TextStyle(
+                                color: HColors.darkgrey,
+                                fontSize: 10,
+                              ),
                             ),
                           ),
                         ],
                       ),
                     ),
-                    Text(
-                      '+855 99 799 579',
-                      style: TextStyle(fontSize: 12, color: HColors.darkgrey),
-                    ),
                     GestureDetector(
                       onTap: () async {
-                        final url = 'www.cdc.gov.kh';
+                        final url = 'tel:+85599799579'; // Use tel for phone
                         if (await canLaunchUrl(Uri.parse(url))) {
                           await launchUrl(Uri.parse(url));
                         } else {
-                          // Handle error (e.g., show a snackbar)
-                          print('Could not launch $url');
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Could not launch phone')),
+                          );
                         }
                       },
                       child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.end,
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.phone,
+                            size: 14,
+                            color: HColors.darkgrey,
+                          ),
+                          SizedBox(width: 5),
+                          Text(
+                            '+855 99 799 579',
+                            style: TextStyle(
+                              fontSize: 10,
+                              color: HColors.darkgrey,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () async {
+                        final url =
+                            'https://www.cdc.gov.kh'; // Fix URL with https
+                        if (await canLaunchUrl(Uri.parse(url))) {
+                          await launchUrl(Uri.parse(url));
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Could not launch $url')),
+                          );
+                        }
+                      },
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment:
+                            CrossAxisAlignment.center, // Consistent alignment
                         children: [
                           Icon(
                             Icons.language,
                             size: 14,
                             color: HColors.darkgrey,
                           ),
-                          SizedBox(
-                            width: 5,
-                          ),
-                          Text(
-                            'www.cdc.gov.kh',
-                            style: TextStyle(
-                              // decoration:
-                              //     TextDecoration.underline, // Adds underline
-                              color: HColors.darkgrey,
-                              fontSize: 12,
+                          SizedBox(width: 5),
+                          Flexible(
+                            child: Text(
+                              'www.cdc.gov.kh',
+                              overflow:
+                                  TextOverflow.ellipsis, // Handle overflow
+                              style: TextStyle(
+                                color: HColors.darkgrey,
+                                fontSize: 10,
+                              ),
                             ),
                           ),
                         ],
                       ),
                     ),
                   ],
-                )
+                ),
               ],
             ),
           ),

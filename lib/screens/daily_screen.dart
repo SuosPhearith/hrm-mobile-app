@@ -135,7 +135,28 @@ class DailyScreenState extends State<DailyScreen> {
             backgroundColor: Colors.white,
             onRefresh: () => _refreshData(scanProvider),
             child: scanProvider.isLoading
-                ? Center(child: Text('Loading...'))
+                ? Center(
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  SizedBox(
+                    height: 60,
+                    width: 60,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2.0,
+                    ),
+                  ),
+                  Text(
+                    'សូមរងចាំ',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.black,
+                    ),
+                  ),
+                ],
+              ),
+            )
                 : scanProvider.data == null
                     ? Center(child: Text('Something went wrong'))
                     : SafeArea(

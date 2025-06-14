@@ -111,4 +111,20 @@ class DetailRequestService {
       throw Exception(ErrorType.unexpectedError);
     }
   }
+
+  Future<Map<String, dynamic>> downloadReport(
+      {required String id}) async {
+    try {
+      final response = await DioClient.dio.get("/sup/request/$id/print");
+      if (response.data is Map<String, dynamic>) {
+        return response.data as Map<String, dynamic>;
+      } else {
+        throw Exception('Response data is not a Map<String, dynamic>');
+      }
+    } on DioException catch (_) {
+      rethrow;
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

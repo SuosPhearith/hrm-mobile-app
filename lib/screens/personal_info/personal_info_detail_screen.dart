@@ -36,7 +36,28 @@ class _PersonalInfoDetailScreenState extends State<PersonalInfoDetailScreen> {
               backgroundColor: Colors.white,
               onRefresh: () => _refreshData(evaluateProvider),
               child: evaluateProvider.isLoading
-                  ? Center(child: Text('Loading...'))
+                  ? Center(
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  SizedBox(
+                    height: 60,
+                    width: 60,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2.0,
+                    ),
+                  ),
+                  Text(
+                    'សូមរងចាំ',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.black,
+                    ),
+                  ),
+                ],
+              ),
+            )
                   : SafeArea(
                     child: SingleChildScrollView(
                         physics: const AlwaysScrollableScrollPhysics(),

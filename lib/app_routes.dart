@@ -31,4 +31,5 @@ class AppRoutes {
   static const String card = '/card-screen';
   static const String document = '/document-screen';
   static const String updateRequest = '/update-request';
+  static const String notification = '/notification';
 }

@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:mobile_app/app_lang.dart';
 import 'package:mobile_app/providers/global/auth_provider.dart';
@@ -8,6 +6,7 @@ import 'package:mobile_app/providers/local/home_provider.dart';
 import 'package:mobile_app/shared/color/colors.dart';
 import 'package:mobile_app/shared/component/bottom_appbar.dart';
 import 'package:mobile_app/utils/help_util.dart';
+import 'package:mobile_app/widgets/helper.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -31,18 +30,42 @@ class CardScreen extends StatelessWidget {
               ),
               centerTitle: true,
               bottom: CustomHeader(),
+              actions: [
+                Padding(
+                  padding: EdgeInsets.all(8),
+                  child: IconButton(
+                    onPressed: () {
+                      showConfirmDialog(context, 'កំពុងអភិវឌ្ឍន៍',
+                          'កំពុងអភិវឌ្ឍន៍', DialogType.primary, () {});
+                    },
+                    icon: Icon(
+                      Icons.download_outlined,
+                      color: HColors.darkgrey,
+                      size: 22,
+                    ),
+                  ),
+                )
+              ],
             ),
             body: SafeArea(
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                child: SizedBox(
-                  height: 220,
-                  child: homeProvider.isLoading
-                      ? CardSkeleton()
-                      : FlippableCardView(homeProvider: homeProvider),
-                ),
-              ),
+              child: homeProvider.isLoading
+                  ? const Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: CardSkeleton(),
+                    )
+                  : SingleChildScrollView(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16.0, vertical: 8.0),
+                      child: Column(
+                        children: [
+                          CardView(homeProvider: homeProvider),
+                          const SizedBox(
+                              height: 16), // Add spacing between cards
+                          const BackCardView(),
+                          const SizedBox(height: 16), // Add bottom padding
+                        ],
+                      ),
+                    ),
             ),
           );
         },
@@ -73,74 +96,6 @@ class RotatedImagePainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }
 
-class FlippableCardView extends StatefulWidget {
-  final HomeProvider homeProvider;
-
-  const FlippableCardView({super.key, required this.homeProvider});
-
-  @override
-  _FlippableCardViewState createState() => _FlippableCardViewState();
-}
-
-class _FlippableCardViewState extends State<FlippableCardView>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  bool _isFront = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 500),
-      vsync: this,
-    );
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  void _toggleCard() {
-    if (_isFront) {
-      _controller.forward();
-    } else {
-      _controller.reverse();
-    }
-    setState(() {
-      _isFront = !_isFront;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: _toggleCard,
-      child: AnimatedBuilder(
-        animation: _controller,
-        builder: (context, child) {
-          final angle = _controller.value * math.pi;
-          final isFrontVisible = angle < math.pi / 2 || angle > 3 * math.pi / 2;
-          return Transform(
-            transform: Matrix4.identity()
-              ..setEntry(3, 2, 0.001) // Perspective
-              ..rotateY(angle),
-            alignment: Alignment.center,
-            child: isFrontVisible
-                ? CardView(homeProvider: widget.homeProvider)
-                : Transform(
-                    transform: Matrix4.identity()..rotateY(math.pi),
-                    alignment: Alignment.center,
-                    child: BackCardView(),
-                  ),
-          );
-        },
-      ),
-    );
-  }
-}
-
 class CardView extends StatelessWidget {
   final HomeProvider homeProvider;
 
@@ -150,132 +105,148 @@ class CardView extends StatelessWidget {
   Widget build(BuildContext context) {
     final lang = Provider.of<SettingProvider>(context).lang;
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    return CustomPaint(
-      painter: RotatedImagePainter(
-        imagePath: 'lib/assets/images/Kbach-2.png',
-        rotationAngle: 3.14159, // 180 degrees in radians
-      ),
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(16),
-        clipBehavior: Clip.antiAlias,
-        decoration: ShapeDecoration(
-          color: Colors.white,
-          shape: RoundedRectangleBorder(
-            side: const BorderSide(
-              width: 1,
-              color: Color(0xFFCBD5E1),
-            ),
-            borderRadius: BorderRadius.circular(12),
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      clipBehavior: Clip.antiAlias,
+      decoration: ShapeDecoration(
+        color: Colors.white,
+        shape: RoundedRectangleBorder(
+          side: const BorderSide(
+            width: 1,
+            color: Color(0xFFCBD5E1),
           ),
-          image: DecorationImage(
-            image: AssetImage('lib/assets/images/Kbach-2.png'),
-            fit: BoxFit.contain,
-            opacity: 0.3,
-            alignment: Alignment.centerLeft,
-          ),
+          borderRadius: BorderRadius.circular(12),
         ),
-        child: IntrinsicHeight(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.only(bottom: 4),
-                      child: Column(
+        image: DecorationImage(
+          image: AssetImage('lib/assets/images/Kbach-2.png'),
+          fit: BoxFit.contain,
+          opacity: 0.3,
+          alignment: Alignment.centerLeft,
+        ),
+      ),
+      child: Column(
+        children: [
+          // Main content row
+          IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Left side - User information
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Header section
+                      Container(
+                        padding: const EdgeInsets.only(bottom: 4),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              getSafeString(
+                                  safeValue: '...',
+                                  value: authProvider.profile?.data['user']
+                                      ?['name_kh']),
+                              style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 18,
+                                color: HColors.blue,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            SizedBox(
+                              width: 220,
+                              child: Wrap(
+                                crossAxisAlignment: WrapCrossAlignment.center,
+                                spacing: 4,
+                                runSpacing: 4,
+                                children: [
+                                  Text(
+                                    "${AppLang.translate(data: authProvider.profile?.data['user']['roles'][0]['department'], lang: lang ?? 'kh')} | ${AppLang.translate(lang: lang ?? 'kh', data: authProvider.profile?.data['user']?['user_work']?['staff_type'])}",
+                                    style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w500),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Container(
+                              width: 30,
+                              height: 1,
+                              color: Color(0xFFDDAD01),
+                            ),
+                          ],
+                        ),
+                      ),
+                      // Contact information
+                      Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text(
-                            getSafeString(
-                                safeValue: '...',
-                                value: authProvider.profile?.data['user']
-                                    ?['name_kh']),
-                            style: TextStyle(
-                              fontWeight: FontWeight.w500,
-                              fontSize: 18,
-                              color: HColors.blue,
-                            ),
+                          _buildContactRow(
+                            Icons.phone_android_sharp,
+                            '${getSafeString(value: authProvider.profile?.data['user']?['phone_number'])} ',
                           ),
-                          SizedBox(height: 2),
-                          SizedBox(
-                            width: 220,
-                            child: Wrap(
-                              crossAxisAlignment: WrapCrossAlignment.center,
-                              spacing: 4,
-                              runSpacing: 4,
-                              children: [
-                                Text(
-                                  "${AppLang.translate(data: authProvider.profile?.data['user']['roles'][0]['department'], lang: lang ?? 'kh')} | ${AppLang.translate(lang: lang ?? 'kh', data: authProvider.profile?.data['user']?['user_work']?['staff_type'])}",
-                                  style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w500),
-                                ),
-                              ],
-                            ),
+                          const SizedBox(height: 4),
+                          _buildContactRow(
+                            Icons.email,
+                            '${getSafeString(value: authProvider.profile?.data['user']?['email'])} ',
                           ),
-                          SizedBox(height: 2),
-                          Container(
-                            width: 30,
-                            height: 1,
-                            color: Color(0xFFDDAD01),
+                          const SizedBox(height: 4),
+                          _buildContactRow(
+                            Icons.location_on,
+                            '${AppLang.translate(lang: lang ?? 'kh', data: authProvider.profile?.data['user']?['village'])} ${AppLang.translate(lang: lang ?? 'kh', data: authProvider.profile?.data['user']?['commune'])} ${AppLang.translate(lang: lang ?? 'kh', data: authProvider.profile?.data['user']?['district'])} ${AppLang.translate(lang: lang ?? 'kh', data: authProvider.profile?.data['user']?['province'])} ',
+                            isAddress: true,
                           ),
                         ],
                       ),
+                    ],
+                  ),
+                ),
+                // Right side - Avatar and QR
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    CircleAvatar(
+                      radius: 36,
+                      backgroundColor: Colors.grey[300],
+                      backgroundImage:
+                          authProvider.profile?.data['user']['avatar'] != null
+                              ? NetworkImage(
+                                  '${authProvider.profile?.data['user']['avatar']['file_domain']}${authProvider.profile?.data['user']['avatar']['uri']}',
+                                )
+                              : null,
+                      child:
+                          authProvider.profile?.data['user']['avatar'] == null
+                              ? const Icon(Icons.person,
+                                  size: 30.0, color: Colors.white)
+                              : null,
                     ),
-                    _buildContactRow(
-                      Icons.phone_android_sharp,
-                      '${getSafeString(value: authProvider.profile?.data['user']?['phone_number'])} ',
-                    ),
-                    const SizedBox(height: 4),
-                    _buildContactRow(
-                      Icons.email,
-                      '${getSafeString(value: authProvider.profile?.data['user']?['email'])} ',
-                    ),
-                    const SizedBox(height: 4),
-                    _buildContactRow(
-                      Icons.location_on,
-                      '${AppLang.translate(lang: lang ?? 'kh', data: authProvider.profile?.data['user']?['village'])} ,${AppLang.translate(lang: lang ?? 'kh', data: authProvider.profile?.data['user']?['commune'])} ,${AppLang.translate(lang: lang ?? 'kh', data: authProvider.profile?.data['user']?['district'])} ,${AppLang.translate(lang: lang ?? 'kh', data: authProvider.profile?.data['user']?['province'])}  ',
-                      isAddress: true,
+                    const SizedBox(height: 8),
+                    SizedBox(
+                      width: 56.0,
+                      height: 56.0,
+                      child: QrImageView(
+                        data: getSafeString(
+                            value: authProvider.profile?.data['user']
+                                    ?['email'] ??
+                                ''),
+                        version: QrVersions.auto,
+                        size: 56.0,
+                        backgroundColor: Colors.white,
+                        padding: const EdgeInsets.all(4),
+                      ),
                     ),
                   ],
                 ),
-              ),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  CircleAvatar(
-                    radius: 36,
-                    backgroundColor: Colors.grey[300],
-                    backgroundImage:
-                        authProvider.profile?.data['user']['avatar'] != null
-                            ? NetworkImage(
-                                '${authProvider.profile?.data['user']['avatar']['file_domain']}${authProvider.profile?.data['user']['avatar']['uri']}',
-                              )
-                            : null,
-                    child: authProvider.profile?.data['user']['avatar'] == null
-                        ? const Icon(Icons.person,
-                            size: 30.0, color: Colors.white)
-                        : null,
-                  ),
-                  QrImageView(
-                    data: getSafeString(
-                        value:
-                            authProvider.profile?.data['user']?['email'] ?? ''),
-                    version: QrVersions.auto,
-                    size: 56.0,
-                    backgroundColor: Colors.white,
-                    padding: const EdgeInsets.all(4),
-                  ),
-                ],
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
@@ -339,6 +310,7 @@ class BackCardView extends StatelessWidget {
       ),
       child: Stack(
         children: [
+          // Background decorative images
           Positioned(
             left: -30,
             top: -30,
@@ -373,11 +345,13 @@ class BackCardView extends StatelessWidget {
               ),
             ),
           ),
+          // Main content
           Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
+                // Logo
                 Container(
                   height: 60,
                   width: 100,
@@ -389,24 +363,30 @@ class BackCardView extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 8),
-                Text(
-                  "ក្រុមប្រឹក្សារអភិវឌ្ឍកម្ពុជា",
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  "Council for the Development of Cambodia",
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  textAlign: TextAlign.center,
+                // Organization names
+                Column(
+                  children: [
+                    Text(
+                      "ក្រុមប្រឹក្សារអភិវឌ្ឍកម្ពុជា",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      "Council for the Development of Cambodia",
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 8),
+                // Address
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -437,74 +417,120 @@ class BackCardView extends StatelessWidget {
                     ),
                   ],
                 ),
-                SizedBox(
-                  height: 8,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                const SizedBox(height: 8),
+                // Contact information row
+                Wrap(
+                  alignment: WrapAlignment.spaceBetween,
+                  spacing: 8.0, // Horizontal spacing between items
+                  runSpacing: 8.0, // Vertical spacing between wrapped lines
                   children: [
                     GestureDetector(
                       onTap: () async {
-                        final url = 'https://www.youtube.com';
+                        final url =
+                            'mailto:info@cdc.gov.kh'; // Use mailto for email
                         if (await canLaunchUrl(Uri.parse(url))) {
                           await launchUrl(Uri.parse(url));
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Could not launch email')),
+                          );
                         }
                       },
                       child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.end,
+                        mainAxisSize: MainAxisSize
+                            .min, // Prevent Row from taking full width
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Icon(
                             Icons.email,
                             size: 14,
                             color: HColors.darkgrey,
                           ),
-                          SizedBox(
-                            width: 5,
-                          ),
-                          Text(
-                            'info@cdc.gov.kh',
-                            style: TextStyle(
-                              color: HColors.darkgrey,
-                              fontSize: 12,
+                          SizedBox(width: 5),
+                          Flexible(
+                            child: Text(
+                              'info@cdc.gov.kh',
+                              overflow:
+                                  TextOverflow.ellipsis, // Handle overflow
+                              style: TextStyle(
+                                color: HColors.darkgrey,
+                                fontSize: 10,
+                              ),
                             ),
                           ),
                         ],
                       ),
                     ),
-                    Text(
-                      '+855 99 799 579',
-                      style: TextStyle(fontSize: 12, color: HColors.darkgrey),
-                    ),
                     GestureDetector(
                       onTap: () async {
-                        final url = 'www.cdc.gov.kh';
+                        final url = 'tel:+85599799579'; // Use tel for phone
                         if (await canLaunchUrl(Uri.parse(url))) {
                           await launchUrl(Uri.parse(url));
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Could not launch phone')),
+                          );
                         }
                       },
                       child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.end,
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.phone,
+                            size: 14,
+                            color: HColors.darkgrey,
+                          ),
+                          SizedBox(width: 5),
+                          Text(
+                            '+855 99 799 579',
+                            style: TextStyle(
+                              fontSize: 10,
+                              color: HColors.darkgrey,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () async {
+                        final url =
+                            'https://www.cdc.gov.kh'; // Fix URL with https
+                        if (await canLaunchUrl(Uri.parse(url))) {
+                          await launchUrl(Uri.parse(url));
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Could not launch $url')),
+                          );
+                        }
+                      },
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment:
+                            CrossAxisAlignment.center, // Consistent alignment
                         children: [
                           Icon(
                             Icons.language,
                             size: 14,
                             color: HColors.darkgrey,
                           ),
-                          SizedBox(
-                            width: 5,
-                          ),
-                          Text(
-                            'www.cdc.gov.kh',
-                            style: TextStyle(
-                              color: HColors.darkgrey,
-                              fontSize: 12,
+                          SizedBox(width: 5),
+                          Flexible(
+                            child: Text(
+                              'www.cdc.gov.kh',
+                              overflow:
+                                  TextOverflow.ellipsis, // Handle overflow
+                              style: TextStyle(
+                                color: HColors.darkgrey,
+                                fontSize: 10,
+                              ),
                             ),
                           ),
                         ],
                       ),
                     ),
                   ],
-                )
+                ),
               ],
             ),
           ),
@@ -526,7 +552,7 @@ class _CardSkeletonState extends State<CardSkeleton>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _opacityAnimation;
-  final bool _isFront = true; // Added to fix the undefined name error
+  // final bool _isFront = true;
 
   @override
   void initState() {
@@ -554,117 +580,194 @@ class _CardSkeletonState extends State<CardSkeleton>
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        // Optional: Toggle _isFront for flip effect (can be disabled during loading)
-        // setState(() {
-        //   _isFront = !_isFront;
-        // });
-      },
-      child: AnimatedBuilder(
-        animation: _controller,
-        builder: (context, child) {
-          final angle = 0.0; // No flip animation for simplicity in skeleton
-          return Transform(
-            transform: Matrix4.identity()
-              ..setEntry(3, 2, 0.001) // Perspective
-              ..rotateY(angle),
-            alignment: Alignment.center,
-            child: Stack(
-              children: [
-                // Front Skeleton
-                Positioned.fill(
-                  child: _buildSkeletonCard(
-                    isFront: true,
-                    opacity: _opacityAnimation.value,
-                  ),
-                ),
-                // Back Skeleton (visible when flipped)
-                Positioned.fill(
-                  child: Opacity(
-                    opacity: _isFront ? 0.0 : _opacityAnimation.value,
-                    child: _buildSkeletonCard(
-                      isFront: false,
-                      opacity: _opacityAnimation.value,
-                    ),
-                  ),
-                ),
-              ],
+    return Column(
+      children: [
+        // Front card skeleton
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          margin: const EdgeInsets.only(bottom: 16),
+          clipBehavior: Clip.antiAlias,
+          decoration: ShapeDecoration(
+            color: HColors.darkgrey.withOpacity(0.1),
+            shape: RoundedRectangleBorder(
+              side: const BorderSide(
+                width: 1,
+                color: Color(0xFFCBD5E1),
+              ),
+              borderRadius: BorderRadius.circular(12),
             ),
-          );
-        },
-      ),
+          ),
+          child: AnimatedBuilder(
+            animation: _controller,
+            builder: (context, child) {
+              return IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          _buildSkeletonPlaceholder(width: 150, height: 18),
+                          const SizedBox(height: 6),
+                          _buildSkeletonPlaceholder(width: 200, height: 14),
+                          const SizedBox(height: 4),
+                          _buildSkeletonPlaceholder(width: 30, height: 1),
+                          const SizedBox(height: 6),
+                          _buildSkeletonPlaceholder(width: 160, height: 14),
+                          const SizedBox(height: 4),
+                          _buildSkeletonPlaceholder(width: 160, height: 14),
+                          const SizedBox(height: 4),
+                          _buildSkeletonPlaceholder(width: 180, height: 28),
+                        ],
+                      ),
+                    ),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        _buildSkeletonPlaceholder(width: 72, height: 72),
+                        const SizedBox(height: 8),
+                        _buildSkeletonPlaceholder(width: 56, height: 56),
+                      ],
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ),
+        // Back card skeleton
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          clipBehavior: Clip.antiAlias,
+          decoration: ShapeDecoration(
+            color: HColors.darkgrey.withOpacity(0.1),
+            shape: RoundedRectangleBorder(
+              side: const BorderSide(
+                width: 1,
+                color: Color(0xFFCBD5E1),
+              ),
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+          child: AnimatedBuilder(
+            animation: _controller,
+            builder: (context, child) {
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _buildSkeletonPlaceholder(width: 100, height: 50),
+                  const SizedBox(height: 8),
+                  _buildSkeletonPlaceholder(width: 150, height: 18),
+                  const SizedBox(height: 4),
+                  _buildSkeletonPlaceholder(width: 180, height: 14),
+                  const SizedBox(height: 8),
+                  _buildSkeletonPlaceholder(width: 200, height: 28),
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      _buildSkeletonPlaceholder(width: 80, height: 14),
+                      _buildSkeletonPlaceholder(width: 70, height: 14),
+                      _buildSkeletonPlaceholder(width: 80, height: 14),
+                    ],
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 
-  Widget _buildSkeletonCard({required bool isFront, required double opacity}) {
-    return Container(
-      width: double.infinity,
-      height: 200,
-      padding: const EdgeInsets.all(16),
-      clipBehavior: Clip.antiAlias,
-      decoration: ShapeDecoration(
-        color: HColors.darkgrey.withOpacity(0.1),
-        shape: RoundedRectangleBorder(
-          side: const BorderSide(
-            width: 1,
-            color: Color(0xFFCBD5E1),
-          ),
-          borderRadius: BorderRadius.circular(12),
-        ),
-      ),
-      child: isFront
-          ? Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildSkeletonPlaceholder(width: 150, height: 20), // Name
-                const SizedBox(height: 8),
-                _buildSkeletonPlaceholder(width: 200, height: 16), // Role
-                const SizedBox(height: 4),
-                _buildSkeletonPlaceholder(width: 30, height: 1), // Line
-                const SizedBox(height: 8),
-                _buildSkeletonPlaceholder(width: 180, height: 16), // Phone
-                const SizedBox(height: 8),
-                _buildSkeletonPlaceholder(width: 180, height: 16), // Email
-                const SizedBox(height: 8),
-                _buildSkeletonPlaceholder(width: 200, height: 32), // Address
-                SizedBox(
-                  height: 0,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    _buildSkeletonPlaceholder(width: 72, height: 35), // Avatar
-                  ],
-                ),
-              ],
-            )
-          : Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                _buildSkeletonPlaceholder(width: 100, height: 60), // Logo
-                const SizedBox(height: 8),
-                _buildSkeletonPlaceholder(width: 150, height: 20), // Khmer Text
-                const SizedBox(height: 4),
-                _buildSkeletonPlaceholder(
-                    width: 180, height: 16), // English Text
-                const SizedBox(height: 8),
-                _buildSkeletonPlaceholder(width: 200, height: 32), // Address
-                const SizedBox(height: 8),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    _buildSkeletonPlaceholder(width: 100, height: 16), // Email
-                    _buildSkeletonPlaceholder(width: 80, height: 16), // Phone
-                    _buildSkeletonPlaceholder(
-                        width: 100, height: 16), // Website
-                  ],
-                ),
-              ],
-            ),
-    );
-  }
+  // Widget _buildSkeletonCard({required bool isFront, required double opacity}) {
+  //   return AnimatedBuilder(
+  //     animation: _controller,
+  //     builder: (context, child) {
+  //       return Container(
+  //         width: double.infinity,
+  //         padding: const EdgeInsets.all(16),
+  //         clipBehavior: Clip.antiAlias,
+  //         decoration: ShapeDecoration(
+  //           color: HColors.darkgrey.withOpacity(0.1),
+  //           shape: RoundedRectangleBorder(
+  //             side: const BorderSide(
+  //               width: 1,
+  //               color: Color(0xFFCBD5E1),
+  //             ),
+  //             borderRadius: BorderRadius.circular(12),
+  //           ),
+  //         ),
+  //         child: isFront
+  //             ? IntrinsicHeight(
+  //                 child: Row(
+  //                   crossAxisAlignment: CrossAxisAlignment.start,
+  //                   children: [
+  //                     Expanded(
+  //                       child: Column(
+  //                         crossAxisAlignment: CrossAxisAlignment.start,
+  //                         mainAxisSize: MainAxisSize.min,
+  //                         children: [
+  //                           _buildSkeletonPlaceholder(width: 150, height: 18), // Name
+  //                           const SizedBox(height: 6),
+  //                           _buildSkeletonPlaceholder(width: 200, height: 14), // Role
+  //                           const SizedBox(height: 4),
+  //                           _buildSkeletonPlaceholder(width: 30, height: 1), // Line
+  //                           const SizedBox(height: 6),
+  //                           _buildSkeletonPlaceholder(width: 160, height: 14), // Phone
+  //                           const SizedBox(height: 4),
+  //                           _buildSkeletonPlaceholder(width: 160, height: 14), // Email
+  //                           const SizedBox(height: 4),
+  //                           _buildSkeletonPlaceholder(width: 180, height: 28), // Address
+  //                         ],
+  //                       ),
+  //                     ),
+  //                     Column(
+  //                       mainAxisAlignment: MainAxisAlignment.spaceAround,
+  //                       children: [
+  //                         _buildSkeletonPlaceholder(width: 72, height: 72), // Avatar
+  //                         const SizedBox(height: 8),
+  //                         _buildSkeletonPlaceholder(width: 56, height: 56), // QR
+  //                       ],
+  //                     ),
+  //                   ],
+  //                 ),
+  //               )
+  //             : Column(
+  //                 mainAxisAlignment: MainAxisAlignment.center,
+  //                 crossAxisAlignment: CrossAxisAlignment.center,
+  //                 mainAxisSize: MainAxisSize.min,
+  //                 children: [
+  //                   _buildSkeletonPlaceholder(width: 100, height: 50), // Logo
+  //                   const SizedBox(height: 8),
+  //                   _buildSkeletonPlaceholder(width: 150, height: 18), // Khmer Text
+  //                   const SizedBox(height: 4),
+  //                   _buildSkeletonPlaceholder(
+  //                       width: 180, height: 14), // English Text
+  //                   const SizedBox(height: 8),
+  //                   _buildSkeletonPlaceholder(width: 200, height: 28), // Address
+  //                   const SizedBox(height: 8),
+  //                   Row(
+  //                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //                     children: [
+  //                       _buildSkeletonPlaceholder(width: 80, height: 14), // Email
+  //                       _buildSkeletonPlaceholder(width: 70, height: 14), // Phone
+  //                       _buildSkeletonPlaceholder(
+  //                           width: 80, height: 14), // Website
+  //                     ],
+  //                   ),
+  //                 ],
+  //               ),
+  //       );
+  //     },
+  //   );
+  // }
 
   Widget _buildSkeletonPlaceholder(
       {required double width, required double height}) {

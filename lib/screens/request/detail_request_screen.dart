@@ -1,5 +1,9 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:mobile_app/app_lang.dart';
 import 'package:mobile_app/app_routes.dart';
 import 'package:mobile_app/providers/global/auth_provider.dart';
@@ -9,6 +13,10 @@ import 'package:mobile_app/services/request/detail_request_service.dart';
 import 'package:mobile_app/shared/color/colors.dart';
 import 'package:mobile_app/utils/help_util.dart';
 import 'package:mobile_app/widgets/custom_header.dart';
+import 'package:mobile_app/widgets/helper.dart';
+import 'package:open_file/open_file.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
 class DetailRequestScreen extends StatefulWidget {
@@ -29,6 +37,8 @@ class _DetailRequestScreenState extends State<DetailRequestScreen> {
   Future<void> _refreshData(DetailRequestProvider provider) async {
     return await provider.getHome(id: widget.id ?? "");
   }
+
+  final _service = DetailRequestService();
 
   @override
   Widget build(BuildContext context) {
@@ -53,6 +63,24 @@ class _DetailRequestScreenState extends State<DetailRequestScreen> {
                 ),
                 centerTitle: true,
                 bottom: CustomHeader(),
+                actions: [
+                  Padding(
+                    padding: EdgeInsets.all(8),
+                    child: IconButton(
+                      onPressed: () {
+                        showConfirmDialog(context, 'កំពុងអភិវឌ្ឍន៍',
+                            'កំពុងអភិវឌ្ឍន៍', DialogType.primary, () {
+                          _handleDownload();
+                        });
+                      },
+                      icon: Icon(
+                        Icons.download_outlined,
+                        color: HColors.darkgrey,
+                        size: 22,
+                      ),
+                    ),
+                  )
+                ],
               ),
               body: SafeArea(
                 child: RefreshIndicator(
@@ -61,7 +89,28 @@ class _DetailRequestScreenState extends State<DetailRequestScreen> {
                   backgroundColor: Colors.white,
                   onRefresh: () => _refreshData(provider),
                   child: provider.isLoading
-                      ? Center(child: Text('Loading...'))
+                      ? Center(
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  SizedBox(
+                    height: 60,
+                    width: 60,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2.0,
+                    ),
+                  ),
+                  Text(
+                    'សូមរងចាំ',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.black,
+                    ),
+                  ),
+                ],
+              ),
+            )
                       : SingleChildScrollView(
                           physics: const AlwaysScrollableScrollPhysics(),
                           child: Padding(
@@ -196,8 +245,8 @@ class _DetailRequestScreenState extends State<DetailRequestScreen> {
                                             ),
                                             onPressed: () {
                                               // Navigate to edit screen or show edit dialog
-                                              context
-                                                  .push(AppRoutes.updateRequest);
+                                              context.push(
+                                                  AppRoutes.updateRequest);
                                             },
                                           )
                                         : SizedBox.shrink(),
@@ -1368,5 +1417,95 @@ class _DetailRequestScreenState extends State<DetailRequestScreen> {
         );
       },
     );
+  }
+
+  // Updated download handler
+  Future<void> _handleDownload() async {
+    try {
+      // 1. Check permissions
+      final hasPermission = await requestStoragePermission();
+      if (!hasPermission) throw Exception('Storage permission denied');
+
+      // 2. Fetch download data
+      final response = await _service.downloadReport(id: widget.id!);
+
+      // 3. Process response
+      final responseData = response;
+      final base64Pdf = responseData['data']['report'] as String;
+      final reportName = responseData['name'] as String? ??
+          'report_${DateFormat('yyyyMMdd').format(DateTime.now())}';
+
+      // 4. Save file
+      final pdfBytes = base64.decode(base64Pdf);
+      final directory = await getApplicationDocumentsDirectory();
+      final file = File('${directory.path}/$reportName.pdf');
+      await file.writeAsBytes(pdfBytes);
+
+      // 5. Open file
+      final result = await OpenFile.open(file.path);
+      if (result.type != ResultType.done) {
+        throw Exception('Failed to open PDF: ${result.message}');
+      }
+
+      if (mounted) {
+        // UI.toast(text: result.message, isSuccess: true);
+      }
+    } catch (e) {
+      // log('Download failed', error: e, stackTrace: stack);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Download failed: ${e.toString()}')),
+        );
+      }
+    } finally {
+      // if (mounted) {
+      //   Navigator.of(context, rootNavigator: true).pop();
+      //   setState(() => _isDownloading = false);
+      // }
+    }
+  }
+
+  Future<bool> requestStoragePermission() async {
+    if (Platform.isAndroid) {
+      final storage = await Permission.storage.request();
+      final manage = await Permission.manageExternalStorage.request();
+
+      if (storage.isGranted || manage.isGranted) {
+        return true;
+      }
+
+      if (storage.isPermanentlyDenied || manage.isPermanentlyDenied) {
+        await openAppSettings();
+      }
+
+      return false;
+    }
+
+    // iOS does not typically need storage permission
+    return true;
+  }
+
+  Future<File?> saveFile(List<int> bytes, String fileName) async {
+    try {
+      Directory? directory;
+
+      if (Platform.isAndroid) {
+        directory = await getExternalStorageDirectory();
+      } else {
+        directory = await getApplicationDocumentsDirectory();
+      }
+
+      if (directory == null)
+        throw Exception('Cannot access storage directory.');
+
+      final filePath = '${directory.path}/$fileName';
+      final file = File(filePath);
+
+      await file.writeAsBytes(bytes);
+      return file;
+    } catch (e) {
+      print("Error saving file: $e");
+      return null;
+    }
   }
 }

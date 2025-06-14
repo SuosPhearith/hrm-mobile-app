@@ -4,9 +4,10 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:mobile_app/shared/color/colors.dart'; // Replace with your actual color file
-import 'package:mobile_app/shared/image/full_screen.dart'; // Replace with your actual full screen widget
-import 'package:mobile_app/widgets/custom_header.dart'; // Replace with your actual header widget
+
+import 'package:mobile_app/shared/color/colors.dart';
+import 'package:mobile_app/shared/component/bottom_appbar.dart';
+import 'package:mobile_app/shared/image/full_screen.dart'; // Replace with your actual header widget
 
 class DocumentScreen extends StatefulWidget {
   const DocumentScreen({super.key});
@@ -16,7 +17,7 @@ class DocumentScreen extends StatefulWidget {
 }
 
 class _DocumentScreenState extends State<DocumentScreen> {
-  bool isClick = false;
+  bool isClick = true;
   final List<PlatformFile> _selectedFiles = [];
   List<dio.MultipartFile>? _selectedMultipartFiles;
   int selectedThumbnail = 0;
@@ -119,86 +120,269 @@ class _DocumentScreenState extends State<DocumentScreen> {
     return filteredFiles;
   }
 
+  final data = [
+    {
+      'id': 1,
+      'name': 'Personal Information',
+      'size': 13,
+      'date': '22/06/2025',
+    },
+    {
+      'id': 1,
+      'name': 'Personal Information',
+      'size': 13,
+      'date': '22/06/2025',
+    },
+    {
+      'id': 1,
+      'name': 'Personal Information',
+      'size': 13,
+      'date': '22/06/2025',
+    },
+    {
+      'id': 1,
+      'name': 'Personal Information',
+      'size': 13,
+      'date': '22/06/2025',
+    },
+    {
+      'id': 1,
+      'name': 'Personal Information',
+      'size': 13,
+      'date': '22/06/2025',
+    },
+    {
+      'id': 1,
+      'name': 'Personal Information',
+      'size': 13,
+      'date': '22/06/2025',
+    },
+    {
+      'id': 1,
+      'name': 'Personal Information',
+      'size': 13,
+      'date': '22/06/2025',
+    },
+    {
+      'id': 1,
+      'name': 'Personal Information',
+      'size': 13,
+      'date': '22/06/2025',
+    },
+    {
+      'id': 1,
+      'name': 'Personal Information',
+      'size': 13,
+      'date': '22/06/2025',
+    },
+    {
+      'id': 1,
+      'name': 'Personal Information',
+      'size': 13,
+      'date': '22/06/2025',
+    },
+    {
+      'id': 1,
+      'name': 'Personal Information',
+      'size': 13,
+      'date': '22/06/2025',
+    },
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: TextField(
-          controller: _searchController,
-          decoration: InputDecoration(
-            hintText: 'Search files...',
-            border: InputBorder.none,
-            suffixIcon: _searchQuery.isNotEmpty
-                ? IconButton(
-                    icon: Icon(Icons.clear, color: HColors.darkgrey),
-                    onPressed: () {
-                      _searchController.clear();
-                    },
-                  )
-                : null,
-          ),
+        title: Text(
+          'ឯកសារ',
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
         ),
         centerTitle: true,
         bottom: CustomHeader(),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              children: [
-                InkWell(
-                  onTap: () {
-                    _showBottomSheetFile(context);
-                  },
-                  child: Icon(
-                    Icons.attach_file_outlined,
-                    color: HColors.darkgrey,
-                  ),
-                ),
-                SizedBox(width: 8),
-                InkWell(
-                  onTap: () {
-                    setState(() {
-                      isClick = !isClick;
-                    });
-                  },
-                  child: isClick
-                      ? Icon(Icons.menu, color: HColors.darkgrey)
-                      : Icon(Icons.grid_view, color: HColors.darkgrey),
-                ),
-                SizedBox(width: 8),
-                InkWell(
-                  onTap: () {
-                    _showSortBottomSheet(
-                        context); // Updated to use bottom sheet
-                  },
-                  child: Icon(Icons.sort, color: HColors.darkgrey),
-                ),
-              ],
-            ),
-          ),
-        ],
+        // actions: [
+        //   Padding(
+        //     padding: const EdgeInsets.all(8.0),
+        //     child: Row(
+        //       children: [
+        //         InkWell(
+        //           onTap: () {
+        //             _showBottomSheetFile(context);
+        //           },
+        //           child: Icon(
+        //             Icons.attach_file_outlined,
+        //             color: HColors.darkgrey,
+        //           ),
+        //         ),
+        //         SizedBox(width: 8),
+        //         InkWell(
+        //           onTap: () {
+        //             setState(() {
+        //               isClick = !isClick;
+        //             });
+        //           },
+        //           child: isClick
+        //               ? Icon(Icons.menu, color: HColors.darkgrey)
+        //               : Icon(Icons.grid_view, color: HColors.darkgrey),
+        //         ),
+        //         SizedBox(width: 8),
+        //         InkWell(
+        //           onTap: () {
+        //             _showSortBottomSheet(context);
+        //           },
+        //           child: Icon(Icons.sort, color: HColors.darkgrey),
+        //         ),
+        //       ],
+        //     ),
+        //   ),
+        // ],
       ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: EdgeInsets.all(8),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildFilterChips(),
-                if (_getFilteredAndSortedFiles().isNotEmpty)
-                  Row(children: [Expanded(child: _buildFileDisplay(isClick))])
-                else
-                  Center(
-                    child: Padding(
-                      padding: EdgeInsets.all(16),
-                      child: Text('No files found'),
+      body: GestureDetector(
+        onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+        child: SafeArea(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: EdgeInsets.all(15),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // TextField(
+
+                  //   controller: _searchController,
+                  //   decoration: InputDecoration(
+                  //     hintText: 'ស្វែងរក...',
+                  //     prefixIcon: Icon(Icons.search, color: HColors.darkgrey),
+                  //     suffixIcon: _searchQuery.isNotEmpty
+                  //         ? IconButton(
+                  //             icon: Icon(Icons.clear, color: HColors.darkgrey),
+                  //             onPressed: () {
+                  //               _searchController.clear();
+                  //             },
+                  //           )
+                  //         : null,
+                  //     border: OutlineInputBorder(
+                  //       borderRadius: BorderRadius.circular(12),
+                  //       borderSide:
+                  //           BorderSide(color: HColors.darkgrey.withOpacity(0.3)),
+                  //     ),
+                  //     enabledBorder: OutlineInputBorder(
+                  //       borderRadius: BorderRadius.circular(12),
+                  //       borderSide:
+                  //           BorderSide(color: HColors.darkgrey.withOpacity(0.3)),
+                  //     ),
+                  //     filled: true,
+                  //     fillColor: HColors.darkgrey.withOpacity(0.05),
+                  //   ),
+                  //   style: TextStyle(fontSize: 14),
+                  // ),
+                  Container(
+                    height: 48,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(25.0),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 8,
+                          offset: Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: TextField(
+                      controller: _searchController,
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.black87,
+                        fontWeight: FontWeight.w400,
+                      ),
+                      decoration: InputDecoration(
+                        hintText: 'ស្វែងរក',
+                        hintStyle: TextStyle(
+                          color: Colors.grey[500],
+                          fontSize: 16,
+                          fontWeight: FontWeight.w400,
+                        ),
+                        prefixIcon: Container(
+                          padding: EdgeInsets.all(12),
+                          child: Icon(
+                            Icons.search_rounded,
+                            color: Colors.grey[600],
+                            size: 22,
+                          ),
+                        ),
+                        // suffixIcon: searchController.text.isNotEmpty
+                        //     ? GestureDetector(
+                        //         onTap: () {
+                        //           searchController.clear();
+                        //           // Reset to original filtered data
+                        //           setState(() {
+                        //             staticData = data;
+                        //           });
+                        //         },
+                        //         child: Container(
+                        //           padding: EdgeInsets.all(12),
+                        //           child: Icon(
+                        //             Icons.clear_rounded,
+                        //             color: Colors.grey[500],
+                        //             size: 20,
+                        //           ),
+                        //         ),
+                        //       )
+                        //     : null,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12.0),
+                          borderSide: BorderSide.none,
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12.0),
+                          borderSide: BorderSide(
+                            color: Colors.grey[300]!.withOpacity(0.5),
+                            width: 1,
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12.0),
+                          borderSide: BorderSide(
+                            color: Colors.blue.withOpacity(0.8),
+                            width: 1,
+                          ),
+                        ),
+                        filled: true,
+                        fillColor: Colors.white,
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 12,
+                        ),
+                        isDense: false,
+                      ),
+                      onChanged: (value) {
+                        // setState(() {
+                        //   if (value.isEmpty) {
+                        //     staticData =
+                        //         data; // Reset to original filtered data
+                        //   } else {
+                        //     staticData = data.where((item) {
+                        //       final name = item['name_kh']
+                        //               ?.toString()
+                        //               .toLowerCase() ??
+                        //           '';
+                        //       return name.contains(value.toLowerCase());
+                        //     }).toList();
+                        //   }
+                        // });
+                      },
                     ),
                   ),
-                SizedBox(height: 100),
-              ],
+                  SizedBox(height: 16),
+                  _buildFilterChips(),
+                  SizedBox(height: 16),
+                  _selectedFiles.isEmpty
+                      ? _buildEmptyStateDisplay(isClick)
+                      : Row(children: [
+                          Expanded(child: _buildFileDisplay(isClick))
+                        ]),
+                  SizedBox(height: 100),
+                ],
+              ),
             ),
           ),
         ),
@@ -206,102 +390,221 @@ class _DocumentScreenState extends State<DocumentScreen> {
     );
   }
 
+  Widget _buildEmptyStateDisplay(bool isGrid) {
+    return isGrid
+        ? GridView.builder(
+            shrinkWrap: true,
+            physics: NeverScrollableScrollPhysics(),
+            itemCount: data.length, // Use data list length
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              childAspectRatio: 1.3,
+              crossAxisSpacing: 8,
+              mainAxisSpacing: 8,
+            ),
+            itemBuilder: (context, index) {
+              return _buildPlaceholderGridItem(
+                  data[index], index); // Pass data item
+            },
+          )
+        : ListView.builder(
+            shrinkWrap: true,
+            physics: NeverScrollableScrollPhysics(),
+            itemCount: data.length, // Use data list length
+            itemBuilder: (context, index) {
+              return _buildPlaceholderListItem(
+                  data[index], index); // Pass data item
+            },
+          );
+  }
+
+  Widget _buildPlaceholderGridItem(Map<String, dynamic> item, int index) {
+    // Alternate between image and document placeholders for variety
+    final isImage = index % 2 == 0;
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: HColors.darkgrey.withOpacity(0.2)),
+        borderRadius: BorderRadius.circular(8),
+        color: HColors.darkgrey.withOpacity(0.05),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Expanded(
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(8),
+                  topRight: Radius.circular(8),
+                ),
+                image: DecorationImage(
+                  image: AssetImage(
+                    'lib/assets/images/pdf.png', // Document placeholder
+                  ),
+                  fit: BoxFit.contain,
+                ),
+              ),
+            ),
+          ),
+          SizedBox(height: 4),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        item['name'], // Use name from data
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 12,
+                        ),
+                      ),
+                      Text(
+                        '${item['size']} MB', // Use size from data
+                        style: TextStyle(
+                          fontSize: 10,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 2),
+          Row(
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.calendar_today_outlined,
+                      size: 10,
+                      color: HColors.darkgrey,
+                    ),
+                    SizedBox(width: 2),
+                    Text(
+                      item['date'], // Use date from data
+                      style: TextStyle(
+                        fontSize: 10,
+                        color: HColors.darkgrey.withOpacity(0.7),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 4),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPlaceholderListItem(Map<String, dynamic> item, int index) {
+    // Alternate between image and document placeholders for variety
+    final isImage = index % 2 == 0;
+    return ListTile(
+      leading: Icon(
+        isImage ? Icons.image : Icons.insert_drive_file,
+        color: HColors.darkgrey.withOpacity(0.5),
+      ),
+      title: Text(
+        item['name'], // Use name from data
+        style: TextStyle(
+          color: HColors.darkgrey.withOpacity(0.7),
+        ),
+      ),
+      subtitle: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '${item['size']} MB', // Use size from data
+            style: TextStyle(
+              fontSize: 12,
+              color: HColors.darkgrey.withOpacity(0.7),
+            ),
+          ),
+          Text(
+            item['date'], // Use date from data
+            style: TextStyle(
+              fontSize: 12,
+              color: HColors.darkgrey.withOpacity(0.7),
+            ),
+          ),
+        ],
+      ),
+      trailing: Icon(
+        Icons.more_vert,
+        color: HColors.darkgrey.withOpacity(0.5),
+      ),
+    );
+  }
+
   Widget _buildFilterChips() {
-    return Wrap(
-      spacing: 8,
+    return Row(
       children: [
-        ChoiceChip(
-          label: Text('All'),
-          selected: _filterType == 'all',
-          onSelected: (selected) {
-            if (selected) {
-              setState(() {
-                _filterType = 'all';
-              });
-            }
-          },
-          labelStyle: TextStyle(
-            color: _filterType == 'all' ? Colors.white : HColors.darkgrey,
-            fontWeight: FontWeight.w400,
-            fontSize: 14,
-          ),
-          selectedColor: HColors.blue,
-          backgroundColor: HColors.darkgrey.withOpacity(0.1),
-          checkmarkColor: Colors.white,
-          side: BorderSide(
-            color: _filterType == 'all'
-                ? HColors.bluegrey
-                : HColors.darkgrey.withOpacity(0.3),
-            width: 1,
-          ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
-          labelPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-          elevation: _filterType == 'all' ? 2 : 0,
-          pressElevation: 4,
+        Container(
+          padding: EdgeInsets.symmetric(vertical: 6, horizontal: 10),
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: HColors.darkgrey.withOpacity(0.1))),
+          child: Row(children: [
+            Icon(
+              Icons.check,
+              size: 14,
+            ),
+            SizedBox(
+              width: 2,
+            ),
+            Text("ទាំងអស់")
+          ]),
         ),
-        ChoiceChip(
-          label: Text('Images'),
-          selected: _filterType == 'images',
-          onSelected: (selected) {
-            if (selected) {
-              setState(() {
-                _filterType = 'images';
-              });
-            }
-          },
-          labelStyle: TextStyle(
-            color: _filterType == 'images' ? Colors.white : HColors.darkgrey,
-            fontWeight: FontWeight.w400,
-            fontSize: 14,
-          ),
-          selectedColor: HColors.blue,
-          backgroundColor: HColors.darkgrey.withOpacity(0.1),
-          checkmarkColor: Colors.white,
-          side: BorderSide(
-            color: _filterType == 'images'
-                ? HColors.bluegrey
-                : HColors.darkgrey.withOpacity(0.3),
-            width: 1,
-          ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
-          labelPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-          elevation: _filterType == 'images' ? 2 : 0,
-          pressElevation: 4,
+        SizedBox(
+          width: 5,
         ),
-        ChoiceChip(
-          label: Text('Documents'),
-          selected: _filterType == 'documents',
-          onSelected: (selected) {
-            if (selected) {
-              setState(() {
-                _filterType = 'documents';
-              });
-            }
-          },
-          labelStyle: TextStyle(
-            color: _filterType == 'documents' ? Colors.white : HColors.darkgrey,
-            fontWeight: FontWeight.w400,
-            fontSize: 14,
-          ),
-          selectedColor: HColors.blue,
-          backgroundColor: HColors.darkgrey.withOpacity(0.1),
-          checkmarkColor: Colors.white,
-          side: BorderSide(
-            color: _filterType == 'documents'
-                ? HColors.bluegrey
-                : HColors.darkgrey.withOpacity(0.1),
-            width: 1,
-          ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
-          labelPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-          elevation: _filterType == 'documents' ? 2 : 0,
-          // pressElevation: 4,
+        Container(
+          padding: EdgeInsets.symmetric(vertical: 6, horizontal: 10),
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: HColors.darkgrey.withOpacity(0.1))),
+          child: Row(children: [
+            // Icon(
+            //   Icons.check,
+            //   size: 14,
+            // ),
+            SizedBox(
+              width: 2,
+            ),
+            Text("ឯកសាររក្សាទុក")
+          ]),
+        ),
+        SizedBox(
+          width: 5,
+        ),
+        Container(
+          padding: EdgeInsets.symmetric(vertical: 6, horizontal: 10),
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: HColors.darkgrey.withOpacity(0.1))),
+          child: Row(children: [
+            // Icon(
+            //   Icons.check,
+            //   size: 14,
+            // ),
+            SizedBox(
+              width: 2,
+            ),
+            Text("ឯកសារសំខាន់ៗ")
+          ]),
         ),
       ],
     );
@@ -370,7 +673,14 @@ class _DocumentScreenState extends State<DocumentScreen> {
 
   Widget _buildFileDisplay(bool isGrid) {
     final filteredFiles = _getFilteredAndSortedFiles();
-    if (filteredFiles.isEmpty) return SizedBox.shrink();
+    if (filteredFiles.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: EdgeInsets.all(16),
+          child: Text('No files found'),
+        ),
+      );
+    }
 
     return isGrid
         ? GridView.builder(
@@ -453,7 +763,6 @@ class _DocumentScreenState extends State<DocumentScreen> {
                       textAlign: TextAlign.center,
                       style: const TextStyle(
                         fontSize: 12,
-                        // fontFamily: 'Kantumruy Pro',
                       ),
                     ),
                     Text(
@@ -489,7 +798,6 @@ class _DocumentScreenState extends State<DocumentScreen> {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             textAlign: TextAlign.center,
-            // style: TextStyle(fontFamily: 'Kantumruy Pro'),
           ),
           Text(
             formatFileSize(file.size),

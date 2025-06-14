@@ -160,7 +160,28 @@ class _RequestScreenState extends State<RequestScreen> {
             backgroundColor: Colors.white,
             onRefresh: () => _refreshData(requestProvider),
             child: requestProvider.isLoading
-                ? const Center(child: Text('Loading...'))
+                ? const Center(
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  SizedBox(
+                    height: 60,
+                    width: 60,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2.0,
+                    ),
+                  ),
+                  Text(
+                    'សូមរងចាំ',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.black,
+                    ),
+                  ),
+                ],
+              ),
+            )
                 : requestProvider.requestData == null
                     ? Center(
                         child: GestureDetector(
@@ -422,10 +443,10 @@ class _RequestScreenState extends State<RequestScreen> {
                   Text(
                     id,
                     style: TextStyle(
-                      color: const Color(0xFF64748B),
+                      // color: const Color(0xFF64748B),
                       fontSize: 14,
                       // fontFamily: 'Kantumruy Pro',
-                      fontWeight: FontWeight.w400,
+                      fontWeight: FontWeight.w500,
                       height: 1.67,
                     ),
                   ),

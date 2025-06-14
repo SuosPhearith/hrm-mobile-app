@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:mobile_app/app_lang.dart';
 import 'package:mobile_app/providers/global/setting_provider.dart';
 import 'package:mobile_app/providers/local/holiday_provider.dart';
@@ -13,6 +14,7 @@ import 'package:mobile_app/screens/daily_screen.dart';
 import 'package:mobile_app/screens/document_screen.dart';
 import 'package:mobile_app/screens/evaluate_screen.dart';
 import 'package:mobile_app/screens/holliday_screen.dart';
+import 'package:mobile_app/screens/notification_screen.dart';
 import 'package:mobile_app/screens/personal_info/create_education_screen.dart';
 import 'package:mobile_app/screens/personal_info/create_language_level.dart';
 import 'package:mobile_app/screens/personal_info/create_relative_screen.dart';
@@ -49,6 +51,7 @@ import 'package:mobile_app/utils/dio.client.dart';
 // Main function remains unchanged
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+   await initializeDateFormatting('km', null); // Load Khmer locale data
   const flavor = String.fromEnvironment('FLAVOR', defaultValue: 'dev');
   await dotenv.load(fileName: '.env.$flavor');
 
@@ -222,6 +225,10 @@ final GoRouter _router = GoRouter(
       path: AppRoutes.document,
       builder: (context, state) => const DocumentScreen(),
     ),
+     GoRoute(
+      path: AppRoutes.notification,
+      builder: (context, state) => const NotificationScreen(),
+    ),
     GoRoute(
       path: '${AppRoutes.createRequest}/:id',
       builder: (context, state) {
@@ -229,6 +236,7 @@ final GoRouter _router = GoRouter(
         return CreateRequestScreen(id: id);
       },
     ),
+    // 
     GoRoute(
       path: '${AppRoutes.detailRequest}/:id',
       builder: (context, state) {
