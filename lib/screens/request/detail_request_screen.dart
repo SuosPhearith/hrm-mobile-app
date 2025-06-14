@@ -1,5 +1,11 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:mobile_app/app_lang.dart';
+import 'package:mobile_app/app_routes.dart';
 import 'package:mobile_app/providers/global/auth_provider.dart';
 import 'package:mobile_app/providers/global/setting_provider.dart';
 import 'package:mobile_app/providers/local/request/detail_request_provider.dart';
@@ -7,6 +13,10 @@ import 'package:mobile_app/services/request/detail_request_service.dart';
 import 'package:mobile_app/shared/color/colors.dart';
 import 'package:mobile_app/utils/help_util.dart';
 import 'package:mobile_app/widgets/custom_header.dart';
+import 'package:mobile_app/widgets/helper.dart';
+import 'package:open_file/open_file.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
 class DetailRequestScreen extends StatefulWidget {
@@ -27,6 +37,8 @@ class _DetailRequestScreenState extends State<DetailRequestScreen> {
   Future<void> _refreshData(DetailRequestProvider provider) async {
     return await provider.getHome(id: widget.id ?? "");
   }
+
+  final _service = DetailRequestService();
 
   @override
   Widget build(BuildContext context) {
@@ -51,6 +63,24 @@ class _DetailRequestScreenState extends State<DetailRequestScreen> {
                 ),
                 centerTitle: true,
                 bottom: CustomHeader(),
+                actions: [
+                  Padding(
+                    padding: EdgeInsets.all(8),
+                    child: IconButton(
+                      onPressed: () {
+                        showConfirmDialog(context, 'កំពុងអភិវឌ្ឍន៍',
+                            'កំពុងអភិវឌ្ឍន៍', DialogType.primary, () {
+                          _handleDownload();
+                        });
+                      },
+                      icon: Icon(
+                        Icons.download_outlined,
+                        color: HColors.darkgrey,
+                        size: 22,
+                      ),
+                    ),
+                  )
+                ],
               ),
               body: SafeArea(
                 child: RefreshIndicator(
@@ -59,7 +89,28 @@ class _DetailRequestScreenState extends State<DetailRequestScreen> {
                   backgroundColor: Colors.white,
                   onRefresh: () => _refreshData(provider),
                   child: provider.isLoading
-                      ? Center(child: Text('Loading...'))
+                      ? Center(
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  SizedBox(
+                    height: 60,
+                    width: 60,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2.0,
+                    ),
+                  ),
+                  Text(
+                    'សូមរងចាំ',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.black,
+                    ),
+                  ),
+                ],
+              ),
+            )
                       : SingleChildScrollView(
                           physics: const AlwaysScrollableScrollPhysics(),
                           child: Padding(
@@ -184,13 +235,24 @@ class _DetailRequestScreenState extends State<DetailRequestScreen> {
                                         fontWeight: FontWeight.w500,
                                       ),
                                     ),
-                                    Icon(
-                                      Icons.edit,
-                                      color: HColors.darkgrey,
-                                    )
+                                    provider.data?.data['request_permission']
+                                                ?['allow_update'] ==
+                                            true
+                                        ? IconButton(
+                                            icon: Icon(
+                                              Icons.edit,
+                                              color: HColors.darkgrey,
+                                            ),
+                                            onPressed: () {
+                                              // Navigate to edit screen or show edit dialog
+                                              context.push(
+                                                  AppRoutes.updateRequest);
+                                            },
+                                          )
+                                        : SizedBox.shrink(),
                                   ],
                                 ),
-                                const SizedBox(height: 12),
+                                // const SizedBox(height: 12),
 
                                 // Leave Info
                                 _infoRow(
@@ -269,6 +331,85 @@ class _DetailRequestScreenState extends State<DetailRequestScreen> {
 
                                 // const SizedBox(height: 24),
 
+                                // data?['request_permission']['allow_assign'] ==
+                                //         true
+                                //     ? Column(
+                                //         children: [
+                                //           Row(
+                                //             children: [
+                                //               Container(
+                                //                 width: 36,
+                                //                 height: 36,
+                                //                 decoration: BoxDecoration(
+                                //                     color: HColors.darkgrey
+                                //                         .withOpacity(0.1),
+                                //                     borderRadius:
+                                //                         BorderRadius.circular(
+                                //                             50)),
+                                //                 child: Icon(Icons.add,
+                                //                     color: HColors.darkgrey),
+                                //               ),
+                                //               const SizedBox(width: 10),
+                                //               const Text("ស្នើរសុំ",
+                                //                   style: TextStyle(
+                                //                       fontSize: 16,
+                                //                       fontWeight:
+                                //                           FontWeight.w500)),
+                                //             ],
+                                //           ),
+                                //           // Group Sections
+                                //           ...mapToList(
+                                //                   dataSetup?['reviewer_types'])
+                                //               .map((record) {
+                                //             // Get selected users for this reviewer_type from state
+                                //             final selectedUsers =
+                                //                 selectedUsersByReviewerType[
+                                //                         record['id']] ??
+                                //                     [];
+                                //             return Padding(
+                                //               padding:
+                                //                   const EdgeInsets.symmetric(
+                                //                       vertical: 8.0),
+                                //               child: _buildGroupSection(
+                                //                 title:
+                                //                     "${mapToList(selectedUsersByReviewerType[record['id']]).length} ${AppLang.translate(lang: settingProvider.lang ?? 'kh', data: record)}",
+                                //                 children:
+                                //                     selectedUsers.map((user) {
+                                //                   return _buildApprovalTile(
+                                //                     imageUrl: user[
+                                //                             'avatarUrl'] ??
+                                //                         'lib/assets/images/pp.png',
+                                //                     name: user['name'] ??
+                                //                         'Unknown',
+                                //                     position:
+                                //                         user['department'] ??
+                                //                             'No Position',
+                                //                   );
+                                //                 }).toList(),
+                                //                 onAdd: () {
+                                //                   _showSelectionBottomSheet(
+                                //                     data: dataUsers!,
+                                //                     context: context,
+                                //                     title:
+                                //                         'ជ្រើសរើស ${AppLang.translate(lang: settingProvider.lang ?? 'kh', data: record)}',
+                                //                     onSelected: (List<
+                                //                             Map<String, String>>
+                                //                         selectedUsers) {
+                                //                       // Update state with selected users for this reviewer_type
+                                //                       setState(() {
+                                //                         selectedUsersByReviewerType[
+                                //                                 record['id']] =
+                                //                             selectedUsers;
+                                //                       });
+                                //                     },
+                                //                   );
+                                //                 },
+                                //               ),
+                                //             );
+                                //           }),
+                                //         ],
+                                //       )
+                                //     : const SizedBox.shrink(),
                                 data?['request_permission']['allow_assign'] ==
                                         true
                                     ? Column(
@@ -304,6 +445,19 @@ class _DetailRequestScreenState extends State<DetailRequestScreen> {
                                                 selectedUsersByReviewerType[
                                                         record['id']] ??
                                                     [];
+                                            // More flexible name checking
+                                            final nameEn =
+                                                (record['name_en'] ?? '')
+                                                    .toLowerCase();
+                                            final nameKh =
+                                                record['name_kh'] ?? '';
+                                            // final isReviewer = nameEn
+                                            //         .contains('review') ||
+                                            //     nameKh.contains('ត្រួតពិនិត្យ');
+                                            final isApprover =
+                                                nameEn.contains('approv') ||
+                                                    nameKh.contains('អនុម័ត');
+
                                             return Padding(
                                               padding:
                                                   const EdgeInsets.symmetric(
@@ -325,8 +479,58 @@ class _DetailRequestScreenState extends State<DetailRequestScreen> {
                                                   );
                                                 }).toList(),
                                                 onAdd: () {
+                                                  // Find reviewer type dynamically by checking names
+                                                  final reviewerTypes =
+                                                      mapToList(dataSetup?[
+                                                          'reviewer_types']);
+                                                  final reviewerType =
+                                                      reviewerTypes.firstWhere(
+                                                    (type) {
+                                                      final nameEn =
+                                                          (type['name_en'] ??
+                                                                  '')
+                                                              .toLowerCase();
+                                                      final nameKh =
+                                                          type['name_kh'] ?? '';
+                                                      return nameEn.contains(
+                                                              'review') ||
+                                                          nameKh.contains(
+                                                              'ត្រួតពិនិត្យ');
+                                                    },
+                                                    orElse: () => {'id': null},
+                                                  );
+                                                  final reviewerTypeId =
+                                                      reviewerType['id'];
+
+                                                  // Get assigned reviewer IDs to exclude from approver list
+                                                  final assignedReviewerIds =
+                                                      reviewerTypeId != null
+                                                          ? (selectedUsersByReviewerType[
+                                                                      reviewerTypeId] ??
+                                                                  [])
+                                                              .map((user) =>
+                                                                  user['id']
+                                                                      .toString())
+                                                              .toSet()
+                                                          : <String>{};
+
+                                                  // Filter users based on type
+                                                  List<Map<String, dynamic>>
+                                                      filteredUsers =
+                                                      dataUsers!;
+                                                  if (isApprover) {
+                                                    // For approver: exclude users already assigned as reviewers
+                                                    filteredUsers = dataUsers
+                                                        .where((user) =>
+                                                            !assignedReviewerIds
+                                                                .contains(user[
+                                                                        'id']
+                                                                    .toString()))
+                                                        .toList();
+                                                  }
+
                                                   _showSelectionBottomSheet(
-                                                    data: dataUsers!,
+                                                    data: filteredUsers,
                                                     context: context,
                                                     title:
                                                         'ជ្រើសរើស ${AppLang.translate(lang: settingProvider.lang ?? 'kh', data: record)}',
@@ -335,9 +539,21 @@ class _DetailRequestScreenState extends State<DetailRequestScreen> {
                                                         selectedUsers) {
                                                       // Update state with selected users for this reviewer_type
                                                       setState(() {
-                                                        selectedUsersByReviewerType[
-                                                                record['id']] =
-                                                            selectedUsers;
+                                                        if (isApprover) {
+                                                          // For approver: only allow one selection
+                                                          selectedUsersByReviewerType[
+                                                                  record[
+                                                                      'id']] =
+                                                              selectedUsers
+                                                                  .take(1)
+                                                                  .toList();
+                                                        } else {
+                                                          // For reviewer: allow multiple selections
+                                                          selectedUsersByReviewerType[
+                                                                  record[
+                                                                      'id']] =
+                                                              selectedUsers;
+                                                        }
                                                       });
                                                     },
                                                   );
@@ -914,9 +1130,9 @@ class _DetailRequestScreenState extends State<DetailRequestScreen> {
                                 ? GestureDetector(
                                     onTap: () {
                                       searchController.clear();
-                                      // Reset your search results here
+                                      // Reset to original filtered data
                                       setState(() {
-                                        staticData = []; // or your default data
+                                        staticData = data;
                                       });
                                     },
                                     child: Container(
@@ -955,13 +1171,20 @@ class _DetailRequestScreenState extends State<DetailRequestScreen> {
                             ),
                             isDense: false,
                           ),
-                          onChanged: (value) async {
-                            final DetailRequestService detailRequestService =
-                                DetailRequestService();
-                            final resUser =
-                                await detailRequestService.users(key: value);
+                          onChanged: (value) {
                             setState(() {
-                              staticData = resUser.data.results;
+                              if (value.isEmpty) {
+                                staticData =
+                                    data; // Reset to original filtered data
+                              } else {
+                                staticData = data.where((item) {
+                                  final name = item['name_kh']
+                                          ?.toString()
+                                          .toLowerCase() ??
+                                      '';
+                                  return name.contains(value.toLowerCase());
+                                }).toList();
+                              }
                             });
                           },
                         ),
@@ -1186,27 +1409,6 @@ class _DetailRequestScreenState extends State<DetailRequestScreen> {
                         },
                       ),
                     ),
-                    // // Confirm button
-                    // Padding(
-                    //   padding: const EdgeInsets.all(16.0),
-                    //   child: ElevatedButton(
-                    //     onPressed: selectedItems.value.isNotEmpty
-                    //         ? () {
-                    //             onSelected(selectedItems.value);
-                    //             Navigator.pop(context);
-                    //           }
-                    //         : null,
-                    //     style: ElevatedButton.styleFrom(
-                    //       backgroundColor: Colors.indigo[400],
-                    //       foregroundColor: Colors.white,
-                    //       minimumSize: const Size(double.infinity, 48.0),
-                    //       shape: RoundedRectangleBorder(
-                    //         borderRadius: BorderRadius.circular(12.0),
-                    //       ),
-                    //     ),
-                    //     child: const Text('Confirm Selection'),
-                    //   ),
-                    // ),
                   ],
                 ),
               );
@@ -1215,5 +1417,95 @@ class _DetailRequestScreenState extends State<DetailRequestScreen> {
         );
       },
     );
+  }
+
+  // Updated download handler
+  Future<void> _handleDownload() async {
+    try {
+      // 1. Check permissions
+      final hasPermission = await requestStoragePermission();
+      if (!hasPermission) throw Exception('Storage permission denied');
+
+      // 2. Fetch download data
+      final response = await _service.downloadReport(id: widget.id!);
+
+      // 3. Process response
+      final responseData = response;
+      final base64Pdf = responseData['data']['report'] as String;
+      final reportName = responseData['name'] as String? ??
+          'report_${DateFormat('yyyyMMdd').format(DateTime.now())}';
+
+      // 4. Save file
+      final pdfBytes = base64.decode(base64Pdf);
+      final directory = await getApplicationDocumentsDirectory();
+      final file = File('${directory.path}/$reportName.pdf');
+      await file.writeAsBytes(pdfBytes);
+
+      // 5. Open file
+      final result = await OpenFile.open(file.path);
+      if (result.type != ResultType.done) {
+        throw Exception('Failed to open PDF: ${result.message}');
+      }
+
+      if (mounted) {
+        // UI.toast(text: result.message, isSuccess: true);
+      }
+    } catch (e) {
+      // log('Download failed', error: e, stackTrace: stack);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Download failed: ${e.toString()}')),
+        );
+      }
+    } finally {
+      // if (mounted) {
+      //   Navigator.of(context, rootNavigator: true).pop();
+      //   setState(() => _isDownloading = false);
+      // }
+    }
+  }
+
+  Future<bool> requestStoragePermission() async {
+    if (Platform.isAndroid) {
+      final storage = await Permission.storage.request();
+      final manage = await Permission.manageExternalStorage.request();
+
+      if (storage.isGranted || manage.isGranted) {
+        return true;
+      }
+
+      if (storage.isPermanentlyDenied || manage.isPermanentlyDenied) {
+        await openAppSettings();
+      }
+
+      return false;
+    }
+
+    // iOS does not typically need storage permission
+    return true;
+  }
+
+  Future<File?> saveFile(List<int> bytes, String fileName) async {
+    try {
+      Directory? directory;
+
+      if (Platform.isAndroid) {
+        directory = await getExternalStorageDirectory();
+      } else {
+        directory = await getApplicationDocumentsDirectory();
+      }
+
+      if (directory == null)
+        throw Exception('Cannot access storage directory.');
+
+      final filePath = '${directory.path}/$fileName';
+      final file = File(filePath);
+
+      await file.writeAsBytes(bytes);
+      return file;
+    } catch (e) {
+      print("Error saving file: $e");
+      return null;
+    }
   }
 }

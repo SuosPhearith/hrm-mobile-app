@@ -103,49 +103,51 @@ class _EvaluateScreenState extends State<EvaluateScreen> {
                   ? Center(
                       child: Text("Loading..."),
                     )
-                  : SingleChildScrollView(
-                      physics: AlwaysScrollableScrollPhysics(),
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(
-                          children: List.generate(
-                            (evaluationProvider.evaluationListData
-                                    ?.data['results'] as List)
-                                .length,
-                            (index) {
-                              final result = evaluationProvider
-                                          .evaluationListData?.data['results']
-                                      [index] as Map<String, dynamic>? ??
-                                  {};
-                              final rawPresentHour = result['present_hour'];
-                              final presentHour = (rawPresentHour is double)
-                                  ? rawPresentHour.toStringAsFixed(0)
-                                  : rawPresentHour.toString();
-                              final rawMissionHour = result['mission_hour'];
-                              final missionHour = (rawMissionHour is double)
-                                  ? rawMissionHour.toStringAsFixed(0)
-                                  : rawMissionHour.toString();
-                              final absenceHour =
-                                  (result['absence_hour'] ?? 0).toString();
-                              final date = (result['date'] ?? '-').toString();
-                              final finalGrade =
-                                  (result['final_grade'] ?? '-').toString();
-
-                              return Padding(
-                                padding: const EdgeInsets.only(bottom: 12.0),
-                                child: _buildevaluationCard(
-                                  presentHour: presentHour,
-                                  absenceHour: absenceHour,
-                                  missionHour: missionHour,
-                                  date: date,
-                                  finalGrade: finalGrade,
-                                ),
-                              );
-                            },
+                  : SafeArea(
+                    child: SingleChildScrollView(
+                        physics: AlwaysScrollableScrollPhysics(),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            children: List.generate(
+                              (evaluationProvider.evaluationListData
+                                      ?.data['results'] as List)
+                                  .length,
+                              (index) {
+                                final result = evaluationProvider
+                                            .evaluationListData?.data['results']
+                                        [index] as Map<String, dynamic>? ??
+                                    {};
+                                final rawPresentHour = result['present_hour'];
+                                final presentHour = (rawPresentHour is double)
+                                    ? rawPresentHour.toStringAsFixed(0)
+                                    : rawPresentHour.toString();
+                                final rawMissionHour = result['mission_hour'];
+                                final missionHour = (rawMissionHour is double)
+                                    ? rawMissionHour.toStringAsFixed(0)
+                                    : rawMissionHour.toString();
+                                final absenceHour =
+                                    (result['absence_hour'] ?? 0).toString();
+                                final date = (result['date'] ?? '-').toString();
+                                final finalGrade =
+                                    (result['final_grade'] ?? '-').toString();
+                    
+                                return Padding(
+                                  padding: const EdgeInsets.only(bottom: 12.0),
+                                  child: _buildevaluationCard(
+                                    presentHour: presentHour,
+                                    absenceHour: absenceHour,
+                                    missionHour: missionHour,
+                                    date: date,
+                                    finalGrade: finalGrade,
+                                  ),
+                                );
+                              },
+                            ),
                           ),
                         ),
                       ),
-                    ),
+                  ),
             ),
           );
         },
@@ -210,74 +212,76 @@ class _YearPickerContentState extends State<YearPickerContent> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 24, 16, 32),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            'ជ្រើសរើសឆ្នាំ',
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-              fontFamily: 'Kantumruy Pro',
-            ),
-          ),
-          const SizedBox(height: 12),
-          SizedBox(
-            height: 200,
-            child: Theme(
-              data: Theme.of(context).copyWith(
-                dividerTheme: DividerThemeData(
-                  color: HColors.darkgrey.withOpacity(0.1), // Hide dividers
-                ),
-              ),
-              child: YearPicker(
-                firstDate: DateTime(2000),
-                lastDate: DateTime.now(),
-                selectedDate: DateTime(tempYear),
-                onChanged: (DateTime dateTime) {
-                  setState(() {
-                    tempYear = dateTime.year;
-                  });
-                },
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 24, 16, 32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'ជ្រើសរើសឆ្នាំ',
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                fontFamily: 'Kantumruy Pro',
               ),
             ),
-          ),
-          const SizedBox(height: 24),
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton(
-                  style: OutlinedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                  ),
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text(
-                    "បិត",
-                    style: TextStyle(fontSize: 12, color: Colors.black),
+            const SizedBox(height: 12),
+            SizedBox(
+              height: 200,
+              child: Theme(
+                data: Theme.of(context).copyWith(
+                  dividerTheme: DividerThemeData(
+                    color: HColors.darkgrey.withOpacity(0.1), // Hide dividers
                   ),
                 ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: HColors.blue,
-                  ),
-                  onPressed: () {
-                    widget.onConfirm(tempYear);
-                    Navigator.pop(context);
+                child: YearPicker(
+                  firstDate: DateTime(2000),
+                  lastDate: DateTime.now(),
+                  selectedDate: DateTime(tempYear),
+                  onChanged: (DateTime dateTime) {
+                    setState(() {
+                      tempYear = dateTime.year;
+                    });
                   },
-                  child: const Text(
-                    "យល់ព្រម",
-                    style: TextStyle(fontSize: 12, color: Colors.white),
-                  ),
                 ),
               ),
-            ],
-          ),
-        ],
+            ),
+            const SizedBox(height: 24),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                    ),
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text(
+                      "បិត",
+                      style: TextStyle(fontSize: 12, color: Colors.black),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: HColors.blue,
+                    ),
+                    onPressed: () {
+                      widget.onConfirm(tempYear);
+                      Navigator.pop(context);
+                    },
+                    child: const Text(
+                      "យល់ព្រម",
+                      style: TextStyle(fontSize: 12, color: Colors.white),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

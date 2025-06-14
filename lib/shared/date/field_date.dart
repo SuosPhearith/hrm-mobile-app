@@ -15,8 +15,10 @@ class DateInputField extends StatelessWidget {
     required this.label,
     required this.initialDate,
     required this.onDateSelected,
-    this.selectedDate, this.hint,
+    this.selectedDate,
+    this.hint,
   });
+
   void _openDatePicker(BuildContext context) async {
     final result = await showModalBottomSheet<DateTime>(
       context: context,
@@ -24,9 +26,11 @@ class DateInputField extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
-      builder: (context) => Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: CustomSingleDatePicker(initialDate: selectedDate),
+      builder: (context) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: CustomSingleDatePicker(initialDate: selectedDate),
+        ),
       ),
     );
 

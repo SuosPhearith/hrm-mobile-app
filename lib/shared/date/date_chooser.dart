@@ -44,119 +44,121 @@ class _MonthYearPickerContentState extends State<MonthYearPickerContent> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 24, 16, 32),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              IconButton(
-                icon: const Icon(Icons.arrow_back_ios),
-                onPressed: () => setState(() => year--),
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 24, 16, 32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.arrow_back_ios),
+                  onPressed: () => setState(() => year--),
+                ),
+                GestureDetector(
+                  onTap: () {
+                    _showYearPickerBottomSheet(context);
+                  },
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Icon(Icons.calendar_month, color: Colors.grey),
+                      SizedBox(width: 8),
+                      Text(
+                        '$year',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          fontFamily: 'Kantumruy Pro',
+                        ),
+                      ),
+                      Icon(Icons.arrow_drop_down),
+                    ],
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.arrow_forward_ios),
+                  onPressed: () => setState(() => year++),
+                ),
+              ],
+            ),
+            Divider(
+              color: HColors.darkgrey.withOpacity(0.1),
+            ),
+            const SizedBox(height: 12),
+            GridView.builder(
+              shrinkWrap: true,
+              itemCount: 12,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+                mainAxisSpacing: 6,
+                crossAxisSpacing: 6,
+                childAspectRatio: 2.3,
               ),
-              GestureDetector(
-                onTap: () {
-                  _showYearPickerBottomSheet(context);
-                },
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // Icon(Icons.calendar_month, color: Colors.grey),
-                    SizedBox(width: 8),
-                    Text(
-                      '$year',
+              itemBuilder: (context, index) {
+                final isSelected = selectedMonth == index;
+                return GestureDetector(
+                  onTap: () => setState(() => selectedMonth = index),
+                  child: Container(
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: isSelected ? HColors.blue : Colors.white,
+                      borderRadius: BorderRadius.circular(24),
+                    ),
+                    child: Text(
+                      khmerMonths[index],
                       style: TextStyle(
                         fontSize: 16,
-                        fontWeight: FontWeight.w500,
                         fontFamily: 'Kantumruy Pro',
+                        color: isSelected ? Colors.white : Colors.black,
                       ),
                     ),
-                    Icon(Icons.arrow_drop_down),
-                  ],
-                ),
-              ),
-              IconButton(
-                icon: const Icon(Icons.arrow_forward_ios),
-                onPressed: () => setState(() => year++),
-              ),
-            ],
-          ),
-          Divider(
-            color: HColors.darkgrey.withOpacity(0.1),
-          ),
-          const SizedBox(height: 12),
-          GridView.builder(
-            shrinkWrap: true,
-            itemCount: 12,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3,
-              mainAxisSpacing: 6,
-              crossAxisSpacing: 6,
-              childAspectRatio: 2.3,
-            ),
-            itemBuilder: (context, index) {
-              final isSelected = selectedMonth == index;
-              return GestureDetector(
-                onTap: () => setState(() => selectedMonth = index),
-                child: Container(
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: isSelected ? HColors.blue : Colors.white,
-                    borderRadius: BorderRadius.circular(24),
                   ),
-                  child: Text(
-                    khmerMonths[index],
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontFamily: 'Kantumruy Pro',
-                      color: isSelected ? Colors.white : Colors.black,
+                );
+              },
+            ),
+            Divider(
+              color: HColors.darkgrey.withOpacity(0.1),
+            ),
+            const SizedBox(height: 24),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                    ),
+                    onPressed: () => Navigator.pop(context),
+                    child: Text(
+                      "បិត",
+                      style: TextStyle(fontSize: 12, color: Colors.black),
                     ),
                   ),
                 ),
-              );
-            },
-          ),
-          Divider(
-            color: HColors.darkgrey.withOpacity(0.1),
-          ),
-          const SizedBox(height: 24),
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton(
-                  style: OutlinedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                  ),
-                  onPressed: () => Navigator.pop(context),
-                  child: Text(
-                    "បិត",
-                    style: TextStyle(fontSize: 12, color: Colors.black),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor:
+                          HColors.blue, // 🔵 Set your desired color here
+                    ),
+                    onPressed: () {
+                      widget.onConfirm(year, selectedMonth);
+                      Navigator.pop(context);
+                    },
+                    child: Text(
+                      "យល់ព្រម",
+                      style: TextStyle(fontSize: 12, color: Colors.white),
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                        HColors.blue, // 🔵 Set your desired color here
-                  ),
-                  onPressed: () {
-                    widget.onConfirm(year, selectedMonth);
-                    Navigator.pop(context);
-                  },
-                  child: Text(
-                    "យល់ព្រម",
-                    style: TextStyle(fontSize: 12, color: Colors.white),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

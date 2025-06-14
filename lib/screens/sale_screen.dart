@@ -7,8 +7,10 @@ class SaleScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[200],
-      body: Center(
-        child: Text('Sale Screen'),
+      body: SafeArea(
+        child: Center(
+          child: Text('Sale Screen'),
+        ),
       ),
     );
   }

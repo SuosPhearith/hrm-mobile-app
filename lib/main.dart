@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:mobile_app/app_lang.dart';
 import 'package:mobile_app/providers/global/setting_provider.dart';
 import 'package:mobile_app/providers/local/holiday_provider.dart';
@@ -13,6 +14,7 @@ import 'package:mobile_app/screens/daily_screen.dart';
 import 'package:mobile_app/screens/document_screen.dart';
 import 'package:mobile_app/screens/evaluate_screen.dart';
 import 'package:mobile_app/screens/holliday_screen.dart';
+import 'package:mobile_app/screens/notification_screen.dart';
 import 'package:mobile_app/screens/personal_info/create_education_screen.dart';
 import 'package:mobile_app/screens/personal_info/create_language_level.dart';
 import 'package:mobile_app/screens/personal_info/create_relative_screen.dart';
@@ -24,6 +26,7 @@ import 'package:mobile_app/screens/personal_info_screen.dart';
 import 'package:mobile_app/screens/qr_scanner_screen.dart';
 import 'package:mobile_app/screens/request/create_request_screen.dart';
 import 'package:mobile_app/screens/request/detail_request_screen.dart';
+import 'package:mobile_app/screens/request/update_request_screen.dart';
 import 'package:mobile_app/screens/request_screen.dart';
 import 'package:mobile_app/screens/salary_screen.dart';
 import 'package:mobile_app/screens/scan_screen.dart';
@@ -48,6 +51,7 @@ import 'package:mobile_app/utils/dio.client.dart';
 // Main function remains unchanged
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+   await initializeDateFormatting('km', null); // Load Khmer locale data
   const flavor = String.fromEnvironment('FLAVOR', defaultValue: 'dev');
   await dotenv.load(fileName: '.env.$flavor');
 
@@ -221,6 +225,10 @@ final GoRouter _router = GoRouter(
       path: AppRoutes.document,
       builder: (context, state) => const DocumentScreen(),
     ),
+     GoRoute(
+      path: AppRoutes.notification,
+      builder: (context, state) => const NotificationScreen(),
+    ),
     GoRoute(
       path: '${AppRoutes.createRequest}/:id',
       builder: (context, state) {
@@ -228,6 +236,7 @@ final GoRouter _router = GoRouter(
         return CreateRequestScreen(id: id);
       },
     ),
+    // 
     GoRoute(
       path: '${AppRoutes.detailRequest}/:id',
       builder: (context, state) {
@@ -341,6 +350,18 @@ final GoRouter _router = GoRouter(
           id: userId,
           workId: workId,
         );
+      },
+    ),
+    GoRoute(
+      path: AppRoutes.updateRequest,
+      builder: (context, state) {
+        // final String userId = state.pathParameters['userId']!;
+        // final String workId = state.pathParameters['workId']!;
+        // return UpdateUserWorkScreen(
+        //   id: userId,
+        //   workId: workId,
+        // );
+        return UpdateRequestScreen();
       },
     ),
   ],
@@ -522,13 +543,13 @@ class _MainLayoutState extends State<MainLayout> {
               ),
             ),
             BottomNavigationBarItem(
-              icon: _buildNavIcon(Icons.grid_view_rounded, 4),
+              icon: _buildNavIcon(Icons.manage_accounts_outlined, 4),
               activeIcon: _buildNavIcon(
-                Icons.grid_view_rounded,
+                Icons.manage_accounts,
                 4,
                 active: true,
               ),
-              label: AppLang.translate(key: 'layout_other', lang: lang ?? 'kh'),
+              label: AppLang.translate(key: 'settings', lang: lang ?? 'kh'),
             ),
           ],
         ),

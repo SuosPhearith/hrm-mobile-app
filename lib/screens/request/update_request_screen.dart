@@ -20,15 +20,15 @@ import 'package:mobile_app/utils/help_util.dart';
 import 'package:mobile_app/widgets/helper.dart';
 import 'package:provider/provider.dart';
 
-class CreateRequestScreen extends StatefulWidget {
+class UpdateRequestScreen extends StatefulWidget {
   final String? id;
-  const CreateRequestScreen({super.key, this.id});
+  const UpdateRequestScreen({super.key, this.id});
 
   @override
-  State<CreateRequestScreen> createState() => _CreateRequestScreenState();
+  State<UpdateRequestScreen> createState() => _CreateRequestScreenState();
 }
 
-class _CreateRequestScreenState extends State<CreateRequestScreen> {
+class _CreateRequestScreenState extends State<UpdateRequestScreen> {
   // final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
   //     GlobalKey<RefreshIndicatorState>();
   // Future<void> _refreshData(CreateRequestProvider provider) async {
@@ -211,7 +211,7 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
             // backgroundColor: Colors.grey[100],
             backgroundColor: Colors.white,
             appBar: AppBar(
-              title: Text('ស្នើសុំច្បាប់'),
+              title: Text('កែប្រែព័ត៌មានស្នើសុំច្បាប់'),
               centerTitle: true,
               bottom: CustomHeader(),
               actions: [
@@ -336,69 +336,69 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
                                 //     }).toList(),
                                 //   ),
                                 // ),
-                                SingleChildScrollView(
-                                  scrollDirection: Axis.horizontal,
-                                  child: Wrap(
-                                    spacing: 10,
-                                    runSpacing: 10,
-                                    children:
-                                        (data!['request_types'] as List).map((
-                                      record,
-                                    ) {
-                                      return InkWell(
-                                        onTap: () {
-                                          setState(() {
-                                            _selectedTypeId = record['id'];
-                                          });
-                                          // print(_selectedTypeId);
-                                        },
-                                        child: Container(
-                                          margin: EdgeInsets.zero,
-                                          padding: const EdgeInsets.symmetric(
-                                            vertical: 8,
-                                            horizontal: 12,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: const Color.fromRGBO(
-                                              33,
-                                              150,
-                                              243,
-                                              0.1,
-                                            ),
-                                            borderRadius:
-                                                const BorderRadius.all(
-                                              Radius.circular(5),
-                                            ),
-                                            border: Border.all(
-                                              color: HColors.darkgrey
-                                                  .withOpacity(0.1),
-                                            ),
-                                          ),
-                                          child: Row(
-                                            children: [
-                                              Text(
-                                                '${getSafeString(value: AppLang.translate(data: record, lang: settingProvider.lang ?? 'kh'))} ',
-                                                style: TextStyle(
-                                                  color: _selectedTypeId ==
-                                                          record['id']
-                                                      ? Colors.blue
-                                                      : HColors.darkgrey,
-                                                ),
-                                              ),
-                                              _selectedTypeId == record['id']
-                                                  ? Icon(
-                                                      Icons.check,
-                                                      size: 16,
-                                                      color: Colors.blue,
-                                                    )
-                                                  : SizedBox(),
-                                            ],
-                                          ),
-                                        ),
-                                      );
-                                    }).toList(),
-                                  ),
-                                ),
+                                // SingleChildScrollView(
+                                //   scrollDirection: Axis.horizontal,
+                                //   child: Wrap(
+                                //     spacing: 10,
+                                //     runSpacing: 10,
+                                //     children:
+                                //         (data!['request_types'] as List).map((
+                                //       record,
+                                //     ) {
+                                //       return InkWell(
+                                //         onTap: () {
+                                //           setState(() {
+                                //             _selectedTypeId = record['id'];
+                                //           });
+                                //           // print(_selectedTypeId);
+                                //         },
+                                //         child: Container(
+                                //           margin: EdgeInsets.zero,
+                                //           padding: const EdgeInsets.symmetric(
+                                //             vertical: 8,
+                                //             horizontal: 12,
+                                //           ),
+                                //           decoration: BoxDecoration(
+                                //             color: const Color.fromRGBO(
+                                //               33,
+                                //               150,
+                                //               243,
+                                //               0.1,
+                                //             ),
+                                //             borderRadius:
+                                //                 const BorderRadius.all(
+                                //               Radius.circular(5),
+                                //             ),
+                                //             border: Border.all(
+                                //               color: HColors.darkgrey
+                                //                   .withOpacity(0.1),
+                                //             ),
+                                //           ),
+                                //           child: Row(
+                                //             children: [
+                                //               Text(
+                                //                 '${getSafeString(value: AppLang.translate(data: record, lang: settingProvider.lang ?? 'kh'))} ',
+                                //                 style: TextStyle(
+                                //                   color: _selectedTypeId ==
+                                //                           record['id']
+                                //                       ? Colors.blue
+                                //                       : HColors.darkgrey,
+                                //                 ),
+                                //               ),
+                                //               _selectedTypeId == record['id']
+                                //                   ? Icon(
+                                //                       Icons.check,
+                                //                       size: 16,
+                                //                       color: Colors.blue,
+                                //                     )
+                                //                   : SizedBox(),
+                                //             ],
+                                //           ),
+                                //         ),
+                                //       );
+                                //     }).toList(),
+                                //   ),
+                                // ),
                                   
                                 const SizedBox(height: 16),
                                 Row(

@@ -160,7 +160,28 @@ class _RequestScreenState extends State<RequestScreen> {
             backgroundColor: Colors.white,
             onRefresh: () => _refreshData(requestProvider),
             child: requestProvider.isLoading
-                ? const Center(child: Text('Loading...'))
+                ? const Center(
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  SizedBox(
+                    height: 60,
+                    width: 60,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2.0,
+                    ),
+                  ),
+                  Text(
+                    'សូមរងចាំ',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.black,
+                    ),
+                  ),
+                ],
+              ),
+            )
                 : requestProvider.requestData == null
                     ? Center(
                         child: GestureDetector(
@@ -172,45 +193,47 @@ class _RequestScreenState extends State<RequestScreen> {
                           child: Text('Something when wrong'),
                         ),
                       )
-                    : SingleChildScrollView(
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Column(
-                            children: [
-                              ...requestProvider.requestData!.data.results.map((
-                                record,
-                              ) {
-                                return GestureDetector(
-                                  onTap: () {
-                                    context.push(
-                                      '${AppRoutes.detailRequest}/${record['id']}',
-                                    );
-                                  },
-                                  child: _buildRequestCard(
-                                    id: AppLang.translate(
-                                      data: record['request_category'],
-                                      lang: settingProvider.lang ?? 'kh',
+                    : SafeArea(
+                      child: SingleChildScrollView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Column(
+                              children: [
+                                ...requestProvider.requestData!.data.results.map((
+                                  record,
+                                ) {
+                                  return GestureDetector(
+                                    onTap: () {
+                                      context.push(
+                                        '${AppRoutes.detailRequest}/${record['id']}',
+                                      );
+                                    },
+                                    child: _buildRequestCard(
+                                      id: AppLang.translate(
+                                        data: record['request_category'],
+                                        lang: settingProvider.lang ?? 'kh',
+                                      ),
+                                      status: AppLang.translate(
+                                        data: record['request_status'],
+                                        lang: settingProvider.lang ?? 'kh',
+                                      ),
+                                      dates:
+                                          '${formatDate(record['start_datetime'])} ដល់ ${formatDate(record['end_datetime'])}',
+                                      days: calculateDateDifference(
+                                        record['start_datetime'],
+                                        record['end_datetime'],
+                                      ),
+                                      description:
+                                          '${AppLang.translate(data: record['request_type'], lang: settingProvider.lang ?? 'kh')} | ${formatStringValue(record['objective'])}',
                                     ),
-                                    status: AppLang.translate(
-                                      data: record['request_status'],
-                                      lang: settingProvider.lang ?? 'kh',
-                                    ),
-                                    dates:
-                                        '${formatDate(record['start_datetime'])} ដល់ ${formatDate(record['end_datetime'])}',
-                                    days: calculateDateDifference(
-                                      record['start_datetime'],
-                                      record['end_datetime'],
-                                    ),
-                                    description:
-                                        '${AppLang.translate(data: record['request_type'], lang: settingProvider.lang ?? 'kh')} | ${formatStringValue(record['objective'])}',
-                                  ),
-                                );
-                              }),
-                            ],
+                                  );
+                                }),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
+                    ),
           ),
         );
       },
@@ -311,37 +334,39 @@ class _RequestScreenState extends State<RequestScreen> {
             ? dataSetup['request_categories'] as List
             : [];
 
-        return Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Text(
-              //   'បន្ថែមសំណើថ្មី',
-              //   style: TextStyle(
-              //     fontSize: 20.0,
-              //     fontWeight: FontWeight.w500,
-              //   ),
-              // ),
-              // const SizedBox(height: 16.0),
-              ...requestCategories.asMap().entries.map((entry) {
-                int index = entry.key;
-                var record = entry.value;
-
-                // Use modulo to cycle through icons if there are more categories than icons
-                IconData selectedIcon = icons[index % icons.length];
-
-                return _buildBottomSheetOption(
-                  icon: selectedIcon,
-                  label: AppLang.translate(data: record, lang: lang ?? 'kh'),
-                  onTap: () {
-                    Navigator.pop(context);
-                    context.push('/create-request/${record['id']}');
-                  },
-                );
-              }),
-            ],
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Text(
+                //   'បន្ថែមសំណើថ្មី',
+                //   style: TextStyle(
+                //     fontSize: 20.0,
+                //     fontWeight: FontWeight.w500,
+                //   ),
+                // ),
+                // const SizedBox(height: 16.0),
+                ...requestCategories.asMap().entries.map((entry) {
+                  int index = entry.key;
+                  var record = entry.value;
+          
+                  // Use modulo to cycle through icons if there are more categories than icons
+                  IconData selectedIcon = icons[index % icons.length];
+          
+                  return _buildBottomSheetOption(
+                    icon: selectedIcon,
+                    label: AppLang.translate(data: record, lang: lang ?? 'kh'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      context.push('/create-request/${record['id']}');
+                    },
+                  );
+                }),
+              ],
+            ),
           ),
         );
       },
@@ -418,10 +443,10 @@ class _RequestScreenState extends State<RequestScreen> {
                   Text(
                     id,
                     style: TextStyle(
-                      color: const Color(0xFF64748B),
+                      // color: const Color(0xFF64748B),
                       fontSize: 14,
                       // fontFamily: 'Kantumruy Pro',
-                      fontWeight: FontWeight.w400,
+                      fontWeight: FontWeight.w500,
                       height: 1.67,
                     ),
                   ),

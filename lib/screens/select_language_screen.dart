@@ -13,63 +13,65 @@ class SelectLanguageScreen extends StatelessWidget {
     return Consumer2<AuthProvider, SettingProvider>(
         builder: (context, provider, setting, child) {
       return Scaffold(
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Container(
-                height: 100,
-                width: 100,
-                decoration: BoxDecoration(
-                  color: Colors.grey[200],
-                  shape: BoxShape.circle,
-                ),
-                child: Center(
-                  child: Icon(
-                    Icons.language,
-                    size: 48,
-                    color: Colors.black,
+        body: SafeArea(
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Container(
+                  height: 100,
+                  width: 100,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[200],
+                    shape: BoxShape.circle,
+                  ),
+                  child: Center(
+                    child: Icon(
+                      Icons.language,
+                      size: 48,
+                      color: Colors.black,
+                    ),
                   ),
                 ),
-              ),
-              SizedBox(height: 8),
-              Text(
-                'ជ្រើសរើសភាសា',
-                style: TextStyle(fontSize: 24),
-              ),
-              Text(
-                'Choose your language',
-                style: TextStyle(fontSize: 18),
-              ),
-              SizedBox(height: 20),
-              Column(
-                children: [
-                  GestureDetector(
-                    onTap: () async {
-                      await setting.handleSetLanguage('kh');
-                      // provider.setIsChecking(true);
-                      if (context.mounted) {
-                        // context.go(AppRoutes.welcome);
-                        context.go(AppRoutes.home);
-                      }
-                    },
-                    child: _buildLanguageOption('ភាសាខ្មែរ', '🇰🇭'),
-                  ),
-                  GestureDetector(
-                    onTap: () async {
-                      await setting.handleSetLanguage('en');
-                      // provider.setIsChecking(true);
-                      if (context.mounted) {
-                        // context.go(AppRoutes.welcome);
-                        context.go(AppRoutes.home);
-                      }
-                    },
-                    child: _buildLanguageOption('English', '🇺🇸'),
-                  ),
-                ],
-              ),
-            ],
+                SizedBox(height: 8),
+                Text(
+                  'ជ្រើសរើសភាសា',
+                  style: TextStyle(fontSize: 24),
+                ),
+                Text(
+                  'Choose your language',
+                  style: TextStyle(fontSize: 18),
+                ),
+                SizedBox(height: 20),
+                Column(
+                  children: [
+                    GestureDetector(
+                      onTap: () async {
+                        await setting.handleSetLanguage('kh');
+                        // provider.setIsChecking(true);
+                        if (context.mounted) {
+                          // context.go(AppRoutes.welcome);
+                          context.go(AppRoutes.home);
+                        }
+                      },
+                      child: _buildLanguageOption('ភាសាខ្មែរ', '🇰🇭'),
+                    ),
+                    GestureDetector(
+                      onTap: () async {
+                        await setting.handleSetLanguage('en');
+                        // provider.setIsChecking(true);
+                        if (context.mounted) {
+                          // context.go(AppRoutes.welcome);
+                          context.go(AppRoutes.home);
+                        }
+                      },
+                      child: _buildLanguageOption('English', '🇺🇸'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       );

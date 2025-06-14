@@ -135,51 +135,74 @@ class DailyScreenState extends State<DailyScreen> {
             backgroundColor: Colors.white,
             onRefresh: () => _refreshData(scanProvider),
             child: scanProvider.isLoading
-                ? Center(child: Text('Loading...'))
+                ? Center(
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  SizedBox(
+                    height: 60,
+                    width: 60,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2.0,
+                    ),
+                  ),
+                  Text(
+                    'សូមរងចាំ',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.black,
+                    ),
+                  ),
+                ],
+              ),
+            )
                 : scanProvider.data == null
                     ? Center(child: Text('Something went wrong'))
-                    : SingleChildScrollView(
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Column(
-                            children: [
-                              // Display selected date range
-                              // DateRangeSelector(
-                              //   startDate: _startDate,
-                              //   endDate: _endDate,
-                              //   onTap: () {
-                              //     _showMonthPicker(context, scanProvider);
-                              //   },
-                              // ),
-                              scanProvider.data!.data.results.isEmpty
-                                  ? Center(child: Text("គ្មានទិន្នន័យ"))
-                                  : SizedBox(),
-                              ...scanProvider.data?.data.results.map((record) {
-                                    final scanIn = parseDateTime(getSafeString(
-                                        value: record['check_in']));
-                                    final scanOut = parseDateTime(getSafeString(
-                                        value: record['check_out']));
-                                    return _buildDailyCard(
-                                        date: formatDate(getSafeString(
-                                            value: record['date'])),
-                                        hours: convertToHoursMinutes(
-                                            value: record['working_hour']),
-                                        loginTime: getSafeString(
-                                            value: scanIn['time']),
-                                        logoutTime: getSafeString(
-                                            value: scanOut['time']),
-                                        percent: clampToZeroOne(getSafeDouble(
-                                            value: record['percentage'])));
-                                  }).toList() ??
-                                  [],
-                              // SizedBox(
-                              //     height:
-                              //         MediaQuery.of(context).size.height * 0.1),
-                            ],
+                    : SafeArea(
+                      child: SingleChildScrollView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Column(
+                              children: [
+                                // Display selected date range
+                                // DateRangeSelector(
+                                //   startDate: _startDate,
+                                //   endDate: _endDate,
+                                //   onTap: () {
+                                //     _showMonthPicker(context, scanProvider);
+                                //   },
+                                // ),
+                                scanProvider.data!.data.results.isEmpty
+                                    ? Center(child: Text("គ្មានទិន្នន័យ"))
+                                    : SizedBox(),
+                                ...scanProvider.data?.data.results.map((record) {
+                                      final scanIn = parseDateTime(getSafeString(
+                                          value: record['check_in']));
+                                      final scanOut = parseDateTime(getSafeString(
+                                          value: record['check_out']));
+                                      return _buildDailyCard(
+                                          date: formatDate(getSafeString(
+                                              value: record['date'])),
+                                          hours: convertToHoursMinutes(
+                                              value: record['working_hour']),
+                                          loginTime: getSafeString(
+                                              value: scanIn['time']),
+                                          logoutTime: getSafeString(
+                                              value: scanOut['time']),
+                                          percent: clampToZeroOne(getSafeDouble(
+                                              value: record['percentage'])));
+                                    }).toList() ??
+                                    [],
+                                // SizedBox(
+                                //     height:
+                                //         MediaQuery.of(context).size.height * 0.1),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
+                    ),
           ),
         );
       }),
