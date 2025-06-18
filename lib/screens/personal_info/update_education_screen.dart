@@ -68,9 +68,10 @@ class _UpdateEducationScreenState extends State<UpdateEducationScreen> {
     super.dispose();
   }
 
-  void _loadExistingData(UpdateEducationProvider provider) {
+  void _loadExistingData(
+      UpdateEducationProvider provider, SettingProvider settingProvider) {
     if (_isDataLoaded || provider.data == null) return;
-
+    final lang = settingProvider.lang;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
 
@@ -86,22 +87,31 @@ class _UpdateEducationScreenState extends State<UpdateEducationScreen> {
         _endDate =
             endDateStr.isNotEmpty ? DateTime.tryParse(startDateStr) : null;
 
-        _type.text = getSafeString(
-            value: provider.data?.data['education_type']?['name_kh'],
-            safeValue: '');
-        _educationLevel.text = getSafeString(
-            value: provider.data?.data['education_level']?['name_kh'],
-            safeValue: '');
-        _certificate.text = getSafeString(
-            value: provider.data?.data['certificate_type']?['name_kh'],
-            safeValue: '');
-        _skill.text = getSafeString(
-            value: provider.data?.data['major']?['name_kh'], safeValue: '');
-        _school.text = getSafeString(
-            value: provider.data?.data['school']?['name_kh'], safeValue: '');
-        _place.text = getSafeString(
-            value: provider.data?.data['education_place']?['name_kh'],
-            safeValue: '');
+        _type.text = AppLang.translate(
+            lang: lang ?? 'kh', data: provider.data?.data['education_type']);
+        _educationLevel.text =  AppLang.translate(
+            lang: lang ?? 'kh', data: provider.data?.data['education_level']);
+        //getSafeString(
+            // value: provider.data?.data['education_level']?['name_kh'],
+            // safeValue: '');
+        _certificate.text = AppLang.translate(
+            lang: lang ?? 'kh', data: provider.data?.data['certificate_type']);
+        // getSafeString(
+        //     value: provider.data?.data['certificate_type']?['name_kh'],
+        //     safeValue: '');
+        _skill.text =AppLang.translate(
+            lang: lang ?? 'kh', data: provider.data?.data['major']);
+        //  getSafeString(
+        //     value: provider.data?.data['major']?['name_kh'], safeValue: '');
+        _school.text = AppLang.translate(
+            lang: lang ?? 'kh', data: provider.data?.data['school']);
+        // getSafeString(
+        //     value: provider.data?.data['school']?['name_kh'], safeValue: '');
+        _place.text = AppLang.translate(
+            lang: lang ?? 'kh', data: provider.data?.data['education_place']);
+        // getSafeString(
+        //     value: provider.data?.data['education_place']?['name_kh'],
+        //     safeValue: '');
 
         // Set selected IDs for dropdowns
         selectedEducationTypeId =
@@ -135,10 +145,10 @@ class _UpdateEducationScreenState extends State<UpdateEducationScreen> {
           selectedEducationLevelId!.isEmpty) {
         return 'Please select education level';
       }
-      if (_startDate==null) {
+      if (_startDate == null) {
         return 'Start Date is required';
       }
-      if (_endDate==null) {
+      if (_endDate == null) {
         return 'End Date is required';
       }
       return null;
@@ -192,7 +202,7 @@ class _UpdateEducationScreenState extends State<UpdateEducationScreen> {
             const SnackBar(content: Text('ការស្នើសុំត្រូវបានបញ្ជូនដោយជោគជ័យ')),
           );
           // _clearAllFields();
-           Provider.of<PersonalInfoProvider>(context,listen: false).getHome();
+          Provider.of<PersonalInfoProvider>(context, listen: false).getHome();
           context.pop();
         }
       } catch (e) {
@@ -245,13 +255,14 @@ class _UpdateEducationScreenState extends State<UpdateEducationScreen> {
               dataKey: 'education_places',
               settingProvider: settingProvider);
           if (!createEducationProvider.isLoading && !_isDataLoaded) {
-            _loadExistingData(createEducationProvider);
+            _loadExistingData(createEducationProvider, settingProvider);
           }
+          final lang = settingProvider.lang;
           return Scaffold(
             backgroundColor: Colors.white,
             appBar: AppBar(
               title: Text(AppLang.translate(
-                  lang: 'kh', key: 'user_info_education_update')),
+                  lang: lang ?? 'kh', key: 'user_info_education_update')),
               centerTitle: true,
               actions: [
                 Padding(
@@ -268,32 +279,32 @@ class _UpdateEducationScreenState extends State<UpdateEducationScreen> {
               bottom: CustomHeader(),
             ),
             body: createEducationProvider.isLoading
-                ? const Center(
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  SizedBox(
-                    height: 60,
-                    width: 60,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2.0,
+                ? Center(
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        SizedBox(
+                          height: 60,
+                          width: 60,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2.0,
+                          ),
+                        ),
+                        Text(
+                          AppLang.translate(lang: lang ?? 'kh', key: 'waiting'),
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                  Text(
-                    'សូមរងចាំ',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.black,
-                    ),
-                  ),
-                ],
-              ),
-            )
+                  )
                 : GestureDetector(
-                  onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-                  child: SafeArea(
-                    child: SingleChildScrollView(
+                    onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+                    child: SafeArea(
+                      child: SingleChildScrollView(
                         physics: const AlwaysScrollableScrollPhysics(),
                         padding: const EdgeInsets.all(15),
                         child: Form(
@@ -406,14 +417,18 @@ class _UpdateEducationScreenState extends State<UpdateEducationScreen> {
                                 },
                               ),
                               const SizedBox(height: 16),
-                                
+
                               // Date Picker Row
                               Row(
                                 children: [
                                   Expanded(
                                     child: DateInputField(
-                                      label: 'ថ្ងៃចាប់ផ្តើម',
-                                      hint: 'សូមជ្រើសរើសកាលបរិច្ឆេទ',
+                                      label: AppLang.translate(
+                                          lang: lang ?? 'kh',
+                                          key: 'start_date'),
+                                      hint: AppLang.translate(
+                                          lang: lang ?? 'kh',
+                                          key: 'please select date'),
                                       initialDate: DateTime.now(),
                                       selectedDate: _startDate,
                                       onDateSelected: (date) {
@@ -428,8 +443,11 @@ class _UpdateEducationScreenState extends State<UpdateEducationScreen> {
                                   ),
                                   Expanded(
                                     child: DateInputField(
-                                      label: 'ថ្ងៃបញ្ចប់',
-                                      hint: 'សូមជ្រើសរើសកាលបរិច្ឆេទ',
+                                      label: AppLang.translate(
+                                          lang: lang ?? 'kh', key: 'end_date'),
+                                      hint: AppLang.translate(
+                                          lang: lang ?? 'kh',
+                                          key: 'please select date'),
                                       initialDate: DateTime.now(),
                                       selectedDate: _endDate,
                                       onDateSelected: (date) {
@@ -441,15 +459,15 @@ class _UpdateEducationScreenState extends State<UpdateEducationScreen> {
                                   ),
                                 ],
                               ),
-                                
+
                               // const SizedBox(
                               //     height: 30), // Extra space before button
                             ],
                           ),
                         ),
                       ),
+                    ),
                   ),
-                ),
             // bottomNavigationBar: Padding(
             //   padding: const EdgeInsets.all(15),
             //   child: SizedBox(

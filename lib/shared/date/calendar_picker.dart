@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:mobile_app/app_lang.dart';
+import 'package:mobile_app/providers/global/setting_provider.dart';
 import 'package:mobile_app/shared/color/colors.dart';
+import 'package:provider/provider.dart';
 
 // Single Date Picker for use with DateInputField
 class CustomSingleDatePicker extends StatefulWidget {
@@ -67,13 +70,17 @@ class _CustomSingleDatePickerState extends State<CustomSingleDatePicker> {
                 : 'ជ្រើសរើសកាលបរិច្ឆេទ',
             style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 20),
           ),
-          trailing:  Icon(Icons.edit,color: HColors.darkgrey,),
+          trailing: Icon(
+            Icons.edit,
+            color: HColors.darkgrey,
+          ),
         ),
-         Divider(color: HColors.darkgrey.withOpacity(0.3),),
+        Divider(
+          color: HColors.darkgrey.withOpacity(0.3),
+        ),
         CalendarDatePicker(
           initialDate: selectedDate ?? DateTime.now(),
           firstDate: DateTime(1900),
-
           lastDate: DateTime(2030),
           onDateChanged: (date) {
             setState(() {
@@ -90,7 +97,11 @@ class _CustomSingleDatePickerState extends State<CustomSingleDatePicker> {
               Expanded(
                 child: OutlinedButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text('បិទ'),
+                  child: Text(AppLang.translate(
+                      lang: Provider.of<SettingProvider>(context, listen: false)
+                              .lang ??
+                          'kh',
+                      key: 'close')),
                 ),
               ),
               const SizedBox(width: 12),
@@ -99,7 +110,7 @@ class _CustomSingleDatePickerState extends State<CustomSingleDatePicker> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: HColors.blue, // Button background color
                     foregroundColor: Colors.white, // Text color
-                 
+
                     shape: RoundedRectangleBorder(
                       borderRadius:
                           BorderRadius.circular(24), // Rounded corners
@@ -115,7 +126,11 @@ class _CustomSingleDatePickerState extends State<CustomSingleDatePicker> {
                           Navigator.pop(context, selectedDate!);
                         }
                       : null,
-                  child: const Text('យល់ព្រម'),
+                  child: Text(AppLang.translate(
+                      lang: Provider.of<SettingProvider>(context, listen: false)
+                              .lang ??
+                          'kh',
+                      key: 'confirm')),
                 ),
               ),
             ],

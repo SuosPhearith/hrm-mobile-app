@@ -320,7 +320,7 @@ class _UpdateWorkHistoryScreenState extends State<UpdateWorkHistoryScreen> {
               apiData: provider.dataSetup,
               dataKey: 'positions',
               settingProvider: settingProvider);
-
+          final lang =settingProvider.lang;
           return Scaffold(
             backgroundColor: Colors.white,
             appBar: AppBar(
@@ -343,7 +343,7 @@ class _UpdateWorkHistoryScreenState extends State<UpdateWorkHistoryScreen> {
               ],
             ),
             body: provider.isLoading
-                ? const Center(
+                ?  Center(
               child: Stack(
                 alignment: Alignment.center,
                 children: [
@@ -355,7 +355,8 @@ class _UpdateWorkHistoryScreenState extends State<UpdateWorkHistoryScreen> {
                     ),
                   ),
                   Text(
-                    'សូមរងចាំ',
+                   AppLang.translate(
+                                        lang: lang ?? 'kh', key: 'waiting'),
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
@@ -500,8 +501,10 @@ class _UpdateWorkHistoryScreenState extends State<UpdateWorkHistoryScreen> {
                                 children: [
                                   Expanded(
                                     child: DateInputField(
-                                      label: 'ថ្ងៃចាប់ផ្តើម',
-                                      hint: 'សូមជ្រើសរើសកាលបរិច្ឆេទ',
+                                      label:AppLang.translate(
+                                        lang: lang ?? 'kh', key: 'start_date'),
+                                      hint: AppLang.translate(
+                                        lang: lang ?? 'kh', key: 'please select date'),
                                       initialDate: DateTime.now(),
                                       selectedDate: _startDate,
                                       onDateSelected: (date) {
@@ -516,8 +519,10 @@ class _UpdateWorkHistoryScreenState extends State<UpdateWorkHistoryScreen> {
                                   ),
                                   Expanded(
                                     child: DateInputField(
-                                      label: 'ថ្ងៃបញ្ចប់',
-                                      hint: 'សូមជ្រើសរើសកាលបរិច្ឆេទ',
+                                      label: AppLang.translate(
+                                        lang: lang ?? 'kh', key: 'end_date'),
+                                      hint: AppLang.translate(
+                                        lang: lang ?? 'kh', key: 'please select date'),
                                       initialDate: DateTime.now(),
                                       selectedDate: _endDate,
                                       onDateSelected: (date) {
@@ -536,7 +541,7 @@ class _UpdateWorkHistoryScreenState extends State<UpdateWorkHistoryScreen> {
                               _buildSelectionField(
                                 controller: _place,
                                 label: AppLang.translate(
-                                    lang: settingProvider.lang ?? 'kh',
+                                    lang: lang ?? 'kh',
                                     key: 'institutions'),
                                 items: department,
                                 selectedId:

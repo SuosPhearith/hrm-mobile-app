@@ -62,7 +62,12 @@ class _CreateRelativeScreenState extends State<CreateRelativeScreen> {
         selectedGender == null) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('សូមបំពេញព័ត៌មានចាំបាច់')),
+        SnackBar(
+            content: Text(AppLang.translate(
+                lang:
+                    Provider.of<SettingProvider>(context, listen: false).lang ??
+                        'kh',
+                key: 'please fill the information'))),
       );
       return;
     }
@@ -101,7 +106,7 @@ class _CreateRelativeScreenState extends State<CreateRelativeScreen> {
             const SnackBar(content: Text('ការស្នើសុំត្រូវបានបញ្ជូនដោយជោគជ័យ')),
           );
           _clearAllFields();
-           Provider.of<PersonalInfoProvider>(context,listen: false).getHome();
+          Provider.of<PersonalInfoProvider>(context, listen: false).getHome();
           context.pop();
         }
       } catch (e) {
@@ -156,13 +161,14 @@ class _CreateRelativeScreenState extends State<CreateRelativeScreen> {
         create: (_) => CreateRelativeProvider(),
         child: Consumer2<CreateRelativeProvider, SettingProvider>(
             builder: (context, createRelativeProvider, settingProvider, child) {
+          final lang = settingProvider.lang;
           final relativeTypes =
               _buildRelativeTypes(createRelativeProvider, settingProvider);
           return Scaffold(
             backgroundColor: Colors.white,
             appBar: AppBar(
-              title: Text(
-                  AppLang.translate(lang: 'kh', key: 'user_info_family_add')),
+              title: Text(AppLang.translate(
+                  lang: lang ?? 'kh', key: 'user_info_family_add')),
               centerTitle: true,
               actions: [
                 Padding(
@@ -179,32 +185,32 @@ class _CreateRelativeScreenState extends State<CreateRelativeScreen> {
               bottom: CustomHeader(),
             ),
             body: createRelativeProvider.isLoading
-                ? const Center(
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  SizedBox(
-                    height: 60,
-                    width: 60,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2.0,
+                ?  Center(
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        SizedBox(
+                          height: 60,
+                          width: 60,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2.0,
+                          ),
+                        ),
+                        Text(
+                          AppLang.translate(lang: lang??'kh',key: 'waiting'),
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                  Text(
-                    'សូមរងចាំ',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.black,
-                    ),
-                  ),
-                ],
-              ),
-            )
+                  )
                 : GestureDetector(
-                  onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-                  child: SafeArea(
-                    child: SingleChildScrollView(
+                    onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+                    child: SafeArea(
+                      child: SingleChildScrollView(
                         physics: const AlwaysScrollableScrollPhysics(),
                         padding: const EdgeInsets.all(16.0),
                         child: Form(
@@ -247,12 +253,13 @@ class _CreateRelativeScreenState extends State<CreateRelativeScreen> {
                                           key: 'male')),
                                       value: '1',
                                       groupValue: selectedGender,
-                                      onChanged: (value) =>
-                                          setState(() => selectedGender = value),
+                                      onChanged: (value) => setState(
+                                          () => selectedGender = value),
                                       activeColor:
                                           Theme.of(context).colorScheme.primary,
-                                      contentPadding: const EdgeInsets.symmetric(
-                                          horizontal: 8.0),
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                              horizontal: 8.0),
                                     ),
                                   ),
                                   Expanded(
@@ -262,12 +269,13 @@ class _CreateRelativeScreenState extends State<CreateRelativeScreen> {
                                           key: 'female')),
                                       value: '2',
                                       groupValue: selectedGender,
-                                      onChanged: (value) =>
-                                          setState(() => selectedGender = value),
+                                      onChanged: (value) => setState(
+                                          () => selectedGender = value),
                                       activeColor:
                                           Theme.of(context).colorScheme.primary,
-                                      contentPadding: const EdgeInsets.symmetric(
-                                          horizontal: 8.0),
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                              horizontal: 8.0),
                                     ),
                                   ),
                                 ],
@@ -316,7 +324,7 @@ class _CreateRelativeScreenState extends State<CreateRelativeScreen> {
                                 label: AppLang.translate(
                                     lang: settingProvider.lang ?? 'kh',
                                     key: 'user_info_date_of_birth'),
-                                hint: 'សូមជ្រើសរើសកាលបរិច្ឆេទ',
+                                hint: AppLang.translate(lang: lang??'kh',key: 'please select date'),
                                 initialDate: DateTime.now(),
                                 selectedDate: dob,
                                 onDateSelected: (date) {
@@ -355,7 +363,7 @@ class _CreateRelativeScreenState extends State<CreateRelativeScreen> {
                               //     });
                               //   },
                               // ),
-                                
+
                               // Name (Khmer)
                               buildTextField(
                                 context: context,
@@ -388,8 +396,8 @@ class _CreateRelativeScreenState extends State<CreateRelativeScreen> {
                           ),
                         ),
                       ),
+                    ),
                   ),
-                ),
             // bottomNavigationBar: // Submit Button
             //     Padding(
             //   padding: const EdgeInsets.all(15),

@@ -112,7 +112,7 @@ String formatStringValue(String? value) {
   return value;
 }
 
-String calculateDateDifference(String? startDatetime, String? endDatetime) {
+String calculateDateDifference(String? startDatetime, String? endDatetime,String? days) {
   // Check if either input is null or empty
   if (startDatetime == null ||
       startDatetime.isEmpty ||
@@ -131,7 +131,7 @@ String calculateDateDifference(String? startDatetime, String? endDatetime) {
         1; // +1 to include both start and end dates
 
     // Return the result as a string
-    return '$differenceInDays ថ្ងៃ'; // Days in Khmer
+    return '$differenceInDays $days'; // Days in Khmer
   } catch (e) {
     // Return N/A if parsing fails
     return 'N/A';

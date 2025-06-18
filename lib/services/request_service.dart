@@ -13,7 +13,7 @@ class RequestService {
     try {
       print(startDate);
       final response = await DioClient.dio.get(
-        "/user/home/request?limit=50&offset=0&start_date=$startDate&end_date=$endDate",
+        "/user/home/request?limit=1000&offset=0&start_date=$startDate&end_date=$endDate",
       );
 
       return ResponseStructure<

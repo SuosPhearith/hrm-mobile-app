@@ -126,7 +126,7 @@ class _CreateEducationScreenState extends State<CreateEducationScreen> {
             key: 'Are you sure to create'),
         DialogType.primary, () async {
       try {
-         await _service.createUserEducation(
+        await _service.createUserEducation(
           userId: widget.id ?? '',
           educationTypeId: selectedEducationTypeId!,
           educationLevelId: selectedEducationLevelId!,
@@ -144,7 +144,7 @@ class _CreateEducationScreenState extends State<CreateEducationScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('ការស្នើសុំត្រូវបានបញ្ជូនដោយជោគជ័យ')),
           );
-          Provider.of<PersonalInfoProvider>(context,listen: false).getHome();
+          Provider.of<PersonalInfoProvider>(context, listen: false).getHome();
           context.pop();
         }
       } catch (e) {
@@ -195,12 +195,12 @@ class _CreateEducationScreenState extends State<CreateEducationScreen> {
               apiData: createEducationProvider.data,
               dataKey: 'education_places',
               settingProvider: settingProvider);
-
+          final lang = settingProvider.lang;
           return Scaffold(
             backgroundColor: Colors.white,
             appBar: AppBar(
               title: Text(AppLang.translate(
-                  lang: 'kh', key: 'user_info_education_add')),
+                  lang: lang ?? 'kh', key: 'user_info_education_add')),
               centerTitle: true,
               bottom: CustomHeader(),
               actions: [
@@ -217,32 +217,32 @@ class _CreateEducationScreenState extends State<CreateEducationScreen> {
               ],
             ),
             body: createEducationProvider.isLoading
-                ? const Center(
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  SizedBox(
-                    height: 60,
-                    width: 60,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2.0,
+                ? Center(
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        SizedBox(
+                          height: 60,
+                          width: 60,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2.0,
+                          ),
+                        ),
+                        Text(
+                          AppLang.translate(lang: lang ?? 'kh', key: 'waiting'),
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                  Text(
-                    'សូមរងចាំ',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.black,
-                    ),
-                  ),
-                ],
-              ),
-            )
+                  )
                 : GestureDetector(
-                  onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-                  child: SafeArea(
-                    child: SingleChildScrollView(
+                    onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+                    child: SafeArea(
+                      child: SingleChildScrollView(
                         physics: const AlwaysScrollableScrollPhysics(),
                         padding: const EdgeInsets.all(15),
                         child: Form(
@@ -355,13 +355,17 @@ class _CreateEducationScreenState extends State<CreateEducationScreen> {
                                 },
                               ),
                               const SizedBox(height: 16),
-                                
+
                               Row(
                                 children: [
                                   Expanded(
                                     child: DateInputField(
-                                      label: 'ថ្ងៃចាប់ផ្តើម',
-                                      hint: 'សូមជ្រើសរើសកាលបរិច្ឆេទ',
+                                      label: AppLang.translate(
+                                          lang: lang ?? 'kh',
+                                          key: 'start_date'),
+                                      hint: AppLang.translate(
+                                          lang: lang ?? 'kh',
+                                          key: 'please select date'),
                                       initialDate: DateTime.now(),
                                       selectedDate: _startDate,
                                       onDateSelected: (date) {
@@ -376,8 +380,11 @@ class _CreateEducationScreenState extends State<CreateEducationScreen> {
                                   ),
                                   Expanded(
                                     child: DateInputField(
-                                      label: 'ថ្ងៃបញ្ចប់',
-                                      hint: 'សូមជ្រើសរើសកាលបរិច្ឆេទ',
+                                      label: AppLang.translate(
+                                          lang: lang ?? 'kh', key: 'end_date'),
+                                      hint: AppLang.translate(
+                                          lang: lang ?? 'kh',
+                                          key: 'please select date'),
                                       initialDate: DateTime.now(),
                                       selectedDate: _endDate,
                                       onDateSelected: (date) {
@@ -389,15 +396,15 @@ class _CreateEducationScreenState extends State<CreateEducationScreen> {
                                   ),
                                 ],
                               ),
-                                
+
                               // const SizedBox(
                               //     height: 30), // Extra space before button
                             ],
                           ),
                         ),
                       ),
+                    ),
                   ),
-                ),
             // bottomNavigationBar: Padding(
             //   padding: const EdgeInsets.all(15),
             //   child: SizedBox(

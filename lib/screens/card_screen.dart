@@ -22,10 +22,12 @@ class CardScreen extends StatelessWidget {
       create: (context) => HomeProvider(),
       child: Consumer<HomeProvider>(
         builder: (context, homeProvider, child) {
+          final lang =
+              Provider.of<SettingProvider>(context, listen: false).lang;
           return Scaffold(
             appBar: AppBar(
               title: Text(
-                "ប័ណ្ណសម្គាល់ខ្លួន",
+                AppLang.translate(lang: lang ?? 'kh', key: 'card'),
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
               ),
               centerTitle: true,
@@ -35,8 +37,14 @@ class CardScreen extends StatelessWidget {
                   padding: EdgeInsets.all(8),
                   child: IconButton(
                     onPressed: () {
-                      showConfirmDialog(context, 'កំពុងអភិវឌ្ឍន៍',
-                          'កំពុងអភិវឌ្ឍន៍', DialogType.primary, () {});
+                      showConfirmDialog(
+                          context,
+                          AppLang.translate(
+                              lang: lang ?? 'kh', key: 'developing'),
+                         AppLang.translate(
+                              lang: lang ?? 'kh', key: 'developing'),
+                          DialogType.primary,
+                          () {});
                     },
                     icon: Icon(
                       Icons.download_outlined,
@@ -294,6 +302,7 @@ class BackCardView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final lang = Provider.of<SettingProvider>(context, listen: false).lang;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
@@ -403,16 +412,23 @@ class BackCardView extends StatelessWidget {
                     ),
                     const SizedBox(width: 4),
                     Flexible(
+                      // Use Flexible to prevent overflow
                       child: Text(
-                        'វិមានរាជរដ្ឋាភិបាល, វិថីសុីសុវត្ថិ, វត្តភ្នំ, ភ្នំពេញ',
+                        AppLang.translate(
+                            lang: lang ?? 'kh',
+                            key:
+                                'Government Palace, Sisowath Street, Wat Phnom'),
                         style: const TextStyle(
+                          // color: Color(0xFF0F172A),
                           fontSize: 12,
+
                           fontWeight: FontWeight.w400,
                           height: 1.5,
                         ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                        textAlign: TextAlign.center,
+                        textAlign:
+                            TextAlign.center, // Center text within the Flexible
                       ),
                     ),
                   ],

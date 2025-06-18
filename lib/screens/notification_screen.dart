@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_app/app_lang.dart';
+import 'package:mobile_app/providers/global/setting_provider.dart';
 import 'package:mobile_app/shared/color/colors.dart';
 import 'package:mobile_app/widgets/custom_header.dart';
+import 'package:provider/provider.dart';
 
-class NotificationScreen extends StatelessWidget {
+class NotificationScreen extends StatefulWidget {
   const NotificationScreen({super.key});
 
+  @override
+  State<NotificationScreen> createState() => _NotificationScreenState();
+}
+
+class _NotificationScreenState extends State<NotificationScreen> {
   @override
   Widget build(BuildContext context) {
     // Sample data for notifications (to simulate read/unread states)
@@ -31,12 +39,12 @@ class NotificationScreen extends StatelessWidget {
       },
       // Add more as needed
     ];
-
+    final lang = Provider.of<SettingProvider>(context, listen: false).lang;
     return Scaffold(
       appBar: AppBar(
         scrolledUnderElevation: 0,
-        title: const Text(
-          'ការជូនដំណឹង',
+        title: Text(
+          AppLang.translate(lang: lang ?? 'kh', key: 'notification'),
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.w500,
@@ -57,10 +65,10 @@ class NotificationScreen extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 8),
         children: [
           // New Notifications Header
-          const Padding(
+          Padding(
             padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Text(
-              'ថ្មីៗ',
+              AppLang.translate(lang: lang ?? 'kh', key: 'recently'),
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
@@ -80,10 +88,10 @@ class NotificationScreen extends StatelessWidget {
                   ))
               .toList(),
           // Earlier Notifications Header
-          const Padding(
+          Padding(
             padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Text(
-              'មុនៗ',
+              AppLang.translate(lang: lang ?? 'kh', key: 'before'),
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,

@@ -571,9 +571,12 @@
 //   }
 // }
 import 'package:flutter/material.dart';
+import 'package:mobile_app/app_lang.dart';
+import 'package:mobile_app/providers/global/setting_provider.dart';
 import 'package:mobile_app/shared/color/colors.dart';
 import 'package:mobile_app/widgets/custom_header.dart';
 import 'package:mobile_app/widgets/helper.dart';
+import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class SalaryScreen extends StatefulWidget {
@@ -586,10 +589,11 @@ class SalaryScreen extends StatefulWidget {
 class _SalaryScreenState extends State<SalaryScreen> {
   @override
   Widget build(BuildContext context) {
+    final lang = Provider.of<SettingProvider>(context, listen: false).lang;
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          "ប្រាក់បៀវត្សរ៍",
+          AppLang.translate(lang: lang ?? 'kh', key: 'salary'),
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.w500,
@@ -641,6 +645,7 @@ class _SalaryCardState extends State<SalaryCard> {
   bool isHide = false;
   @override
   Widget build(BuildContext context) {
+    final lang = Provider.of<SettingProvider>(context, listen: false).lang;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
@@ -722,7 +727,7 @@ class _SalaryCardState extends State<SalaryCard> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  "ប្រាក់បៀវត្សរ៍ប្រចាំខែ",
+                  AppLang.translate(lang: lang ?? 'kh', key: 'month salary'),
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w500,
@@ -789,7 +794,10 @@ class _SalaryCardState extends State<SalaryCard> {
                     Flexible(
                       // Use Flexible to prevent overflow
                       child: Text(
-                        'វិមានរាជរដ្ឋាភិបាល, វិថីសុីសុវត្ថិ, វត្តភ្នំ, ភ្នំពេញ',
+                        AppLang.translate(
+                            lang: lang ?? 'kh',
+                            key:
+                                'Government Palace, Sisowath Street, Wat Phnom, Phnom Penh'),
                         style: const TextStyle(
                           // color: Color(0xFF0F172A),
                           fontSize: 12,

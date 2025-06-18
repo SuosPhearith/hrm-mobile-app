@@ -376,6 +376,7 @@ class _UpdateUserWorkScreenState extends State<UpdateUserWorkScreen> {
           //     apiData: provider.dataSetup,
           //     dataKey: 'staff_types',
           //     settingProvider: settingProvider);
+          final lang =settingProvider.lang;
           return Scaffold(
             backgroundColor: Colors.white,
             appBar: AppBar(
@@ -397,7 +398,7 @@ class _UpdateUserWorkScreenState extends State<UpdateUserWorkScreen> {
               bottom: CustomHeader(),
             ),
             body: provider.isLoading
-                ? const Center(
+                ?  Center(
               child: Stack(
                 alignment: Alignment.center,
                 children: [
@@ -409,7 +410,7 @@ class _UpdateUserWorkScreenState extends State<UpdateUserWorkScreen> {
                     ),
                   ),
                   Text(
-                    'សូមរងចាំ',
+                    AppLang.translate(lang: lang??'kh',key: 'waiting'),
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
@@ -607,8 +608,10 @@ class _UpdateUserWorkScreenState extends State<UpdateUserWorkScreen> {
                                 children: [
                                   Expanded(
                                     child: DateInputField(
-                                      label: 'ថ្ងៃចាប់ផ្តើម',
-                                      hint: 'សូមជ្រើសរើសកាលបរិច្ឆេទ',
+                                      label:AppLang.translate(
+                                        lang: lang ?? 'kh', key: 'start_date'),
+                                      hint: AppLang.translate(
+                                        lang: lang ?? 'kh', key: 'please select date'),
                                       initialDate: DateTime.now(),
                                       selectedDate: _startDate,
                                       onDateSelected: (date) {
@@ -623,8 +626,10 @@ class _UpdateUserWorkScreenState extends State<UpdateUserWorkScreen> {
                                   ),
                                   Expanded(
                                     child: DateInputField(
-                                      label: 'ថ្ងៃបញ្ចប់',
-                                      hint: 'សូមជ្រើសរើសកាលបរិច្ឆេទ',
+                                      label: AppLang.translate(
+                                        lang: lang ?? 'kh', key: 'end_date'),
+                                      hint: AppLang.translate(
+                                        lang: lang ?? 'kh', key: 'please select date'),
                                       initialDate: DateTime.now(),
                                       selectedDate: _endDate,
                                       onDateSelected: (date) {

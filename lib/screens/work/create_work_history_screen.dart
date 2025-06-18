@@ -167,7 +167,7 @@ class _CreateWorkHistoryScreenState extends State<CreateWorkHistoryScreen> {
               apiData: provider.dataSetup,
               dataKey: 'positions',
               settingProvider: settingProvider);
-
+          final lang = settingProvider.lang;
           return Scaffold(
             backgroundColor: Colors.white,
 
@@ -192,7 +192,7 @@ class _CreateWorkHistoryScreenState extends State<CreateWorkHistoryScreen> {
               ],
             ),
             body: provider.isLoading
-                ? const Center(
+                ?Center(
               child: Stack(
                 alignment: Alignment.center,
                 children: [
@@ -204,7 +204,8 @@ class _CreateWorkHistoryScreenState extends State<CreateWorkHistoryScreen> {
                     ),
                   ),
                   Text(
-                    'សូមរងចាំ',
+                    AppLang.translate(
+                                        lang: lang ?? 'kh', key: 'waiting'),
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
@@ -348,8 +349,10 @@ class _CreateWorkHistoryScreenState extends State<CreateWorkHistoryScreen> {
                                 children: [
                                   Expanded(
                                     child: DateInputField(
-                                      label: 'ថ្ងៃចាប់ផ្តើម',
-                                      hint: 'សូមជ្រើសរើសកាលបរិច្ឆេទ',
+                                      label:AppLang.translate(
+                                        lang: lang ?? 'kh', key: 'start_date'),
+                                      hint: AppLang.translate(
+                                        lang: lang ?? 'kh', key: 'please select date'),
                                       initialDate: DateTime.now(),
                                       selectedDate: _startDate,
                                       onDateSelected: (date) {
@@ -364,8 +367,10 @@ class _CreateWorkHistoryScreenState extends State<CreateWorkHistoryScreen> {
                                   ),
                                   Expanded(
                                     child: DateInputField(
-                                      label: 'ថ្ងៃបញ្ចប់',
-                                      hint: 'សូមជ្រើសរើសកាលបរិច្ឆេទ',
+                                      label: AppLang.translate(
+                                        lang: lang ?? 'kh', key: 'end_date'),
+                                      hint: AppLang.translate(
+                                        lang: lang ?? 'kh', key: 'please select date'),
                                       initialDate: DateTime.now(),
                                       selectedDate: _endDate,
                                       onDateSelected: (date) {

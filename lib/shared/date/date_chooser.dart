@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_app/app_lang.dart';
+import 'package:mobile_app/providers/global/setting_provider.dart';
 import 'package:mobile_app/shared/color/colors.dart';
+import 'package:provider/provider.dart';
 
 class MonthYearPickerContent extends StatefulWidget {
   final int initialYear;
@@ -20,20 +23,56 @@ class MonthYearPickerContent extends StatefulWidget {
 class _MonthYearPickerContentState extends State<MonthYearPickerContent> {
   late int year;
   late int selectedMonth;
-  final List<String> khmerMonths = [
-    'មករា',
-    'កុម្ភៈ',
-    'មិនា',
-    'មេសា',
-    'ឧសភា',
-    'មិថុនា',
-    'កក្កដា',
-    'សីហា',
-    'កញ្ញា',
-    'តុលា',
-    'វិច្ឆិកា',
-    'ធ្នូ',
+   // Static month names
+  static const List<String> khmerMonths = [
+    'មករា',      // January
+    'កុម្ភៈ',     // February
+    'មីនា',      // March (fixed typo: was 'មិនា')
+    'មេសា',      // April
+    'ឧសភា',      // May
+    'មិថុនា',     // June
+    'កក្កដា',     // July
+    'សីហា',      // August
+    'កញ្ញា',      // September
+    'តុលា',      // October
+    'វិច្ឆិកា',    // November
+    'ធ្នូ',       // December
   ];
+
+  static const List<String> englishMonths = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
+  ];
+
+  // Helper method to get month name based on language
+  String getMonthName(int monthIndex) {
+    if (monthIndex < 0 || monthIndex > 11) return '';
+    
+    if (Provider.of<SettingProvider>(context,listen: false).lang == 'en') {
+      return englishMonths[monthIndex];
+    } else {
+      return khmerMonths[monthIndex];
+    }
+  }
+
+  // Helper method to get all month names for the current language
+  List<String> getMonthNames() {
+    if (Provider.of<SettingProvider>(context,listen: false).lang == 'en') {
+      return englishMonths;
+    } else {
+      return khmerMonths;
+    }
+  }
 
   @override
   void initState() {
@@ -42,8 +81,11 @@ class _MonthYearPickerContentState extends State<MonthYearPickerContent> {
     selectedMonth = widget.selectedMonth;
   }
 
+
   @override
   Widget build(BuildContext context) {
+     final monthNames = getMonthNames();
+     final lang = Provider.of<SettingProvider>(context,listen: false).lang;
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 24, 16, 32),
@@ -71,7 +113,7 @@ class _MonthYearPickerContentState extends State<MonthYearPickerContent> {
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
-                          fontFamily: 'Kantumruy Pro',
+                          fontFamily: 'KantumruyPro',
                         ),
                       ),
                       Icon(Icons.arrow_drop_down),
@@ -109,10 +151,10 @@ class _MonthYearPickerContentState extends State<MonthYearPickerContent> {
                       borderRadius: BorderRadius.circular(24),
                     ),
                     child: Text(
-                      khmerMonths[index],
+                      monthNames[index],
                       style: TextStyle(
                         fontSize: 16,
-                        fontFamily: 'Kantumruy Pro',
+                        fontFamily: 'KantumruyPro',
                         color: isSelected ? Colors.white : Colors.black,
                       ),
                     ),
@@ -133,7 +175,7 @@ class _MonthYearPickerContentState extends State<MonthYearPickerContent> {
                     ),
                     onPressed: () => Navigator.pop(context),
                     child: Text(
-                      "បិត",
+                      AppLang.translate(lang: lang??'kh',key:'close'),
                       style: TextStyle(fontSize: 12, color: Colors.black),
                     ),
                   ),
@@ -150,7 +192,7 @@ class _MonthYearPickerContentState extends State<MonthYearPickerContent> {
                       Navigator.pop(context);
                     },
                     child: Text(
-                      "យល់ព្រម",
+                     AppLang.translate(lang: lang??'kh',key:'confirm'),
                       style: TextStyle(fontSize: 12, color: Colors.white),
                     ),
                   ),

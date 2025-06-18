@@ -78,6 +78,7 @@ class _WorkScreenState extends State<WorkScreen> {
     return Consumer2<WorkProvider, SettingProvider>(
       builder: (context, provider, settingProvider, child) {
         final user = provider.data?.data['user'];
+        final lang = settingProvider.lang;
         return Scaffold(
           backgroundColor: Colors.white,
           appBar: AppBar(
@@ -93,27 +94,27 @@ class _WorkScreenState extends State<WorkScreen> {
             onRefresh: () => _refreshData(provider),
             child: provider.isLoading
                 ? Center(
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  SizedBox(
-                    height: 60,
-                    width: 60,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2.0,
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        SizedBox(
+                          height: 60,
+                          width: 60,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2.0,
+                          ),
+                        ),
+                        Text(
+                          AppLang.translate(lang: lang ?? 'kh', key: 'waiting'),
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                  Text(
-                    'សូមរងចាំ',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.black,
-                    ),
-                  ),
-                ],
-              ),
-            )
+                  )
                 : SafeArea(
                     child: SingleChildScrollView(
                         physics: const AlwaysScrollableScrollPhysics(),
@@ -392,7 +393,7 @@ class _WorkScreenState extends State<WorkScreen> {
                                     {
                                       'icon': Icons.star_outline,
                                       'description':
-                                          "ឋានៈស្មើ ${AppLang.translate(data: record['rank_position'], lang: settingProvider.lang ?? 'kh')}",
+                                          "${AppLang.translate(key: 'rank_position', lang: settingProvider.lang ?? 'kh')} ${AppLang.translate(data: record['rank_position'], lang: settingProvider.lang ?? 'kh')}",
                                     },
                                     {
                                       'icon': Icons.calendar_month_outlined,

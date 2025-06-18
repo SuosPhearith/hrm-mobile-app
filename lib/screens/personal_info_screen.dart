@@ -100,6 +100,7 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
     return Consumer2<PersonalInfoProvider, SettingProvider>(
       builder: (context, provider, settingProvider, child) {
         final user = provider.data?.data['user'];
+        final lang = settingProvider.lang;
         return Scaffold(
           backgroundColor: Colors.white,
           appBar: AppBar(
@@ -116,297 +117,303 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
             onRefresh: () => _refreshData(provider),
             child: provider.isLoading
                 ? Center(
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  SizedBox(
-                    height: 60,
-                    width: 60,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2.0,
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        SizedBox(
+                          height: 60,
+                          width: 60,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2.0,
+                          ),
+                        ),
+                        Text(
+                          AppLang.translate(
+                              lang: lang ?? 'kh', key: 'waiting'),
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                  Text(
-                    'សូមរងចាំ',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.black,
-                    ),
-                  ),
-                ],
-              ),
-            )
+                  )
                 : SafeArea(
-                  child: SingleChildScrollView(
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(
-                          children: [
-                            buildContainer(
-                              text: 'រូបភាព',
-                              // onEditTap: () => {},
-                            ),
-                            Container(
-                              padding: EdgeInsets.all(16.0),
-                              child: CircleAvatar(
-                                radius: 50.0,
-                                backgroundColor: Colors.blue,
+                    child: SingleChildScrollView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            children: [
+                              buildContainer(
+                                text: AppLang.translate(
+                            lang: lang ?? 'kh', key: 'image'),
+                                // onEditTap: () => {},
+                              ),
+                              Container(
+                                padding: EdgeInsets.all(16.0),
                                 child: CircleAvatar(
-                                  radius: 48.0,
-                                  backgroundImage: NetworkImage(
-                                      '${user?['avatar']?['file_domain']}${user?['avatar']?['uri']}'),
+                                  radius: 50.0,
+                                  backgroundColor: Colors.blue,
+                                  child: CircleAvatar(
+                                    radius: 48.0,
+                                    backgroundImage: NetworkImage(
+                                        '${user?['avatar']?['file_domain']}${user?['avatar']?['uri']}'),
+                                  ),
                                 ),
                               ),
-                            ),
-                            buildContainer(
-                              text: AppLang.translate(
-                                  key: 'user_info_personal_info',
-                                  lang: settingProvider.lang ?? 'kh'),
-                              onEditTap: () => {
-                                context
-                                    .push('/update-personal-info/${user['id']}'),
-                              },
-                            ),
-                            buildProfileContainer(
-                              name:
-                                  '${AppLang.translate(data: user?['salute'], lang: settingProvider.lang ?? 'kh')} ${getSafeString(value: user?['name_kh'])}\n(${getSafeString(value: user?['name_en'])})',
-                              description: AppLang.translate(
-                                  key: 'user_info_name',
-                                  lang: settingProvider.lang ?? 'kh'),
-                              icon: Icons.person,
-                            ),
-                            buildProfileContainer(
-                              name: AppLang.translate(
-                                  data: user?['sex'],
-                                  lang: settingProvider.lang ?? 'kh'),
-                              description: AppLang.translate(
-                                  key: 'user_info_sex',
-                                  lang: settingProvider.lang ?? 'kh'),
-                              icon: Icons.transgender,
-                            ),
-                            buildProfileContainer(
-                              name: getSafeString(value: user?['phone_number']),
-                              description: AppLang.translate(
-                                  key: 'user_info_phone',
-                                  lang: settingProvider.lang ?? 'kh'),
-                              icon: Icons.phone_iphone,
-                            ),
-                            buildProfileContainer(
-                              name: getSafeString(value: user?['email']),
-                              description: AppLang.translate(
-                                  key: 'user_info_email',
-                                  lang: settingProvider.lang ?? 'kh'),
-                              icon: Icons.email,
-                            ),
-                            buildProfileContainer(
-                              name: getSafeString(
-                                  value: user?['identity_card_number']),
-                              description: AppLang.translate(
-                                  key: 'user_info_card_id',
-                                  lang: settingProvider.lang ?? 'kh'),
-                              icon: Icons.fingerprint,
-                            ),
-                            buildProfileContainer(
-                              name:
-                                  getSafeString(value: formatDate(user?['dob'])),
-                              description: AppLang.translate(
-                                  key: 'user_info_date_of_birth',
-                                  lang: settingProvider.lang ?? 'kh'),
-                              icon: Icons.calendar_today,
-                            ),
-                            buildProfileContainer(
-                              name:
-                                  '${AppLang.translate(data: user?['village'], lang: settingProvider.lang ?? 'kh')} ${AppLang.translate(data: user?['commune'], lang: settingProvider.lang ?? 'kh')} ${AppLang.translate(data: user?['district'], lang: settingProvider.lang ?? 'kh')} ${AppLang.translate(data: user?['province'], lang: settingProvider.lang ?? 'kh')}',
-                              description: AppLang.translate(
-                                  key: 'user_info_place_of_birth',
-                                  lang: settingProvider.lang ?? 'kh'),
-                              icon: Icons.location_on,
-                            ),
-                            buildProfileContainer(
-                              name:
-                                  '${AppLang.translate(data: user?['pob_village'], lang: settingProvider.lang ?? 'kh')} ${AppLang.translate(data: user?['pob_commune'], lang: settingProvider.lang ?? 'kh')} ${AppLang.translate(data: user?['pob_district'], lang: settingProvider.lang ?? 'kh')} ${AppLang.translate(data: user?['pob_province'], lang: settingProvider.lang ?? 'kh')}',
-                              description: AppLang.translate(
-                                  key: 'user_info_current_address',
-                                  lang: settingProvider.lang ?? 'kh'),
-                              icon: Icons.location_on,
-                            ),
-                            buildContainer(
-                              text: AppLang.translate(
-                                  key: 'user_info_family',
-                                  lang: settingProvider.lang ?? 'kh'),
-                            ),
-                            buildIconTextContainer(
-                              text: AppLang.translate(
-                                  key: 'user_info_family_add',
-                                  lang: settingProvider.lang ?? 'kh'),
-                              icon: Icons.group,
-                              onEditTap: () {
-                                context
-                                    .push('/create-user-relative/${user['id']}');
-                              },
-                            ),
-                  
-                            ...(user?['relatives'] != null
-                                    ? user['relatives'] as List
-                                    : [])
-                                .map((record) {
-                              return buildProfileContainerAction1(
-                                name:
-                                    '${getSafeString(value: record?['name_kh'])} (${getSafeString(value: record?['name_en'])})',
-                                descriptionItems: [
-                                  {
-                                    'icon': Icons.cake_outlined,
-                                    'description': formatDate(record['dob']),
-                                  },
-                                  {
-                                    'icon': Icons.work_outline,
-                                    'description':
-                                        getSafeString(value: record?['job']),
-                                  },
-                                  {
-                                    'icon': Icons.place_outlined,
-                                    'description': getSafeString(
-                                        value: record?['work_place']),
-                                  },
-                                ],
-                                icon: Icons.person,
-                                onDelete: () =>
-                                    _deleteRelative(record['id'], provider),
-                                onUpdated: () {
-                                  context.push(
-                                      '/update-relative/${user['id']}/${record['id']}');
-                                },
-                              );
-                            }),
-                            buildContainer(
-                              text: 'ការសិក្សា',
-                            ),
-                            buildIconTextContainer(
-                              text: AppLang.translate(
-                                  lang: settingProvider.lang ?? 'kh',
-                                  key: 'user_info_education_add'),
-                              icon: Icons.group,
-                              onEditTap: () {
-                                context.push('/create-education/${user['id']}');
-                              },
-                            ),
-                  
-                            ...(user?['user_educations'] != null
-                                    ? user['user_educations'] as List
-                                    : [])
-                                .map((record) {
-                              return buildProfileContainerAction1(
-                                name:
-                                    "${AppLang.translate(data: record['education_type'], lang: settingProvider.lang ?? 'kh')} - ${AppLang.translate(data: record['education_level'], lang: settingProvider.lang ?? 'kh')}",
-                                descriptionItems: [
-                                  {
-                                    'icon': Icons.apartment_rounded,
-                                    'description': AppLang.translate(
-                                        data: record['school'],
-                                        lang: settingProvider.lang ?? 'kh'),
-                                  },
-                                  {
-                                    'icon': Icons.place_outlined,
-                                    'description': AppLang.translate(
-                                        data: record['education_place'],
-                                        lang: settingProvider.lang ?? 'kh'),
-                                  },
-                                  {
-                                    'icon': Icons.school_outlined,
-                                    'description': AppLang.translate(
-                                        data: record['major'],
-                                        lang: settingProvider.lang ?? 'kh'),
-                                  },
-                                  {
-                                    'icon': Icons.date_range_outlined,
-                                    'description':
-                                        "${formatDate(record['study_at'])} | ${formatDate(record['graduate_at'])}",
-                                  },
-                                ],
-                                icon: Icons.person,
-                                onDelete: () => _deleteEducation(
-                                    record['id'], user['id'], provider),
-                                onUpdated: () {
-                                  context.push(
-                                      '/update-education/${user['id']}/${record['id']}');
-                                },
-                              );
-                            }),
-                  
-                            //Language
-                            buildContainer(
-                              text: AppLang.translate(
-                                  lang: settingProvider.lang ?? 'kh',
-                                  key: 'user_info_language'),
-                            ),
-                            buildIconTextContainer(
-                              text: AppLang.translate(
-                                  key: 'user_info_language_add',
-                                  lang: settingProvider.lang ?? 'kh'),
-                              icon: Icons.translate,
-                              onEditTap: () {
-                                context
-                                    .push('/create-langauge-level/${user['id']}');
-                              },
-                            ),
-                  
-                            ...(user?['user_languages'] != null
-                                    ? user['user_languages'] as List
-                                    : [])
-                                .map((record) {
-                              return buildProfileContainerAction1(
-                                name: AppLang.translate(
-                                    data: record['language'],
+                              buildContainer(
+                                text: AppLang.translate(
+                                    key: 'user_info_personal_info',
                                     lang: settingProvider.lang ?? 'kh'),
-                                descriptionItems: [
-                                  {
-                                    'icon': Icons.mic_outlined,
-                                    'description': AppLang.translate(
-                                        data: record['speaking_level'],
-                                        lang: settingProvider.lang ?? 'kh'),
-                                  },
-                                  {
-                                    'icon': Icons.edit_outlined,
-                                    'description': AppLang.translate(
-                                        data: record['writing_level'],
-                                        lang: settingProvider.lang ?? 'kh'),
-                                  },
-                                  {
-                                    'icon': Icons.book_outlined,
-                                    'description': AppLang.translate(
-                                        data: record['reading_level'],
-                                        lang: settingProvider.lang ?? 'kh'),
-                                  },
-                                  {
-                                    'icon': Icons.hearing_outlined,
-                                    'description': AppLang.translate(
-                                        data: record['listening_level'],
-                                        lang: settingProvider.lang ?? 'kh'),
-                                  },
-                                ],
-                                icon: Icons.flag_outlined,
-                                onDelete: () => _deleteLanuageLevel(
-                                    record['id'], user['id'], provider),
-                                onUpdated: () {
+                                onEditTap: () => {
                                   context.push(
-                                      '/update-langauge-level/${user['id']}/${record['id']}');
+                                      '/update-personal-info/${user['id']}'),
                                 },
-                              );
-                            }),
-                            // buildProfileContainerAction(
-                            //   name: 'ឃួច ទីទ្ធ (khouch tith)',
-                            //   description:
-                            //       '01-01-1965 (60 ឆ្នាំ) • នារីជនជាតិខ្មែរ • សញ្ញាតិ ABA\nភេទ: ស្ត្រី',
-                            //   icon: Icons.person,
-                            // ),
-                            SizedBox(
-                                height: MediaQuery.of(context).size.height * 0.1),
-                          ],
-                        ),
-                      )),
-                ),
+                              ),
+                              buildProfileContainer(
+                                name:
+                                    '${AppLang.translate(data: user?['salute'], lang: settingProvider.lang ?? 'kh')} ${getSafeString(value: user?['name_kh'])}\n(${getSafeString(value: user?['name_en'])})',
+                                description: AppLang.translate(
+                                    key: 'user_info_name',
+                                    lang: settingProvider.lang ?? 'kh'),
+                                icon: Icons.person,
+                              ),
+                              buildProfileContainer(
+                                name: AppLang.translate(
+                                    data: user?['sex'],
+                                    lang: settingProvider.lang ?? 'kh'),
+                                description: AppLang.translate(
+                                    key: 'user_info_sex',
+                                    lang: settingProvider.lang ?? 'kh'),
+                                icon: Icons.transgender,
+                              ),
+                              buildProfileContainer(
+                                name:
+                                    getSafeString(value: user?['phone_number']),
+                                description: AppLang.translate(
+                                    key: 'user_info_phone',
+                                    lang: settingProvider.lang ?? 'kh'),
+                                icon: Icons.phone_iphone,
+                              ),
+                              buildProfileContainer(
+                                name: getSafeString(value: user?['email']),
+                                description: AppLang.translate(
+                                    key: 'user_info_email',
+                                    lang: settingProvider.lang ?? 'kh'),
+                                icon: Icons.email,
+                              ),
+                              buildProfileContainer(
+                                name: getSafeString(
+                                    value: user?['identity_card_number']),
+                                description: AppLang.translate(
+                                    key: 'user_info_card_id',
+                                    lang: settingProvider.lang ?? 'kh'),
+                                icon: Icons.fingerprint,
+                              ),
+                              buildProfileContainer(
+                                name: getSafeString(
+                                    value: formatDate(user?['dob'])),
+                                description: AppLang.translate(
+                                    key: 'user_info_date_of_birth',
+                                    lang: settingProvider.lang ?? 'kh'),
+                                icon: Icons.calendar_today,
+                              ),
+                              buildProfileContainer(
+                                name:
+                                    '${AppLang.translate(data: user?['village'], lang: settingProvider.lang ?? 'kh')} ${AppLang.translate(data: user?['commune'], lang: settingProvider.lang ?? 'kh')} ${AppLang.translate(data: user?['district'], lang: settingProvider.lang ?? 'kh')} ${AppLang.translate(data: user?['province'], lang: settingProvider.lang ?? 'kh')}',
+                                description: AppLang.translate(
+                                    key: 'user_info_place_of_birth',
+                                    lang: settingProvider.lang ?? 'kh'),
+                                icon: Icons.location_on,
+                              ),
+                              buildProfileContainer(
+                                name:
+                                    '${AppLang.translate(data: user?['pob_village'], lang: settingProvider.lang ?? 'kh')} ${AppLang.translate(data: user?['pob_commune'], lang: settingProvider.lang ?? 'kh')} ${AppLang.translate(data: user?['pob_district'], lang: settingProvider.lang ?? 'kh')} ${AppLang.translate(data: user?['pob_province'], lang: settingProvider.lang ?? 'kh')}',
+                                description: AppLang.translate(
+                                    key: 'user_info_current_address',
+                                    lang: settingProvider.lang ?? 'kh'),
+                                icon: Icons.location_on,
+                              ),
+                              buildContainer(
+                                text: AppLang.translate(
+                                    key: 'user_info_family',
+                                    lang: settingProvider.lang ?? 'kh'),
+                              ),
+                              buildIconTextContainer(
+                                text: AppLang.translate(
+                                    key: 'user_info_family_add',
+                                    lang: settingProvider.lang ?? 'kh'),
+                                icon: Icons.group,
+                                onEditTap: () {
+                                  context.push(
+                                      '/create-user-relative/${user['id']}');
+                                },
+                              ),
+
+                              ...(user?['relatives'] != null
+                                      ? user['relatives'] as List
+                                      : [])
+                                  .map((record) {
+                                return buildProfileContainerAction1(
+                                  name:
+                                      '${getSafeString(value: record?['name_kh'])} (${getSafeString(value: record?['name_en'])})',
+                                  descriptionItems: [
+                                    {
+                                      'icon': Icons.cake_outlined,
+                                      'description': formatDate(record['dob']),
+                                    },
+                                    {
+                                      'icon': Icons.work_outline,
+                                      'description':
+                                          getSafeString(value: record?['job']),
+                                    },
+                                    {
+                                      'icon': Icons.place_outlined,
+                                      'description': getSafeString(
+                                          value: record?['work_place']),
+                                    },
+                                  ],
+                                  icon: Icons.person,
+                                  onDelete: () =>
+                                      _deleteRelative(record['id'], provider),
+                                  onUpdated: () {
+                                    context.push(
+                                        '/update-relative/${user['id']}/${record['id']}');
+                                  },
+                                );
+                              }),
+                              buildContainer(
+                                text: AppLang.translate(
+                            lang: lang ?? 'kh', key: 'education'),
+                              ),
+                              buildIconTextContainer(
+                                text: AppLang.translate(
+                                    lang: settingProvider.lang ?? 'kh',
+                                    key: 'user_info_education_add'),
+                                icon: Icons.group,
+                                onEditTap: () {
+                                  context
+                                      .push('/create-education/${user['id']}');
+                                },
+                              ),
+
+                              ...(user?['user_educations'] != null
+                                      ? user['user_educations'] as List
+                                      : [])
+                                  .map((record) {
+                                return buildProfileContainerAction1(
+                                  name:
+                                      "${AppLang.translate(data: record['education_type'], lang: settingProvider.lang ?? 'kh')} - ${AppLang.translate(data: record['education_level'], lang: settingProvider.lang ?? 'kh')}",
+                                  descriptionItems: [
+                                    {
+                                      'icon': Icons.apartment_rounded,
+                                      'description': AppLang.translate(
+                                          data: record['school'],
+                                          lang: settingProvider.lang ?? 'kh'),
+                                    },
+                                    {
+                                      'icon': Icons.place_outlined,
+                                      'description': AppLang.translate(
+                                          data: record['education_place'],
+                                          lang: settingProvider.lang ?? 'kh'),
+                                    },
+                                    {
+                                      'icon': Icons.school_outlined,
+                                      'description': AppLang.translate(
+                                          data: record['major'],
+                                          lang: settingProvider.lang ?? 'kh'),
+                                    },
+                                    {
+                                      'icon': Icons.date_range_outlined,
+                                      'description':
+                                          "${formatDate(record['study_at'])} | ${formatDate(record['graduate_at'])}",
+                                    },
+                                  ],
+                                  icon: Icons.person,
+                                  onDelete: () => _deleteEducation(
+                                      record['id'], user['id'], provider),
+                                  onUpdated: () {
+                                    context.push(
+                                        '/update-education/${user['id']}/${record['id']}');
+                                  },
+                                );
+                              }),
+
+                              //Language
+                              buildContainer(
+                                text: AppLang.translate(
+                                    lang: settingProvider.lang ?? 'kh',
+                                    key: 'user_info_language'),
+                              ),
+                              buildIconTextContainer(
+                                text: AppLang.translate(
+                                    key: 'user_info_language_add',
+                                    lang: settingProvider.lang ?? 'kh'),
+                                icon: Icons.translate,
+                                onEditTap: () {
+                                  context.push(
+                                      '/create-langauge-level/${user['id']}');
+                                },
+                              ),
+
+                              ...(user?['user_languages'] != null
+                                      ? user['user_languages'] as List
+                                      : [])
+                                  .map((record) {
+                                return buildProfileContainerAction1(
+                                  name: AppLang.translate(
+                                      data: record['language'],
+                                      lang: settingProvider.lang ?? 'kh'),
+                                  descriptionItems: [
+                                    {
+                                      'icon': Icons.mic_outlined,
+                                      'description': AppLang.translate(
+                                          data: record['speaking_level'],
+                                          lang: settingProvider.lang ?? 'kh'),
+                                    },
+                                    {
+                                      'icon': Icons.edit_outlined,
+                                      'description': AppLang.translate(
+                                          data: record['writing_level'],
+                                          lang: settingProvider.lang ?? 'kh'),
+                                    },
+                                    {
+                                      'icon': Icons.book_outlined,
+                                      'description': AppLang.translate(
+                                          data: record['reading_level'],
+                                          lang: settingProvider.lang ?? 'kh'),
+                                    },
+                                    {
+                                      'icon': Icons.hearing_outlined,
+                                      'description': AppLang.translate(
+                                          data: record['listening_level'],
+                                          lang: settingProvider.lang ?? 'kh'),
+                                    },
+                                  ],
+                                  icon: Icons.flag_outlined,
+                                  onDelete: () => _deleteLanuageLevel(
+                                      record['id'], user['id'], provider),
+                                  onUpdated: () {
+                                    context.push(
+                                        '/update-langauge-level/${user['id']}/${record['id']}');
+                                  },
+                                );
+                              }),
+                              // buildProfileContainerAction(
+                              //   name: 'ឃួច ទីទ្ធ (khouch tith)',
+                              //   description:
+                              //       '01-01-1965 (60 ឆ្នាំ) • នារីជនជាតិខ្មែរ • សញ្ញាតិ ABA\nភេទ: ស្ត្រី',
+                              //   icon: Icons.person,
+                              // ),
+                              SizedBox(
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.1),
+                            ],
+                          ),
+                        )),
+                  ),
           ),
         );
       },
@@ -465,7 +472,7 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
           // Only show edit icon if onEditTap is provided
           if (onEditTap != null)
             IconButton(
-              onPressed: (){
+              onPressed: () {
                 setState(() {
                   onEditTap();
                   // print("hello");

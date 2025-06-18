@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:mobile_app/app_lang.dart';
+import 'package:mobile_app/providers/global/setting_provider.dart';
 import 'package:mobile_app/providers/local/holiday_provider.dart';
 import 'package:mobile_app/shared/color/colors.dart';
 import 'package:mobile_app/widgets/custom_header.dart';
@@ -44,11 +46,12 @@ class _HolidayScreenState extends State<HolidayScreen> {
   @override
   Widget build(BuildContext context) {
     return Consumer<HolidayProvider>(builder: (context, provider, child) {
+      final lang = Provider.of<SettingProvider>(context, listen: false).lang;
       return Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.white,
-          title: const Text(
-            'ឈប់សម្រាក',
+          title: Text(
+            AppLang.translate(lang: lang ?? 'kh', key: 'home_holiday'),
             style: TextStyle(
               fontWeight: FontWeight.w500,
               color: Colors.black,
@@ -59,16 +62,17 @@ class _HolidayScreenState extends State<HolidayScreen> {
           bottom: CustomHeader(),
         ),
         body: provider.isLoading
-            ?HolidayScreenSkeleton()
+            ? HolidayScreenSkeleton()
             : SafeArea(
-              child: Column(
+                child: Column(
                   children: [
                     TableCalendar(
                       firstDay: DateTime.utc(2025, 1, 1),
                       lastDay: DateTime.utc(2025, 12, 31),
                       focusedDay: _focusedDay,
                       calendarFormat: calendarFormat,
-                      selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+                      selectedDayPredicate: (day) =>
+                          isSameDay(_selectedDay, day),
                       onDaySelected: (selectedDay, focusedDay) {
                         setState(() {
                           _selectedDay = selectedDay;
@@ -84,7 +88,7 @@ class _HolidayScreenState extends State<HolidayScreen> {
                       availableCalendarFormats: const {
                         CalendarFormat.month: 'Month',
                       },
-              
+
                       // Enhanced Header Styling
                       headerStyle: HeaderStyle(
                         formatButtonVisible: false,
@@ -99,7 +103,8 @@ class _HolidayScreenState extends State<HolidayScreen> {
                           color: Colors.grey.shade700,
                           size: 28,
                         ),
-                        headerPadding: const EdgeInsets.symmetric(vertical: 16.0),
+                        headerPadding:
+                            const EdgeInsets.symmetric(vertical: 16.0),
                         titleTextStyle: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.w600,
@@ -107,13 +112,13 @@ class _HolidayScreenState extends State<HolidayScreen> {
                           letterSpacing: 0.5,
                         ),
                       ),
-              
+
                       // Professional Calendar Styling
                       calendarStyle: CalendarStyle(
                         // Remove default borders and padding
                         cellMargin: const EdgeInsets.all(2.0),
                         cellPadding: const EdgeInsets.all(0),
-              
+
                         // Today's date styling
                         todayDecoration: BoxDecoration(
                           color: Colors.blue.shade50,
@@ -128,7 +133,7 @@ class _HolidayScreenState extends State<HolidayScreen> {
                           fontWeight: FontWeight.w600,
                           fontSize: 16,
                         ),
-              
+
                         // Selected day styling
                         selectedDecoration: BoxDecoration(
                           color: Colors.blue.shade600,
@@ -146,33 +151,34 @@ class _HolidayScreenState extends State<HolidayScreen> {
                           fontWeight: FontWeight.w600,
                           fontSize: 16,
                         ),
-              
+
                         // Weekend styling
                         weekendTextStyle: TextStyle(
                           color: Colors.grey.shade600,
                           fontSize: 16,
                         ),
-              
+
                         // Default day styling
                         defaultTextStyle: TextStyle(
                           color: Colors.grey.shade800,
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
                         ),
-              
+
                         // Outside month days
                         outsideDaysVisible: false,
-              
+
                         // Holiday styling (will be overridden by custom builder)
                         holidayTextStyle: const TextStyle(
                           color: Colors.red,
                           fontWeight: FontWeight.w500,
                         ),
-              
+
                         // Header styling for days of week
-                        tablePadding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        tablePadding:
+                            const EdgeInsets.symmetric(horizontal: 8.0),
                       ),
-              
+
                       // Days of week styling
                       daysOfWeekStyle: DaysOfWeekStyle(
                         weekdayStyle: TextStyle(
@@ -186,20 +192,21 @@ class _HolidayScreenState extends State<HolidayScreen> {
                           fontSize: 14,
                         ),
                       ),
-              
+
                       // Holiday predicate
                       holidayPredicate: (day) {
                         return parseHolidaysFromApi(provider.data['data'])
-                            .containsKey(DateTime(day.year, day.month, day.day));
+                            .containsKey(
+                                DateTime(day.year, day.month, day.day));
                       },
-              
+
                       // Custom builders for enhanced styling
                       calendarBuilders: CalendarBuilders(
                         // Holiday builder with professional styling
                         holidayBuilder: (context, day, focusedDay) {
                           final isSelected = isSameDay(_selectedDay, day);
                           final isToday = isSameDay(DateTime.now(), day);
-              
+
                           return Container(
                             margin: const EdgeInsets.all(2.0),
                             decoration: BoxDecoration(
@@ -237,7 +244,7 @@ class _HolidayScreenState extends State<HolidayScreen> {
                             ),
                           );
                         },
-              
+
                         // Default day builder for consistent styling
                         defaultBuilder: (context, day, focusedDay) {
                           return Container(
@@ -258,7 +265,7 @@ class _HolidayScreenState extends State<HolidayScreen> {
                             ),
                           );
                         },
-              
+
                         // Weekend builder for subtle differentiation
                       ),
                     ),
@@ -272,7 +279,7 @@ class _HolidayScreenState extends State<HolidayScreen> {
                     ),
                   ],
                 ),
-            ),
+              ),
       );
     });
   }

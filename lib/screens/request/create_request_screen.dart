@@ -113,11 +113,14 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
   }
 
   // Method to validate and submit
-  void _validateAndSubmit() async {
+  void _validateAndSubmit(BuildContext context) async {
+    final lang = Provider.of<SettingProvider>(context, listen: false).lang;
     if (_selectedTypeId == null) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('សូមជ្រើសរើសប្រភេទច្បាប់')),
+          SnackBar(
+              content: Text(AppLang.translate(
+                  lang: lang ?? 'kh', key: 'please select request type'))),
         );
       }
       return;
@@ -125,7 +128,9 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
     if (_startDate == null) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('សូមជ្រើសរើសកាលបរិច្ឆេទចាប់ផ្តើម')),
+          SnackBar(
+              content: Text(AppLang.translate(
+                  lang: lang ?? 'kh', key: 'please select start date'))),
         );
       }
       return;
@@ -134,14 +139,18 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(const SnackBar(content: Text('សូមបញ្ចូលមូលហេតុ')));
+        ).showSnackBar(SnackBar(
+            content: Text(AppLang.translate(
+                lang: lang ?? 'kh', key: 'please input reson'))));
       }
       return;
     }
     if (_endDate == null) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('សូមជ្រើសរើសកាលបរិច្ឆេទបញ្ចប់')),
+          SnackBar(
+              content: Text(AppLang.translate(
+                  lang: lang ?? 'kh', key: 'please select end date'))),
         );
       }
       return;
@@ -190,7 +199,8 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
         builder: (context, createRequestProvider, settingProvider, child) {
           final List<dynamic>? requestCategories = createRequestProvider
               .data?.data['request_categories'] as List<dynamic>?;
-
+          final lang =
+              Provider.of<SettingProvider>(context, listen: false).lang;
           Map<String, dynamic>? data;
           if (requestCategories != null) {
             try {
@@ -211,7 +221,8 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
             // backgroundColor: Colors.grey[100],
             backgroundColor: Colors.white,
             appBar: AppBar(
-              title: Text('ស្នើសុំច្បាប់'),
+              title: Text(
+                  AppLang.translate(lang: lang ?? 'kh', key: 'create request')),
               centerTitle: true,
               bottom: CustomHeader(),
               actions: [
@@ -258,11 +269,14 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
                     onPressed: () {
                       showConfirmDialog(
                         context,
-                        'Confirm Create',
-                        'Are you sure to create request?',
+                        AppLang.translate(
+                            lang: lang ?? 'kh', key: 'confirm create'),
+                        AppLang.translate(
+                            lang: lang ?? 'kh',
+                            key: 'are you sure you want to create?'),
                         DialogType.primary,
                         () {
-                          _validateAndSubmit();
+                          _validateAndSubmit(context);
                         },
                       );
                       // ConfirmationDialog.show(
@@ -283,16 +297,31 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
             body: GestureDetector(
               onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
               child: createRequestProvider.isLoading
-                  ? const Center(
-                      child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text('Loading...'),
-                      ],
-                    ))
+                  ? Center(
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          SizedBox(
+                            height: 60,
+                            width: 60,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2.0,
+                            ),
+                          ),
+                          Text(
+                            AppLang.translate(
+                                lang: lang ?? 'kh', key: 'waiting'),
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
                   : SafeArea(
-                    child: ListView(
+                      child: ListView(
                         shrinkWrap: true,
                         children: [
                           Padding(
@@ -399,14 +428,20 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
                                     }).toList(),
                                   ),
                                 ),
-                                  
+
                                 const SizedBox(height: 16),
                                 Row(
                                   children: [
                                     Expanded(
                                       child: DateInputField(
-                                        label: 'ថ្ងៃចាប់ផ្តើម',
-                                        hint: 'សូមជ្រើសរើសកាលបរិច្ឆេទ',
+                                        label: AppLang.translate(
+                                          lang: lang ?? 'kh',
+                                          key: 'start_date',
+                                        ),
+                                        hint: AppLang.translate(
+                                          lang: lang ?? 'kh',
+                                          key: 'please select start date',
+                                        ),
                                         initialDate: DateTime.now(),
                                         selectedDate: _startDate,
                                         onDateSelected: (date) {
@@ -421,8 +456,14 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
                                     ),
                                     Expanded(
                                       child: DateInputField(
-                                        label: 'ថ្ងៃបញ្ចប់',
-                                        hint: 'សូមជ្រើសរើសកាលបរិច្ឆេទ',
+                                        label: AppLang.translate(
+                                          lang: lang ?? 'kh',
+                                          key: 'end_date',
+                                        ),
+                                        hint: AppLang.translate(
+                                          lang: lang ?? 'kh',
+                                          key: 'please select end date',
+                                        ),
                                         initialDate: DateTime.now(),
                                         selectedDate: _endDate,
                                         onDateSelected: (date) {
@@ -495,7 +536,8 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
                                           Icon(Icons.image,
                                               color: HColors.darkgrey),
                                           SizedBox(width: 8),
-                                          Text("រូបភាព")
+                                          Text(AppLang.translate(
+                                              lang: lang ?? 'kh', key: 'image'))
                                           // EText(text: "រូបភាព", size: EFontSize.content),
                                         ],
                                       ),
@@ -542,7 +584,7 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
                           ),
                         ],
                       ),
-                  ),
+                    ),
             ),
           );
         },
@@ -653,7 +695,7 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
                     textAlign: TextAlign.center,
                     style: const TextStyle(
                       fontSize: 12,
-                      fontFamily: 'Kantumruy Pro',
+                      fontFamily: 'KantumruyPro',
                     ),
                   ),
                 ),
@@ -684,7 +726,7 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             textAlign: TextAlign.center,
-            style: TextStyle(fontFamily: 'Kantumruy Pro'),
+            style: TextStyle(fontFamily: 'KantumruyPro'),
           ),
         ],
       ),
@@ -740,13 +782,14 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
       ),
       builder: (context) {
+        final lang = Provider.of<SettingProvider>(context, listen: false).lang;
         return Padding(
           padding: const EdgeInsets.all(8.0),
           child: Wrap(
             children: [
               ListTile(
                 leading: Icon(Icons.remove_red_eye, color: HColors.darkgrey),
-                title: Text('មើល'),
+                title: Text(AppLang.translate(lang: lang ?? 'kh', key: 'view')),
                 onTap: () {
                   // Get.to(
                   //   () => FullscreenImage(
@@ -769,7 +812,8 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
               // ),
               ListTile(
                 leading: Icon(Icons.delete, color: HColors.danger),
-                title: Text("លុប"),
+                title:
+                    Text(AppLang.translate(lang: lang ?? 'kh', key: 'delete')),
                 onTap: () {
                   // Handle recent files selection
                   _removeFileAtIndex(index);
@@ -834,6 +878,7 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(5)),
       ),
       builder: (context) {
+        final lang = Provider.of<SettingProvider>(context, listen: false).lang;
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
           child: Wrap(
@@ -854,7 +899,8 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
                   Icons.folder_open_outlined,
                   color: HColors.darkgrey,
                 ),
-                title: Text('ជ្រើសរើសពីម៉ាសុីន'),
+                title: Text(AppLang.translate(
+                    lang: lang ?? 'kh', key: 'select from galery')),
                 onTap: () async {
                   final picker = ImagePicker();
                   final List<XFile> pickedImages =
@@ -880,7 +926,8 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
               // ),
               ListTile(
                 leading: Icon(Icons.attach_file, color: HColors.darkgrey),
-                title: Text("ជ្រើសរើសរូបពីឯកសារខ្ញុំ"),
+                title: Text(AppLang.translate(
+                    lang: lang ?? 'kh', key: 'select from file')),
                 onTap: () async {
                   // Use FilePicker to pick files
                   final result = await FilePicker.platform.pickFiles(
@@ -915,6 +962,7 @@ class DescriptionTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final lang = Provider.of<SettingProvider>(context, listen: false).lang;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -932,8 +980,9 @@ class DescriptionTextField extends StatelessWidget {
           maxLines: null,
           onChanged: onChanged,
           decoration: InputDecoration(
-            label: Text("មូលហេតុ"),
-            hintText: 'បញ្ចូលហេតុផល',
+            label: Text(AppLang.translate(lang: lang ?? 'kh', key: 'reson')),
+            hintText: AppLang.translate(
+                lang: lang ?? 'kh', key: 'please input reson'),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
             ),

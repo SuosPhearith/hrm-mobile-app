@@ -1,18 +1,15 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:mobile_app/app_lang.dart';
 import 'package:mobile_app/providers/global/auth_provider.dart';
 import 'package:mobile_app/providers/global/setting_provider.dart';
-// import 'package:mobile_app/shared/button/elevatedbutton_.dart';
 import 'package:mobile_app/utils/help_util.dart';
 import 'package:mobile_app/widgets/custom_header.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:mobile_app/shared/color/colors.dart';
 import 'package:provider/provider.dart';
-// import 'package:url_launcher/url_launcher.dart'; // Assuming HColors is defined here
 
 class QRScannerScreen extends StatefulWidget {
   const QRScannerScreen({super.key});
@@ -21,181 +18,473 @@ class QRScannerScreen extends StatefulWidget {
   State<QRScannerScreen> createState() => _QRScannerScreenState();
 }
 
-class _QRScannerScreenState extends State<QRScannerScreen> {
+class _QRScannerScreenState extends State<QRScannerScreen>
+    with WidgetsBindingObserver {
   bool isLoading = true;
   bool hasPermission = false;
   String? scannedResult;
-  MobileScannerController controller = MobileScannerController();
+  MobileScannerController controller = MobileScannerController(
+    // Add iOS-specific configurations
+    detectionSpeed: DetectionSpeed.noDuplicates,
+    facing: CameraFacing.back,
+    torchEnabled: false,
+  );
+  String? errorMessage;
 
   @override
   void initState() {
     super.initState();
-    _requestCameraPermission();
+
+    WidgetsBinding.instance.addObserver(this);
+    _forceCameraPermission(); // Use this instead
   }
 
-  Future<void> _requestCameraPermission() async {
-    var status = await Permission.camera.status;
-    if (!status.isGranted) {
-      status = await Permission.camera.request();
+  Future<void> _forceCameraPermission() async {
+    final status = await Permission.camera.request();
+    if (status.isGranted) {
+      setState(() {
+        hasPermission = true;
+        isLoading = false;
+      });
+      await controller.start();
+    } else {
+      setState(() {
+        hasPermission = false;
+        isLoading = false;
+        errorMessage = 'Camera permission is required.';
+      });
+      _showPermissionDialog();
     }
-    setState(() {
-      hasPermission = status.isGranted;
-      isLoading = false;
-    });
   }
 
   @override
   void dispose() {
-    controller.dispose();
+    WidgetsBinding.instance.removeObserver(this);
+    _disposeController();
     super.dispose();
+  }
+
+  Future<void> _disposeController() async {
+    try {
+      await controller.dispose();
+    } catch (e) {
+      print('Error disposing controller: $e');
+    }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // Handle app lifecycle for iOS
+    if (!controller.value.isInitialized) {
+      return;
+    }
+
+    switch (state) {
+      case AppLifecycleState.detached:
+      case AppLifecycleState.hidden:
+      case AppLifecycleState.paused:
+        return;
+      case AppLifecycleState.resumed:
+        // Restart scanner when app resumes
+        _restartScanner();
+        return;
+      case AppLifecycleState.inactive:
+        // Stop scanner when app becomes inactive
+        _stopScanner();
+        return;
+    }
+  }
+
+  Future<void> _stopScanner() async {
+    try {
+      await controller.stop();
+    } catch (e) {
+      print('Error stopping scanner: $e');
+    }
+  }
+
+  Future<void> _restartScanner() async {
+    try {
+      if (hasPermission && scannedResult == null) {
+        await controller.start();
+      }
+    } catch (e) {
+      print('Error restarting scanner: $e');
+    }
+  }
+
+  Future<void> _requestCameraPermission() async {
+    try {
+      var status = await Permission.camera.status;
+
+      print('Camera permission status: $status');
+
+      if (status.isDenied) {
+        status = await Permission.camera.request();
+      }
+
+      if (status.isPermanentlyDenied) {
+        setState(() {
+          hasPermission = false;
+          isLoading = false;
+          errorMessage =
+              'Camera permission is permanently denied. Please enable it in Settings.';
+        });
+        _showPermissionDialog();
+        return;
+      }
+
+      if (status.isGranted) {
+        setState(() {
+          hasPermission = true;
+          isLoading = false;
+          errorMessage = null;
+        });
+      } else {
+        setState(() {
+          hasPermission = false;
+          isLoading = false;
+          errorMessage = 'Camera permission is required to scan QR codes.';
+        });
+      }
+    } catch (e) {
+      print('Permission error: $e');
+      setState(() {
+        hasPermission = false;
+        isLoading = false;
+        errorMessage = 'Error requesting camera permission: $e';
+      });
+    }
+  }
+
+  void _showPermissionDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: const Text('Camera Permission Required'),
+        content: const Text(
+          'This app needs camera permission to scan QR codes. Please enable camera permission in Settings.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              context.pop(); // Go back to previous screen
+            },
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              await openAppSettings();
+              // Recheck permission after user returns from settings
+              _requestCameraPermission();
+            },
+            child: const Text('Settings'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    final lang = Provider.of<SettingProvider>(context, listen: false).lang;
+
     return Scaffold(
-      // appBar: AppBar(
-      //   backgroundColor: Colors.white,
-      //   // title: const Text(
-      //   //   'ស្កេនវត្តមានចូល',
-      //   //   style: TextStyle(
-      //   //     fontWeight: FontWeight.w500,
-      //   //     color: Colors.black,
-      //   //   ),
-      //   // ),
-      //   centerTitle: true,
-      //   elevation: 0,
-      //   actions: [
-      //     IconButton(
-      //       icon: const Icon(Icons.flash_on, color: HColors.darkgrey),
-      //       onPressed: () => controller.toggleTorch(),
-      //     ),
-      //   ],
-      // ),
-      body: isLoading || !hasPermission
+      body: isLoading
           ? const QRScannerSkeleton()
-          : Stack(
-              children: [
-                MobileScanner(
-                  controller: controller,
-                  onDetect: (capture) {
-                    final List<Barcode> barcodes = capture.barcodes;
-                    if (barcodes.isNotEmpty && scannedResult == null) {
-                      setState(() {
-                        scannedResult = barcodes.first.rawValue;
-                      });
-                      // print(
-                      //     'Scanned QR Code: $scannedResult'); // Print the result
-                      controller.stop();
-                      // Navigate to success screen instead of popping
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => QRScanSuccessScreen(
-                            scannedResult: scannedResult!,
+          : !hasPermission
+              ? _buildPermissionError()
+              : Stack(
+                  children: [
+                    MobileScanner(
+                      controller: controller,
+                      onDetect: (capture) {
+                        if (scannedResult != null)
+                          return; // Prevent multiple scans
+
+                        final List<Barcode> barcodes = capture.barcodes;
+                        if (barcodes.isNotEmpty) {
+                          final String code = barcodes.first.rawValue ?? '';
+                          if (code.isNotEmpty) {
+                            setState(() {
+                              scannedResult = code;
+                            });
+
+                            // Stop the scanner immediately
+                            controller.stop();
+
+                            // Navigate to success screen
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => QRScanSuccessScreen(
+                                  scannedResult: code,
+                                ),
+                              ),
+                            );
+                          }
+                        }
+                      },
+                      errorBuilder: (context, error, child) {
+                        return _buildScannerError(error);
+                      },
+                    ),
+                    // Scanner overlay
+                    Center(
+                      child: Container(
+                        width: MediaQuery.of(context).size.width * 0.7,
+                        height: MediaQuery.of(context).size.width * 0.7,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: HColors.blue, width: 2),
+                        ),
+                        child: const Center(
+                          child: Text(
+                            'Point camera at QR code',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            textAlign: TextAlign.center,
                           ),
                         ),
-                      );
-                    }
-                  },
-                ),
-                Center(
-                  child: Container(
-                    width: MediaQuery.of(context).size.width * 0.7,
-                    height: MediaQuery.of(context).size.width * 0.7,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: HColors.blue, width: 2),
+                      ),
                     ),
-                  ),
-                ),
-                Scaffold(
-                  backgroundColor: Colors.transparent,
-                  body: SafeArea(
-                    child: AppBar(
+                    // Custom AppBar and controls
+                    Scaffold(
                       backgroundColor: Colors.transparent,
-                      leading: IconButton(
-                        onPressed: () {
-                          context.pop();
-                        },
-                        icon: Icon(
-                          Icons.close,
-                          color: Colors.white,
-                        ),
-                      ),
-                      title: Text(
-                        "ស្កេនវត្តមានចូល",
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.w500),
-                      ),
-                      actions: [
-                        Padding(
-                          padding: EdgeInsets.all(8),
-                          child: CircleAvatar(
-                            radius: 24,
-                            backgroundColor: Colors.transparent,
-                            child: Image(
-                              image: AssetImage('lib/assets/images/logo.png'),
-                              height: 32,
+                      body: SafeArea(
+                        child: AppBar(
+                          backgroundColor: Colors.transparent,
+                          leading: IconButton(
+                            onPressed: () {
+                              context.pop();
+                            },
+                            icon: const Icon(
+                              Icons.close,
+                              color: Colors.white,
                             ),
                           ),
-                        )
-                      ],
-                      centerTitle: true,
-                    ),
-                  ),
-                  bottomNavigationBar: SafeArea(
-                      child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 50, vertical: 60),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        InkWell(
-                          onTap: () => controller.toggleTorch(),
-                          child: Container(
-                              width: 60,
-                              height: 60,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(50),
-                                  color: HColors.darkgrey.withOpacity(0.3)),
-                              alignment: Alignment.center,
-                              child: Icon(
-                                Icons.flashlight_on_outlined,
-                                color: const Color.fromARGB(154, 255, 255, 255),
-                                size: 32,
-                              )),
+                          title: Text(
+                            AppLang.translate(
+                                lang: lang ?? 'kh', key: 'scan_attendence'),
+                            style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontWeight: FontWeight.w500),
+                          ),
+                          actions: [
+                            Padding(
+                              padding: const EdgeInsets.all(8),
+                              child: CircleAvatar(
+                                radius: 24,
+                                backgroundColor: Colors.transparent,
+                                child: Image(
+                                  image:
+                                      AssetImage('lib/assets/images/logo.png'),
+                                  height: 32,
+                                ),
+                              ),
+                            )
+                          ],
+                          centerTitle: true,
                         ),
-                        InkWell(
-                          onTap: () {
-                            // setState(() {
-                            //   controller.toggleTorch();
-                            // });
-                          },
-                          child: Container(
-                              width: 60,
-                              height: 60,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(50),
-                                  color: HColors.darkgrey.withOpacity(0.3)),
-                              alignment: Alignment.center,
-                              child: Icon(
-                                Icons.upload,
-                                color: Color.fromARGB(154, 255, 255, 255),
-                                size: 32,
-                              )),
+                      ),
+                      bottomNavigationBar: SafeArea(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 50, vertical: 60),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              // Flashlight toggle
+                              InkWell(
+                                onTap: () async {
+                                  try {
+                                    await controller.toggleTorch();
+                                  } catch (e) {
+                                    print('Error toggling torch: $e');
+                                  }
+                                },
+                                child: Container(
+                                  width: 60,
+                                  height: 60,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(50),
+                                    color: HColors.darkgrey.withOpacity(0.3),
+                                  ),
+                                  alignment: Alignment.center,
+                                  child: const Icon(
+                                    Icons.flashlight_on_outlined,
+                                    color: Color.fromARGB(154, 255, 255, 255),
+                                    size: 32,
+                                  ),
+                                ),
+                              ),
+                              // Camera switch (if needed)
+                              InkWell(
+                                onTap: () async {
+                                  try {
+                                    await controller.switchCamera();
+                                  } catch (e) {
+                                    print('Error switching camera: $e');
+                                  }
+                                },
+                                child: Container(
+                                  width: 60,
+                                  height: 60,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(50),
+                                    color: HColors.darkgrey.withOpacity(0.3),
+                                  ),
+                                  alignment: Alignment.center,
+                                  child: const Icon(
+                                    Icons.switch_camera,
+                                    color: Color.fromARGB(154, 255, 255, 255),
+                                    size: 32,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ],
+                      ),
                     ),
-                  )),
+                  ],
                 ),
-              ],
+    );
+  }
+
+  Widget _buildPermissionError() {
+    return Container(
+      color: Colors.black,
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.camera_alt_outlined,
+              size: 80,
+              color: Colors.white54,
             ),
+            const SizedBox(height: 20),
+            const Text(
+              'Camera Permission Required',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const SizedBox(height: 10),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 40),
+              child: Text(
+                errorMessage ??
+                    'Please grant camera permission to scan QR codes',
+                style: const TextStyle(
+                  color: Colors.white70,
+                  fontSize: 16,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+            const SizedBox(height: 30),
+            ElevatedButton(
+              onPressed: () async {
+                await openAppSettings();
+                _requestCameraPermission();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: HColors.blue,
+                foregroundColor: Colors.white,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+              ),
+              child: const Text('Open Settings'),
+            ),
+            const SizedBox(height: 10),
+            TextButton(
+              onPressed: () => context.pop(),
+              child: const Text(
+                'Cancel',
+                style: TextStyle(color: Colors.white70),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildScannerError(MobileScannerException error) {
+    return Container(
+      color: Colors.black,
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.error_outline,
+              size: 80,
+              color: Colors.red,
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              'Scanner Error',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const SizedBox(height: 10),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 40),
+              child: Text(
+                'Error: ${error.errorCode}\n${error.errorDetails?.message ?? 'Unknown error occurred'}',
+                style: const TextStyle(
+                  color: Colors.white70,
+                  fontSize: 14,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+            const SizedBox(height: 30),
+            ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  isLoading = true;
+                });
+                _requestCameraPermission();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: HColors.blue,
+                foregroundColor: Colors.white,
+              ),
+              child: const Text('Retry'),
+            ),
+            const SizedBox(height: 10),
+            TextButton(
+              onPressed: () => context.pop(),
+              child: const Text(
+                'Cancel',
+                style: TextStyle(color: Colors.white70),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
 
+// Keep your existing QRScannerSkeleton, QRScanSuccessScreen, TicketCard, etc. classes unchanged
 class QRScannerSkeleton extends StatelessWidget {
   const QRScannerSkeleton({super.key});
 
@@ -204,7 +493,7 @@ class QRScannerSkeleton extends StatelessWidget {
     return Stack(
       children: [
         Container(
-          color: Colors.black, // Mimics camera background
+          color: Colors.black,
         ),
         Center(
           child: Container(
@@ -217,14 +506,18 @@ class QRScannerSkeleton extends StatelessWidget {
             ),
           ),
         ),
-        Positioned(
-          top: 20,
-          left: 20,
-          right: 20,
-          child: Container(
-            width: MediaQuery.of(context).size.width * 0.4,
-            height: Theme.of(context).textTheme.titleLarge!.fontSize!,
-            color: Colors.grey,
+        const Positioned(
+          top: 50,
+          left: 0,
+          right: 0,
+          child: Center(
+            child: Text(
+              'Initializing Camera...',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+              ),
+            ),
           ),
         ),
       ],

@@ -15,7 +15,6 @@ import 'package:mobile_app/shared/date/field_date.dart';
 import 'package:mobile_app/utils/help_util.dart';
 import 'package:mobile_app/widgets/custom_header.dart';
 import 'package:mobile_app/widgets/helper.dart';
-import 'package:mobile_app/widgets/skeleton.dart';
 import 'package:provider/provider.dart';
 
 class UpdatePersonalInfoScreen extends StatefulWidget {
@@ -278,14 +277,14 @@ class _UpdatePersonalInfoScreenState extends State<UpdatePersonalInfoScreen> {
           }
           final salutes =
               _buildSaluteSelectData(updatePersonalProvider, settingProvider);
-
+          final lang = settingProvider.lang;
           return Scaffold(
             // backgroundColor: Colors.grey[100],
             backgroundColor: Colors.white,
             // backgroundColor: HColors.darkgrey.withOpacity(0.1),
             appBar: AppBar(
-              title:
-                  Text(AppLang.translate(key: 'user_info_update', lang: 'kh')),
+              title: Text(AppLang.translate(
+                  key: 'user_info_update', lang: lang ?? 'kh')),
               centerTitle: true,
               actions: [
                 Padding(
@@ -316,7 +315,7 @@ class _UpdatePersonalInfoScreenState extends State<UpdatePersonalInfoScreen> {
                           ),
                         ),
                         Text(
-                          'សូមរងចាំ',
+                          AppLang.translate(lang: lang ?? 'kh', key: 'waiting'),
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
@@ -391,7 +390,8 @@ class _UpdatePersonalInfoScreenState extends State<UpdatePersonalInfoScreen> {
                                 children: genderList.map((gender) {
                                   return Expanded(
                                     child: RadioListTile<int>(
-                                      title: Text(gender['name_kh']),
+                                      title: Text(AppLang.translate(
+                                          lang: lang ?? 'kh', data: gender)),
                                       value: gender['id'],
                                       groupValue: selectedGenderId,
                                       onChanged: (int? value) {
@@ -488,7 +488,9 @@ class _UpdatePersonalInfoScreenState extends State<UpdatePersonalInfoScreen> {
                                 label: AppLang.translate(
                                     lang: settingProvider.lang ?? 'kh',
                                     key: 'user_info_date_of_birth'),
-                                hint: 'សូមជ្រើសរើសកាលបរិច្ឆេទ',
+                                hint: AppLang.translate(
+                                    lang: lang ?? 'kh',
+                                    key: 'please select date'),
                                 initialDate: DateTime.now(),
                                 selectedDate: _dob,
                                 onDateSelected: (date) {
@@ -535,7 +537,7 @@ class _UpdatePersonalInfoScreenState extends State<UpdatePersonalInfoScreen> {
                                     const SizedBox(width: 8),
                                     Text(AppLang.translate(
                                         key: "user_info_place_of_birth",
-                                        lang: 'kh')),
+                                        lang: lang ?? 'kh')),
                                   ],
                                 ),
                               ),
@@ -707,7 +709,7 @@ class _UpdatePersonalInfoScreenState extends State<UpdatePersonalInfoScreen> {
                                     const SizedBox(width: 8),
                                     Text(AppLang.translate(
                                         key: "user_info_current_address",
-                                        lang: 'kh')),
+                                        lang: lang ?? 'kh')),
                                   ],
                                 ),
                               ),

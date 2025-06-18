@@ -46,46 +46,70 @@ class _RequestScreenState extends State<RequestScreen> {
         selectedYear, now.month, getLastDayOfMonth(selectedYear, now.month));
   }
 
-  final List<String> khmerMonths = [
-    'មករា',
-    'កុម្ភៈ',
-    'មីនា',
-    'មេសា',
-    'ឧសភា',
-    'មិថុនា',
-    'កក្កដា',
-    'សីហា',
-    'កញ្ញា',
-    'តុលា',
-    'វិច្ឆិកា',
-    'ធ្នូ',
+  // Static month names that don't depend on context
+  static const List<String> khmerMonths = [
+    'មករា', // January
+    'កុម្ភៈ', // February
+    'មីនា', // March
+    'មេសា', // April
+    'ឧសភា', // May
+    'មិថុនា', // June
+    'កក្កដា', // July
+    'សីហា', // August
+    'កញ្ញា', // September
+    'តុលា', // October
+    'វិច្ឆិកា', // November
+    'ធ្នូ', // December
   ];
 
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   // Use current month as default
-  //   final now = DateTime.now();
-  //   sselectedMonth = now;
+  static const List<String> englishMonths = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
+  ];
 
-  //   // Set start date to first day of current month
-  //   _startDate = DateTime(now.year, now.month, 1);
-  //   // Set end date to last day of current month
-  //   _endDate = DateTime(now.year, now.month + 1, 0);
+  // Helper method to get month name based on language
+  String getMonthName(int monthIndex, String? lang) {
+    if (monthIndex < 0 || monthIndex > 11) return '';
 
-  //   selectedYear = now.year;
-  //   selectedMonth = now.month - 1;
-  // }
+    // Use Khmer as default, English if explicitly set to 'en'
+    if (lang == 'en') {
+      return englishMonths[monthIndex];
+    } else {
+      return khmerMonths[monthIndex];
+    }
+  }
+
+  // Helper method to get both language month names
+  String getBothLanguageMonths(int monthIndex, {String separator = ' / '}) {
+    if (monthIndex < 0 || monthIndex > 11) return '';
+    return '${englishMonths[monthIndex]}$separator${khmerMonths[monthIndex]}';
+  }
 
   int getLastDayOfMonth(int year, int month) {
     return DateTime(year, month + 1, 0).day;
   }
+
+
 
   @override
   Widget build(BuildContext context) {
     return Consumer2<RequestProvider, SettingProvider>(
       builder: (context, requestProvider, settingProvider, child) {
         final dataSetup = requestProvider.dataSetup?.data;
+        // Update displayMonth with current language setting
+        final currentLang = settingProvider.lang ?? 'kh';
+        displayMonth = getMonthName(selectedMonth, currentLang);
+        final lang = Provider.of<SettingProvider>(context, listen: false).lang;
         return Scaffold(
           // backgroundColor: Color(0xFFF1F5F9),
           backgroundColor: Colors.white,
@@ -104,13 +128,19 @@ class _RequestScreenState extends State<RequestScreen> {
             title: GestureDetector(
               onTap: () {
                 _showMonthPicker(context, requestProvider);
-               
               },
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    displayMonth.isEmpty ? "ស្កេន" : "ស្កេន - $displayMonth",
+                    displayMonth.isEmpty
+                        ? AppLang.translate(
+                            lang: Provider.of<SettingProvider>(context,
+                                        listen: false)
+                                    .lang ??
+                                'kh',
+                            key: 'home_request')
+                        : "${AppLang.translate(lang: Provider.of<SettingProvider>(context, listen: false).lang ?? 'kh', key: 'home_request')} - $displayMonth",
                     style: const TextStyle(
                       fontWeight: FontWeight.w500,
                       // color: Colors.black,
@@ -160,28 +190,28 @@ class _RequestScreenState extends State<RequestScreen> {
             backgroundColor: Colors.white,
             onRefresh: () => _refreshData(requestProvider),
             child: requestProvider.isLoading
-                ? const Center(
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  SizedBox(
-                    height: 60,
-                    width: 60,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2.0,
+                ? Center(
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        SizedBox(
+                          height: 60,
+                          width: 60,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2.0,
+                          ),
+                        ),
+                        Text(
+                          AppLang.translate(lang: lang ?? 'kh', key: 'waiting'),
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                  Text(
-                    'សូមរងចាំ',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.black,
-                    ),
-                  ),
-                ],
-              ),
-            )
+                  )
                 : requestProvider.requestData == null
                     ? Center(
                         child: GestureDetector(
@@ -194,13 +224,14 @@ class _RequestScreenState extends State<RequestScreen> {
                         ),
                       )
                     : SafeArea(
-                      child: SingleChildScrollView(
+                        child: SingleChildScrollView(
                           physics: const AlwaysScrollableScrollPhysics(),
                           child: Padding(
                             padding: const EdgeInsets.all(16.0),
                             child: Column(
                               children: [
-                                ...requestProvider.requestData!.data.results.map((
+                                ...requestProvider.requestData!.data.results
+                                    .map((
                                   record,
                                 ) {
                                   return GestureDetector(
@@ -219,10 +250,11 @@ class _RequestScreenState extends State<RequestScreen> {
                                         lang: settingProvider.lang ?? 'kh',
                                       ),
                                       dates:
-                                          '${formatDate(record['start_datetime'])} ដល់ ${formatDate(record['end_datetime'])}',
+                                          '${formatDate(record['start_datetime'])} ${AppLang.translate(lang: lang ?? 'kh', key: 'to')} ${formatDate(record['end_datetime'])}',
                                       days: calculateDateDifference(
                                         record['start_datetime'],
                                         record['end_datetime'],
+                                        AppLang.translate(lang:lang??'kh',key: 'days'),
                                       ),
                                       description:
                                           '${AppLang.translate(data: record['request_type'], lang: settingProvider.lang ?? 'kh')} | ${formatStringValue(record['objective'])}',
@@ -233,7 +265,7 @@ class _RequestScreenState extends State<RequestScreen> {
                             ),
                           ),
                         ),
-                    ),
+                      ),
           ),
         );
       },
@@ -352,10 +384,10 @@ class _RequestScreenState extends State<RequestScreen> {
                 ...requestCategories.asMap().entries.map((entry) {
                   int index = entry.key;
                   var record = entry.value;
-          
+
                   // Use modulo to cycle through icons if there are more categories than icons
                   IconData selectedIcon = icons[index % icons.length];
-          
+
                   return _buildBottomSheetOption(
                     icon: selectedIcon,
                     label: AppLang.translate(data: record, lang: lang ?? 'kh'),

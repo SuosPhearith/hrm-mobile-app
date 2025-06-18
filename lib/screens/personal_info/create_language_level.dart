@@ -131,6 +131,7 @@ class _CreateLanguageLevelState extends State<CreateLanguageLevel> {
         create: (_) => CreateEducationProvider(),
         child: Consumer2<CreateEducationProvider, SettingProvider>(
             builder: (context, provider, settingProvider, child) {
+              final lang =settingProvider.lang;
           final languages = _buildEducationSelectionMap(
               apiData: provider.data,
               dataKey: 'languages',
@@ -143,7 +144,7 @@ class _CreateLanguageLevelState extends State<CreateLanguageLevel> {
             backgroundColor: Colors.white,
             appBar: AppBar(
               title: Text(
-                  AppLang.translate(lang: 'kh', key: 'user_info_language_add')),
+                  AppLang.translate(lang:lang?? 'kh', key: 'user_info_language_add')),
               centerTitle: true,
               bottom: CustomHeader(),
               actions: [
@@ -172,7 +173,7 @@ class _CreateLanguageLevelState extends State<CreateLanguageLevel> {
                     ),
                   ),
                   Text(
-                    'សូមរងចាំ',
+                    AppLang.translate(lang: lang??'kh',key: 'waiting'),
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,

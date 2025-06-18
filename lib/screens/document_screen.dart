@@ -3,11 +3,14 @@ import 'package:dio/dio.dart' as dio;
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:image_picker/image_picker.dart';
+// import 'package:image_picker/image_picker.dart';
+import 'package:mobile_app/app_lang.dart';
+import 'package:mobile_app/providers/global/setting_provider.dart';
 
 import 'package:mobile_app/shared/color/colors.dart';
 import 'package:mobile_app/shared/component/bottom_appbar.dart';
-import 'package:mobile_app/shared/image/full_screen.dart'; // Replace with your actual header widget
+import 'package:mobile_app/shared/image/full_screen.dart';
+import 'package:provider/provider.dart'; // Replace with your actual header widget
 
 class DocumentScreen extends StatefulWidget {
   const DocumentScreen({super.key});
@@ -22,9 +25,9 @@ class _DocumentScreenState extends State<DocumentScreen> {
   List<dio.MultipartFile>? _selectedMultipartFiles;
   int selectedThumbnail = 0;
   String _searchQuery = '';
-  String _sortCriteria = 'name'; // Options: name, size, date
-  bool _sortAscending = true;
-  String _filterType = 'all'; // Options: all, images, documents
+  final String _sortCriteria = 'name'; // Options: name, size, date
+  final bool _sortAscending = true;
+  final String _filterType = 'all'; // Options: all, images, documents
   final TextEditingController _searchController = TextEditingController();
 
   @override
@@ -43,45 +46,45 @@ class _DocumentScreenState extends State<DocumentScreen> {
     super.dispose();
   }
 
-  Future<PlatformFile> _convertXFileToPlatformFile(XFile xFile) async {
-    final bytes = await xFile.readAsBytes();
-    final name = xFile.name.isNotEmpty
-        ? xFile.name
-        : 'image_${DateTime.now().millisecondsSinceEpoch}';
-    final size = bytes.length;
-    return PlatformFile(
-      name: name,
-      path: xFile.path,
-      size: size,
-      bytes: bytes,
-      readStream: xFile.openRead(),
-    );
-  }
+  // Future<PlatformFile> _convertXFileToPlatformFile(XFile xFile) async {
+  //   final bytes = await xFile.readAsBytes();
+  //   final name = xFile.name.isNotEmpty
+  //       ? xFile.name
+  //       : 'image_${DateTime.now().millisecondsSinceEpoch}';
+  //   final size = bytes.length;
+  //   return PlatformFile(
+  //     name: name,
+  //     path: xFile.path,
+  //     size: size,
+  //     bytes: bytes,
+  //     readStream: xFile.openRead(),
+  //   );
+  // }
 
-  Future<void> _addImagesToSelectedFiles(List<XFile> images) async {
-    try {
-      final converted = await Future.wait(
-        images.map((xFile) => _convertXFileToPlatformFile(xFile)),
-      );
+  // Future<void> _addImagesToSelectedFiles(List<XFile> images) async {
+  //   try {
+  //     final converted = await Future.wait(
+  //       images.map((xFile) => _convertXFileToPlatformFile(xFile)),
+  //     );
 
-      final multipartFiles = converted.map((pf) {
-        return dio.MultipartFile.fromBytes(pf.bytes!, filename: pf.name);
-      }).toList();
+  //     final multipartFiles = converted.map((pf) {
+  //       return dio.MultipartFile.fromBytes(pf.bytes!, filename: pf.name);
+  //     }).toList();
 
-      setState(() {
-        _selectedFiles.addAll(converted);
-        _selectedMultipartFiles ??= [];
-        _selectedMultipartFiles!.addAll(multipartFiles);
-      });
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Failed to add files: ${e.toString()}'),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
-  }
+  //     setState(() {
+  //       _selectedFiles.addAll(converted);
+  //       _selectedMultipartFiles ??= [];
+  //       _selectedMultipartFiles!.addAll(multipartFiles);
+  //     });
+  //   } catch (e) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(
+  //         content: Text('Failed to add files: ${e.toString()}'),
+  //         backgroundColor: Colors.red,
+  //       ),
+  //     );
+  //   }
+  // }
 
   List<PlatformFile> _getFilteredAndSortedFiles() {
     List<PlatformFile> filteredFiles = _selectedFiles.where((file) {
@@ -191,10 +194,11 @@ class _DocumentScreenState extends State<DocumentScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final lang = Provider.of<SettingProvider>(context, listen: false).lang;
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'ឯកសារ',
+          AppLang.translate(lang: lang ?? 'kh', key: 'document'),
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
         ),
         centerTitle: true,
@@ -295,7 +299,8 @@ class _DocumentScreenState extends State<DocumentScreen> {
                         fontWeight: FontWeight.w400,
                       ),
                       decoration: InputDecoration(
-                        hintText: 'ស្វែងរក',
+                        hintText: AppLang.translate(
+                            lang: lang ?? 'kh', key: 'search'),
                         hintStyle: TextStyle(
                           color: Colors.grey[500],
                           fontSize: 16,
@@ -420,7 +425,7 @@ class _DocumentScreenState extends State<DocumentScreen> {
 
   Widget _buildPlaceholderGridItem(Map<String, dynamic> item, int index) {
     // Alternate between image and document placeholders for variety
-    final isImage = index % 2 == 0;
+    // final isImage = index % 2 == 0;
     return Container(
       decoration: BoxDecoration(
         border: Border.all(color: HColors.darkgrey.withOpacity(0.2)),
@@ -550,6 +555,7 @@ class _DocumentScreenState extends State<DocumentScreen> {
   }
 
   Widget _buildFilterChips() {
+    final lang = Provider.of<SettingProvider>(context, listen: false).lang;
     return Row(
       children: [
         Container(
@@ -565,7 +571,9 @@ class _DocumentScreenState extends State<DocumentScreen> {
             SizedBox(
               width: 2,
             ),
-            Text("ទាំងអស់")
+            Text(
+              AppLang.translate(lang: lang ?? 'kh', key: 'all'),
+            )
           ]),
         ),
         SizedBox(
@@ -584,7 +592,9 @@ class _DocumentScreenState extends State<DocumentScreen> {
             SizedBox(
               width: 2,
             ),
-            Text("ឯកសាររក្សាទុក")
+            Text(
+              AppLang.translate(lang: lang ?? 'kh', key: 'save'),
+            )
           ]),
         ),
         SizedBox(
@@ -603,73 +613,75 @@ class _DocumentScreenState extends State<DocumentScreen> {
             SizedBox(
               width: 2,
             ),
-            Text("ឯកសារសំខាន់ៗ")
+            Text(
+              AppLang.translate(lang: lang ?? 'kh', key: 'impotant'),
+            )
           ]),
         ),
       ],
     );
   }
 
-  void _showSortBottomSheet(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
-      ),
-      builder: (context) {
-        return Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Wrap(
-            children: [
-              ListTile(
-                leading: Icon(Icons.sort_by_alpha, color: HColors.darkgrey),
-                title: Text('Sort by Name'),
-                onTap: () {
-                  setState(() {
-                    _sortCriteria = 'name';
-                  });
-                  Navigator.pop(context);
-                },
-              ),
-              ListTile(
-                leading: Icon(Icons.storage, color: HColors.darkgrey),
-                title: Text('Sort by Size'),
-                onTap: () {
-                  setState(() {
-                    _sortCriteria = 'size';
-                  });
-                  Navigator.pop(context);
-                },
-              ),
-              ListTile(
-                leading: Icon(Icons.date_range, color: HColors.darkgrey),
-                title: Text('Sort by Date Added'),
-                onTap: () {
-                  setState(() {
-                    _sortCriteria = 'date';
-                  });
-                  Navigator.pop(context);
-                },
-              ),
-              ListTile(
-                leading: Icon(
-                  _sortAscending ? Icons.arrow_upward : Icons.arrow_downward,
-                  color: HColors.darkgrey,
-                ),
-                title: Text(_sortAscending ? 'Ascending' : 'Descending'),
-                onTap: () {
-                  setState(() {
-                    _sortAscending = !_sortAscending;
-                  });
-                  Navigator.pop(context);
-                },
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
+  // void _showSortBottomSheet(BuildContext context) {
+  //   showModalBottomSheet(
+  //     context: context,
+  //     shape: RoundedRectangleBorder(
+  //       borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
+  //     ),
+  //     builder: (context) {
+  //       return Padding(
+  //         padding: const EdgeInsets.all(8.0),
+  //         child: Wrap(
+  //           children: [
+  //             ListTile(
+  //               leading: Icon(Icons.sort_by_alpha, color: HColors.darkgrey),
+  //               title: Text('Sort by Name'),
+  //               onTap: () {
+  //                 setState(() {
+  //                   _sortCriteria = 'name';
+  //                 });
+  //                 Navigator.pop(context);
+  //               },
+  //             ),
+  //             ListTile(
+  //               leading: Icon(Icons.storage, color: HColors.darkgrey),
+  //               title: Text('Sort by Size'),
+  //               onTap: () {
+  //                 setState(() {
+  //                   _sortCriteria = 'size';
+  //                 });
+  //                 Navigator.pop(context);
+  //               },
+  //             ),
+  //             ListTile(
+  //               leading: Icon(Icons.date_range, color: HColors.darkgrey),
+  //               title: Text('Sort by Date Added'),
+  //               onTap: () {
+  //                 setState(() {
+  //                   _sortCriteria = 'date';
+  //                 });
+  //                 Navigator.pop(context);
+  //               },
+  //             ),
+  //             ListTile(
+  //               leading: Icon(
+  //                 _sortAscending ? Icons.arrow_upward : Icons.arrow_downward,
+  //                 color: HColors.darkgrey,
+  //               ),
+  //               title: Text(_sortAscending ? 'Ascending' : 'Descending'),
+  //               onTap: () {
+  //                 setState(() {
+  //                   _sortAscending = !_sortAscending;
+  //                 });
+  //                 Navigator.pop(context);
+  //               },
+  //             ),
+  //           ],
+  //         ),
+  //       );
+  //     },
+  //   );
+  // }
 
   Widget _buildFileDisplay(bool isGrid) {
     final filteredFiles = _getFilteredAndSortedFiles();
@@ -919,54 +931,54 @@ class _DocumentScreenState extends State<DocumentScreen> {
     }
   }
 
-  void _showBottomSheetFile(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(5)),
-      ),
-      builder: (context) {
-        return SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-            child: Wrap(
-              children: [
-                ListTile(
-                  leading: Icon(
-                    Icons.folder_open_outlined,
-                    color: HColors.darkgrey,
-                  ),
-                  title: Text('ជ្រើសរើសពីម៉ាសុីន'),
-                  onTap: () async {
-                    final picker = ImagePicker();
-                    final List<XFile> pickedImages =
-                        await picker.pickMultiImage();
-                    if (pickedImages.isNotEmpty) {
-                      await _addImagesToSelectedFiles(pickedImages);
-                    }
-                    Navigator.pop(context);
-                  },
-                ),
-                ListTile(
-                  leading: Icon(Icons.attach_file, color: HColors.darkgrey),
-                  title: Text("ជ្រើសរើសរូបពីឯកសារខ្ញុំ"),
-                  onTap: () async {
-                    final result = await FilePicker.platform.pickFiles(
-                      allowMultiple: true,
-                    );
-                    if (result != null) {
-                      setState(() {
-                        _selectedFiles.addAll(result.files);
-                      });
-                    }
-                    Navigator.pop(context);
-                  },
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
+  // void _showBottomSheetFile(BuildContext context) {
+  //   showModalBottomSheet(
+  //     context: context,
+  //     shape: RoundedRectangleBorder(
+  //       borderRadius: BorderRadius.vertical(top: Radius.circular(5)),
+  //     ),
+  //     builder: (context) {
+  //       return SafeArea(
+  //         child: Padding(
+  //           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+  //           child: Wrap(
+  //             children: [
+  //               ListTile(
+  //                 leading: Icon(
+  //                   Icons.folder_open_outlined,
+  //                   color: HColors.darkgrey,
+  //                 ),
+  //                 title: Text('ជ្រើសរើសពីម៉ាសុីន'),
+  //                 onTap: () async {
+  //                   final picker = ImagePicker();
+  //                   final List<XFile> pickedImages =
+  //                       await picker.pickMultiImage();
+  //                   if (pickedImages.isNotEmpty) {
+  //                     await _addImagesToSelectedFiles(pickedImages);
+  //                   }
+  //                   Navigator.pop(context);
+  //                 },
+  //               ),
+  //               ListTile(
+  //                 leading: Icon(Icons.attach_file, color: HColors.darkgrey),
+  //                 title: Text("ជ្រើសរើសរូបពីឯកសារខ្ញុំ"),
+  //                 onTap: () async {
+  //                   final result = await FilePicker.platform.pickFiles(
+  //                     allowMultiple: true,
+  //                   );
+  //                   if (result != null) {
+  //                     setState(() {
+  //                       _selectedFiles.addAll(result.files);
+  //                     });
+  //                   }
+  //                   Navigator.pop(context);
+  //                 },
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //       );
+  //     },
+  //   );
+  // }
 }

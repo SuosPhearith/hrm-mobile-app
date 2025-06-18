@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_app/app_lang.dart';
 import 'package:mobile_app/providers/global/setting_provider.dart';
 import 'package:mobile_app/providers/local/evaluate_provider.dart';
 import 'package:mobile_app/shared/color/colors.dart';
@@ -46,6 +47,7 @@ class _EvaluateScreenState extends State<EvaluateScreen> {
       create: (_) => EvaluationProvider(),
       child: Consumer2<EvaluationProvider, SettingProvider>(
         builder: (context, evaluationProvider, settingProvider, child) {
+          final lang = settingProvider.lang;
           return RefreshIndicator(
             key: _refreshIndicatorKey,
             color: Colors.blue[800],
@@ -62,7 +64,7 @@ class _EvaluateScreenState extends State<EvaluateScreen> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        "ប្រចាំថ្ងៃ - $displayYear",
+                        "${AppLang.translate(lang: lang ?? 'kh', key: 'home_evaluation')} - $displayYear",
                         style: const TextStyle(
                           fontWeight: FontWeight.w500,
                           fontSize: 20,
@@ -104,7 +106,7 @@ class _EvaluateScreenState extends State<EvaluateScreen> {
                       child: Text("Loading..."),
                     )
                   : SafeArea(
-                    child: SingleChildScrollView(
+                      child: SingleChildScrollView(
                         physics: AlwaysScrollableScrollPhysics(),
                         child: Padding(
                           padding: const EdgeInsets.all(16.0),
@@ -131,7 +133,7 @@ class _EvaluateScreenState extends State<EvaluateScreen> {
                                 final date = (result['date'] ?? '-').toString();
                                 final finalGrade =
                                     (result['final_grade'] ?? '-').toString();
-                    
+
                                 return Padding(
                                   padding: const EdgeInsets.only(bottom: 12.0),
                                   child: _buildevaluationCard(
@@ -147,7 +149,7 @@ class _EvaluateScreenState extends State<EvaluateScreen> {
                           ),
                         ),
                       ),
-                  ),
+                    ),
             ),
           );
         },

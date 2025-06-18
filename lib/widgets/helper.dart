@@ -331,6 +331,9 @@
 //   danger,
 // }
 import 'package:flutter/material.dart';
+import 'package:mobile_app/app_lang.dart';
+import 'package:mobile_app/providers/global/setting_provider.dart';
+import 'package:provider/provider.dart';
 
 enum DialogType {
   primary,
@@ -418,7 +421,7 @@ void showConfirmDialog(
                           alignment: Alignment.center,
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           child: Text(
-                            "បោះបង់",
+                            AppLang.translate(lang: Provider.of<SettingProvider>(context).lang??'kh',key: 'close'),
                             style: TextStyle(
                               color: isLoading ? Colors.grey : Colors.black,
                               fontSize: 16,
@@ -472,7 +475,7 @@ void showConfirmDialog(
                                     ),
                                     const SizedBox(width: 4),
                                     Text(
-                                      "បាទ/ចាស",
+                                      AppLang.translate(lang: Provider.of<SettingProvider>(context).lang??'kh',key: 'yes'),
                                       style: TextStyle(
                                         color: type == DialogType.primary ? Colors.blue : Colors.red,
                                         fontSize: 16,
@@ -800,8 +803,8 @@ void showConfirmDialogWithNavigationOfSaleInvoice(
                     child: Container(
                       alignment: Alignment.center,
                       padding: const EdgeInsets.symmetric(vertical: 12),
-                      child: const Text(
-                        "បោះបង់",
+                      child:  Text(
+                         AppLang.translate(lang: Provider.of<SettingProvider>(context).lang??'kh',key: 'close'),
                         style: TextStyle(
                           color: Colors.black,
                           fontSize: 16,
@@ -837,7 +840,7 @@ void showConfirmDialogWithNavigationOfSaleInvoice(
                           ),
                           const SizedBox(width: 4),
                           Text(
-                            "បាទ/ចាស",
+                            AppLang.translate(lang: Provider.of<SettingProvider>(context).lang??'kh',key: 'yes'),
                             style: TextStyle(
                               color: type == DialogType.primary ? Colors.blue : Colors.red,
                               fontSize: 16,

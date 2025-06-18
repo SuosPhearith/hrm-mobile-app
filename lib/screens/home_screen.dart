@@ -112,7 +112,7 @@ class UserProfileHeader extends StatelessWidget {
       scrolledUnderElevation: 0,
       title: InkWell(
         onTap: () {
-           context.go(AppRoutes.profile);
+          context.go(AppRoutes.profile);
         },
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -215,8 +215,14 @@ class UserProfileHeader extends StatelessWidget {
               _IconButton(
                   icon: Icons.download,
                   onPressed: () {
-                    showConfirmDialog(context, 'កំពុងអភិវឌ្ឍន៍',
-                        'កំពុងអភិវឌ្ឍន៍', DialogType.primary, () {});
+                    showConfirmDialog(
+                        context,
+                        AppLang.translate(
+                            lang: lang ?? 'kh', key: 'developing'),
+                        AppLang.translate(
+                            lang: lang ?? 'kh', key: 'developing'),
+                        DialogType.primary,
+                        () {});
                   }),
               const SizedBox(width: 8.0),
               _IconButton(
@@ -967,6 +973,7 @@ class BackCardView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final lang = Provider.of<SettingProvider>(context, listen: false).lang;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
@@ -1085,7 +1092,10 @@ class BackCardView extends StatelessWidget {
                     Flexible(
                       // Use Flexible to prevent overflow
                       child: Text(
-                        'វិមានរាជរដ្ឋាភិបាល, វិថីសុីសុវត្ថិ, វត្តភ្នំ, ភ្នំពេញ',
+                        AppLang.translate(
+                            lang: lang ?? 'kh',
+                            key:
+                                'Government Palace, Sisowath Street, Wat Phnom'),
                         style: const TextStyle(
                           // color: Color(0xFF0F172A),
                           fontSize: 12,
@@ -1658,7 +1668,11 @@ class RequestCard extends StatelessWidget {
                           // ),
                           child: Text(
                             calculateDateDifference(
-                                item['start_datetime'], item['end_datetime']),
+                              item['start_datetime'],
+                              item['end_datetime'],
+                              AppLang.translate(
+                                  lang: lang ?? 'kh', key: 'days'),
+                            ),
                             style: TextStyle(
                                 fontSize: Theme.of(context)
                                     .textTheme

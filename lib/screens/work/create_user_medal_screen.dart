@@ -144,6 +144,7 @@ class _CreateUserMedalScreenState extends State<CreateUserMedalScreen> {
               apiData: provider.dataSetup,
               dataKey: 'medals',
               settingProvider: settingProvider);
+          final lang = settingProvider.lang;
           return GestureDetector(
             onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
             child: Scaffold(
@@ -168,31 +169,33 @@ class _CreateUserMedalScreenState extends State<CreateUserMedalScreen> {
               ),
               body: provider.isLoading
                   ? Center(
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  SizedBox(
-                    height: 60,
-                    width: 60,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2.0,
-                    ),
-                  ),
-                  Text(
-                    'សូមរងចាំ',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.black,
-                    ),
-                  ),
-                ],
-              ),
-            )
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          SizedBox(
+                            height: 60,
+                            width: 60,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2.0,
+                            ),
+                          ),
+                          Text(
+                            AppLang.translate(
+                                lang: lang ?? 'kh', key: 'waiting'),
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
                   : GestureDetector(
-                    onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-                    child: SafeArea(
-                      child: SingleChildScrollView(
+                      onTap: () =>
+                          FocusManager.instance.primaryFocus?.unfocus(),
+                      child: SafeArea(
+                        child: SingleChildScrollView(
                           physics: const AlwaysScrollableScrollPhysics(),
                           child: Padding(
                             padding: const EdgeInsets.all(15),
@@ -248,8 +251,11 @@ class _CreateUserMedalScreenState extends State<CreateUserMedalScreen> {
                                   //   ),
                                   // ),
                                   DateInputField(
-                                    label: 'ថ្ងៃចាប់ផ្តើម',
-                                    hint: 'សូមជ្រើសរើសកាលបរិច្ឆេទ',
+                                    label: AppLang.translate(
+                                        lang: lang ?? 'kh', key: 'start_date'),
+                                    hint: AppLang.translate(
+                                        lang: lang ?? 'kh',
+                                        key: 'please select date'),
                                     initialDate: DateTime.now(),
                                     selectedDate: _startDate,
                                     onDateSelected: (date) {
@@ -274,9 +280,9 @@ class _CreateUserMedalScreenState extends State<CreateUserMedalScreen> {
                                       });
                                     },
                                   ),
-                      
+
                                   const SizedBox(height: 16),
-                      
+
                                   // Speaking and Reading Levels
                                   _buildSelectionField(
                                     controller: _medalType,
@@ -310,8 +316,8 @@ class _CreateUserMedalScreenState extends State<CreateUserMedalScreen> {
                             ),
                           ),
                         ),
+                      ),
                     ),
-                  ),
               // bottomNavigationBar: Padding(
               //   padding: const EdgeInsets.all(15),
               //   child: SizedBox(

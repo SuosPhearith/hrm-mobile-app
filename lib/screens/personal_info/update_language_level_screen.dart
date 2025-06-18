@@ -229,6 +229,7 @@ class _UpdateLanguageLevelScreenState extends State<UpdateLanguageLevelScreen> {
               apiData: provider.dataSetup,
               dataKey: 'language_levels',
               settingProvider: settingProvider);
+              final lang = settingProvider.lang;
           return Scaffold(
             backgroundColor: Colors.white,
             appBar: AppBar(
@@ -263,7 +264,7 @@ class _UpdateLanguageLevelScreenState extends State<UpdateLanguageLevelScreen> {
                     ),
                   ),
                   Text(
-                    'សូមរងចាំ',
+                    AppLang.translate(lang: lang??'kh',key: 'waiting'),
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,

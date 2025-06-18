@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_app/app_lang.dart';
 import 'package:mobile_app/providers/global/setting_provider.dart';
 import 'package:mobile_app/providers/local/daily_provider.dart';
 import 'package:mobile_app/shared/color/colors.dart';
@@ -24,25 +25,6 @@ class DailyScreenState extends State<DailyScreen> {
   int selectedYear = DateTime.now().year;
   int selectedMonth = DateTime.now().month - 1; // 0-based for khmerMonths
   late String displayMonth;
-  final List<String> khmerMonths = [
-    'មករា',
-    'កុម្ភៈ',
-    'មីនា',
-    'មេសា',
-    'ឧសភា',
-    'មិថុនា',
-    'កក្កដា',
-    'សីហា',
-    'កញ្ញា',
-    'តុលា',
-    'វិច្ឆិកា',
-    'ធ្នូ',
-  ];
-
-  int getLastDayOfMonth(int year, int month) {
-    return DateTime(year, month + 1, 0).day;
-  }
-
   @override
   void initState() {
     super.initState();
@@ -56,6 +38,60 @@ class DailyScreenState extends State<DailyScreen> {
     _endDate = DateTime(
         selectedYear, now.month, getLastDayOfMonth(selectedYear, now.month));
   }
+
+  // Static month names that don't depend on context
+  static const List<String> khmerMonths = [
+    'មករា', // January
+    'កុម្ភៈ', // February
+    'មីនា', // March
+    'មេសា', // April
+    'ឧសភា', // May
+    'មិថុនា', // June
+    'កក្កដា', // July
+    'សីហា', // August
+    'កញ្ញា', // September
+    'តុលា', // October
+    'វិច្ឆិកា', // November
+    'ធ្នូ', // December
+  ];
+
+  static const List<String> englishMonths = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
+  ];
+
+  // Helper method to get month name based on language
+  String getMonthName(int monthIndex, String? lang) {
+    if (monthIndex < 0 || monthIndex > 11) return '';
+
+    // Use Khmer as default, English if explicitly set to 'en'
+    if (lang == 'en') {
+      return englishMonths[monthIndex];
+    } else {
+      return khmerMonths[monthIndex];
+    }
+  }
+
+  // Helper method to get both language month names
+  String getBothLanguageMonths(int monthIndex, {String separator = ' / '}) {
+    if (monthIndex < 0 || monthIndex > 11) return '';
+    return '${englishMonths[monthIndex]}$separator${khmerMonths[monthIndex]}';
+  }
+
+  int getLastDayOfMonth(int year, int month) {
+    return DateTime(year, month + 1, 0).day;
+  }
+
 
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
       GlobalKey<RefreshIndicatorState>();
@@ -73,20 +109,23 @@ class DailyScreenState extends State<DailyScreen> {
           endDate: _endDate?.toIso8601String().split('T')[0]),
       child: Consumer2<DailyProvider, SettingProvider>(
           builder: (context, scanProvider, settingProvider, child) {
+            final lang = settingProvider.lang;
         return Scaffold(
           backgroundColor: Colors.white,
           appBar: AppBar(
-            title: GestureDetector(
+            title: GestureDetector( 
               onTap: () {
                 _showMonthPicker(context, scanProvider);
               },
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
+                  //home_daily
                   Text(
                     displayMonth.isEmpty
-                        ? "ប្រចាំថ្ងៃ"
-                        : "ប្រចាំថ្ងៃ - $displayMonth",
+                        ? AppLang.translate(
+                            lang: lang ?? 'kh', key: 'home_daily')
+                        : "${AppLang.translate(lang: Provider.of<SettingProvider>(context, listen: false).lang ?? 'kh', key: 'home_daily')} - $displayMonth",
                     style: const TextStyle(
                       fontWeight: FontWeight.w500,
                       // color: Colors.black,

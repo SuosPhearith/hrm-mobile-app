@@ -49,6 +49,8 @@ class _DetailRequestScreenState extends State<DetailRequestScreen> {
           final data = provider.data?.data;
           final dataSetup = provider.dataSetup?.data;
           final dataUsers = provider.users?.data.results;
+          final lang =
+              Provider.of<SettingProvider>(context, listen: false).lang;
           return GestureDetector(
             onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
             child: Scaffold(
@@ -56,7 +58,7 @@ class _DetailRequestScreenState extends State<DetailRequestScreen> {
               backgroundColor: Colors.white,
               appBar: AppBar(
                 title: Text(
-                  'ស្នើរសុំ | ${getSafeString(safeValue: '...', value: AppLang.translate(lang: settingProvider.lang ?? 'kh', data: data?['request']?['request_status']))}',
+                  '${AppLang.translate(lang: lang ?? 'kh', key: 'home_request')} | ${getSafeString(safeValue: '...', value: AppLang.translate(lang: settingProvider.lang ?? 'kh', data: data?['request']?['request_status']))}',
                   style: TextStyle(
                     fontWeight: FontWeight.w500,
                   ),
@@ -68,8 +70,13 @@ class _DetailRequestScreenState extends State<DetailRequestScreen> {
                     padding: EdgeInsets.all(8),
                     child: IconButton(
                       onPressed: () {
-                        showConfirmDialog(context, 'កំពុងអភិវឌ្ឍន៍',
-                            'កំពុងអភិវឌ្ឍន៍', DialogType.primary, () {
+                        showConfirmDialog(
+                            context,
+                            AppLang.translate(
+                                lang: lang ?? 'kh', key: 'developing'),
+                            AppLang.translate(
+                                lang: lang ?? 'kh', key: 'developing'),
+                            DialogType.primary, () {
                           _handleDownload();
                         });
                       },
@@ -90,27 +97,28 @@ class _DetailRequestScreenState extends State<DetailRequestScreen> {
                   onRefresh: () => _refreshData(provider),
                   child: provider.isLoading
                       ? Center(
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  SizedBox(
-                    height: 60,
-                    width: 60,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2.0,
-                    ),
-                  ),
-                  Text(
-                    'សូមរងចាំ',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.black,
-                    ),
-                  ),
-                ],
-              ),
-            )
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              SizedBox(
+                                height: 60,
+                                width: 60,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2.0,
+                                ),
+                              ),
+                              Text(
+                                AppLang.translate(
+                                    lang: lang ?? 'kh', key: 'waiting'),
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
                       : SingleChildScrollView(
                           physics: const AlwaysScrollableScrollPhysics(),
                           child: Padding(
@@ -229,7 +237,9 @@ class _DetailRequestScreenState extends State<DetailRequestScreen> {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                      'ព័ត៌មានលម្អិត',
+                                      AppLang.translate(
+                                          lang: lang ?? 'kh',
+                                          key: 'info detail'),
                                       style: TextStyle(
                                         fontSize: 20,
                                         fontWeight: FontWeight.w500,
@@ -257,25 +267,35 @@ class _DetailRequestScreenState extends State<DetailRequestScreen> {
                                 // Leave Info
                                 _infoRow(
                                     Icons.calendar_today,
-                                    '${getSafeString(value: formatDate(data?['request']['start_datetime']))} ដល់ ${getSafeString(value: formatDate(data?['request']['end_datetime']))}',
-                                    'កាលបរិច្ឆេទ',
+                                    '${getSafeString(value: formatDate(data?['request']['start_datetime']))} ${AppLang.translate(lang: lang ?? 'kh', key: 'to')} ${getSafeString(value: formatDate(data?['request']['end_datetime']))}',
+                                    AppLang.translate(
+                                        lang: lang ?? 'kh', key: 'date'),
                                     trailing:
-                                        '${getSafeInteger(value: data?['request']['num_day'])} ថ្ងៃ'),
+                                        '${getSafeInteger(value: data?['request']['num_day'])} ${AppLang.translate(lang: lang ?? 'kh', key: 'days')}'),
                                 _infoRow(
-                                    Icons.category,
-                                    '${AppLang.translate(lang: settingProvider.lang ?? 'kh', data: data?['request']['request_category'])} (${AppLang.translate(lang: settingProvider.lang ?? 'kh', data: data?['request']['request_type'])})',
-                                    'ប្រភេទ'),
+                                  Icons.category,
+                                  '${AppLang.translate(lang: settingProvider.lang ?? 'kh', data: data?['request']['request_category'])} (${AppLang.translate(lang: settingProvider.lang ?? 'kh', data: data?['request']['request_type'])})',
+                                  AppLang.translate(
+                                      lang: lang ?? 'kh', key: 'type'),
+                                ),
                                 _infoRow(
-                                    Icons.chat_bubble_outline,
-                                    getSafeString(
-                                        value: data?['request']['objective']),
-                                    'មូលហេតុ'),
-                                _infoRow(Icons.picture_as_pdf,
-                                    'ឯកសារភ្ជាប់ស្នើសុំ.pdf', 'ឯកសារភ្ជាប់'),
+                                  Icons.chat_bubble_outline,
+                                  getSafeString(
+                                      value: data?['request']['objective']),
+                                  AppLang.translate(
+                                      lang: lang ?? 'kh', key: 'reson'),
+                                ),
+                                _infoRow(
+                                  Icons.picture_as_pdf,
+                                  'ឯកសារភ្ជាប់ស្នើសុំ.pdf',
+                                  AppLang.translate(
+                                      lang: lang ?? 'kh', key: 'attachment'),
+                                ),
                                 _infoRowWithAvatar(
                                   '${getSafeString(value: data?['request']?['creator']?['avatar']?['file_domain'])}${getSafeString(value: data?['request']?['creator']['avatar']['uri'])}',
                                   '${getSafeString(value: data?['request']?['creator']?['name_kh'])} (${getSafeString(value: data?['request']?['creator']?['name_en'])})',
-                                  'អ្នកបង្កើត',
+                                  AppLang.translate(
+                                      lang: lang ?? 'kh', key: 'creator'),
                                 ),
 
                                 Stack(
@@ -429,7 +449,10 @@ class _DetailRequestScreenState extends State<DetailRequestScreen> {
                                                     color: HColors.darkgrey),
                                               ),
                                               const SizedBox(width: 10),
-                                              const Text("ស្នើរសុំ",
+                                              Text(
+                                                  AppLang.translate(
+                                                      lang: lang ?? 'kh',
+                                                      key: 'home_request'),
                                                   style: TextStyle(
                                                       fontSize: 16,
                                                       fontWeight:
@@ -533,7 +556,7 @@ class _DetailRequestScreenState extends State<DetailRequestScreen> {
                                                     data: filteredUsers,
                                                     context: context,
                                                     title:
-                                                        'ជ្រើសរើស ${AppLang.translate(lang: settingProvider.lang ?? 'kh', data: record)}',
+                                                        '${AppLang.translate(lang: lang ?? 'kh', key: 'choose')} ${AppLang.translate(lang: settingProvider.lang ?? 'kh', data: record)}',
                                                     onSelected: (List<
                                                             Map<String, String>>
                                                         selectedUsers) {
@@ -628,7 +651,8 @@ class _DetailRequestScreenState extends State<DetailRequestScreen> {
                                   textCapitalization:
                                       TextCapitalization.sentences,
                                   decoration: InputDecoration(
-                                    hintText: 'Add a comment...',
+                                    hintText: AppLang.translate(
+                                        lang: lang ?? 'kh', key: 'add comment'),
                                     hintStyle: TextStyle(
                                       color: Colors.grey[500],
                                       fontSize: 14,
@@ -1112,7 +1136,12 @@ class _DetailRequestScreenState extends State<DetailRequestScreen> {
                             fontWeight: FontWeight.w400,
                           ),
                           decoration: InputDecoration(
-                            hintText: 'ស្វែងរក',
+                            hintText: AppLang.translate(
+                                lang: Provider.of<SettingProvider>(context,
+                                            listen: false)
+                                        .lang ??
+                                    'kh',
+                                key: 'search'),
                             hintStyle: TextStyle(
                               color: Colors.grey[500],
                               fontSize: 16,

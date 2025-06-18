@@ -84,7 +84,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     '${authProvider.profile?.data['user']['avatar']['file_domain']}${authProvider.profile?.data['user']['avatar']['uri']}',
                                   )
                                 : null,
-                            child: authProvider.profile?.data['user']['avatar'] ==
+                            child: authProvider.profile?.data['user']
+                                        ['avatar'] ==
                                     null
                                 ? const Icon(Icons.person,
                                     size: 30.0, color: Colors.white)
@@ -126,7 +127,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     Text(
                                       '${getSafeString(value: authProvider.profile?.data['user']?['phone_number'])} | ',
                                       style: TextStyle(
-                                          fontSize: 12, color: HColors.darkgrey),
+                                          fontSize: 12,
+                                          color: HColors.darkgrey),
                                     ),
                                     Icon(
                                       Icons.email_outlined,
@@ -138,7 +140,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           value: authProvider
                                               .profile?.data['user']?['email']),
                                       style: TextStyle(
-                                          fontSize: 12, color: HColors.darkgrey),
+                                          fontSize: 12,
+                                          color: HColors.darkgrey),
                                     ),
                                   ],
                                 )
@@ -156,7 +159,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       Text(
-                        'គណនីត្រូវបានបង្កើតឡើងនៅថ្ងៃទី 25 ខែកុម្ភៈ ឆ្នាំ 2025',
+                        AppLang.translate(
+                            lang: lang ?? 'kh', key: 'updated_at'),
                         style: TextStyle(fontSize: 12, color: HColors.darkgrey),
                       )
                     ],
@@ -169,39 +173,46 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
-                      side: BorderSide(color: HColors.darkgrey.withOpacity(0.2)),
+                      side:
+                          BorderSide(color: HColors.darkgrey.withOpacity(0.2)),
                     ),
                     child: Column(
                       children: [
                         ProfileActionItem(
                           icon: Icons.credit_card,
-                          text: 'ព័ត៌មានលម្អិត និងនាមប័ណ្ណ',
-                          trailingText: '1 ថ្ងៃ',
+                          text: AppLang.translate(
+                              lang: lang ?? 'kh',
+                              key: 'personal info and card'),
+                          // trailingText: '1 ថ្ងៃ',
+
                           onTap: () {},
                         ),
                         ProfileActionItem(
                           icon: Icons.shield_outlined,
-                          text: 'ពាក្យសម្ងាត់ និងសុវត្ថិភាព',
+                          text: AppLang.translate(
+                              lang: lang ?? 'kh', key: 'password and security'),
                           trailingIcon: Icons.check_circle,
                           isVerified: true,
                           onTap: () {},
                         ),
                         ProfileActionItem(
                           icon: Icons.translate,
-                          text: 'ភាសា',
-                          flag:
-                              Provider.of<SettingProvider>(context, listen: true)
-                                          .lang ==
-                                      'kh'
-                                  ? '🇰🇭'
-                                  : '🇺🇸',
+                          text: AppLang.translate(
+                              lang: lang ?? 'kh', key: 'language'),
+                          flag: Provider.of<SettingProvider>(context,
+                                          listen: true)
+                                      .lang ==
+                                  'name_kh'
+                              ? '🇰🇭'
+                              : '🇺🇸',
                           onTap: () {
                             _showSelectLanguageBottomSheet(context);
                           },
                         ),
                         ProfileActionItem(
                           icon: Icons.notifications_active,
-                          text: 'ការជូនដំណឹង',
+                          text: AppLang.translate(
+                              lang: lang ?? 'kh', key: 'notification'),
                           // trailingText: '9.0.0',
                           onTap: () {
                             // context.push(AppRoutes.selectLanguage);
@@ -209,27 +220,37 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                         ProfileActionItem(
                           icon: Icons.grid_view_outlined,
-                          text: 'កម្មវិធីឌីជីថល',
+                          text: AppLang.translate(
+                              lang: lang ?? 'kh', key: 'digital'),
                           onTap: () {
                             // context.push(AppRoutes.selectLanguage);
                           },
                         ),
                         ProfileActionItem(
                           icon: Icons.info_outline,
-                          text: 'អំពីកម្មវិធី',
-                          trailingText: 'ជំនាន់ 1.0.0',
+                          text: AppLang.translate(
+                              lang: lang ?? 'kh', key: 'aboute'),
+                          trailingText:
+                              '${AppLang.translate(lang: lang ?? 'kh', key: 'version')}  1.0.0',
                           onTap: () {
                             // context.push(AppRoutes.selectLanguage);
                           },
                         ),
                         ProfileActionItem(
                           icon: Icons.logout,
-                          text: 'Logout',
+                          text: AppLang.translate(
+                              lang:
+                                  Provider.of<SettingProvider>(context).lang ??
+                                      'kh',
+                              key: 'logout'),
                           onTap: () {
                             showConfirmDialog(
                               context,
-                              "បញ្ជាក់ការចាកចេញ",
-                              "តើអ្នកពិតជាប្រាកដចង់ចាកចេញមែនឬទេ?",
+                              AppLang.translate(
+                                  lang: lang ?? 'kh', key: 'confirm_logout'),
+                              AppLang.translate(
+                                  lang: lang ?? 'kh',
+                                  key: 'are you sure to logout?'),
                               DialogType.primary,
                               () async {
                                 await authProvider.handleLogout();
@@ -350,17 +371,10 @@ void _showSelectLanguageBottomSheet(BuildContext context) {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              _buildBottomSheetOption(
-                label: '🇺🇸 English',
-                onTap: () {
-                  Provider.of<SettingProvider>(context, listen: false)
-                      .handleSetLanguage('en');
-                  Navigator.pop(context);
-                },
-              ),
               const SizedBox(height: 16.0),
               _buildBottomSheetOption(
-                label: '🇰🇭 ភាសាខ្មែរ',
+                label:
+                    '🇰🇭 ${AppLang.translate(lang: Provider.of<SettingProvider>(context).lang ?? 'kh', key: 'khmer')}',
                 onTap: () {
                   Provider.of<SettingProvider>(context, listen: false)
                       .handleSetLanguage('kh');
@@ -368,6 +382,15 @@ void _showSelectLanguageBottomSheet(BuildContext context) {
                 },
               ),
               const SizedBox(height: 16.0),
+              _buildBottomSheetOption(
+                label:
+                    '🇺🇸 ${AppLang.translate(lang: Provider.of<SettingProvider>(context).lang ?? 'kh', key: 'english')}',
+                onTap: () {
+                  Provider.of<SettingProvider>(context, listen: false)
+                      .handleSetLanguage('en');
+                  Navigator.pop(context);
+                },
+              ),
             ],
           ),
         ),

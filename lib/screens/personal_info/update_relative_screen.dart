@@ -260,7 +260,7 @@ class _UpdateRelativeScreenState extends State<UpdateRelativeScreen> {
             builder: (context, provider, settingProvider, child) {
           // Build relative types from API data
           final relativeTypes = _buildRelativeTypes(provider, settingProvider);
-
+          final lang = settingProvider.lang;
           // Load existing data when provider has data
           if (!provider.isLoading && provider.data != null) {
             _loadExistingData(provider, settingProvider);
@@ -271,7 +271,7 @@ class _UpdateRelativeScreenState extends State<UpdateRelativeScreen> {
 
             appBar: AppBar(
               title: Text(AppLang.translate(
-                  lang: 'kh', key: 'user_info_family_update')),
+                  lang:lang?? 'kh', key: 'user_info_family_update')),
               centerTitle: true,
               actions: [
                 Padding(
@@ -288,7 +288,7 @@ class _UpdateRelativeScreenState extends State<UpdateRelativeScreen> {
               bottom: CustomHeader(),
             ),
             body: provider.isLoading
-                ? const Center(
+                ? Center(
                     child: Stack(
                       alignment: Alignment.center,
                       children: [
@@ -300,7 +300,7 @@ class _UpdateRelativeScreenState extends State<UpdateRelativeScreen> {
                           ),
                         ),
                         Text(
-                          'សូមរងចាំ',
+                          AppLang.translate(lang: lang??'kh',key: 'waiting'),
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
